@@ -7,7 +7,9 @@ export const baseResponse = {
     USER_USERID_NOT_EXIST : { "isSuccess": false, "code": 2002, "message": "해당 유저가 존재하지 않습니다." },
 
 
-    POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3002, "message": "해당 게시글이 존재하지 않습니다." },
+    POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 2003, "message": "해당 게시글이 존재하지 않습니다." },
+
+    PROFILE_INFO_NOT_EXIST : { "isSuccess": false, "code": 2004, "message": "유저 프로필 정보가 존재하지 않습니다." },
 
 
     //Connection, Transaction 등의 서버 오류
