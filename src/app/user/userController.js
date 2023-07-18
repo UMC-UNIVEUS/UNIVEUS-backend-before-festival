@@ -8,7 +8,7 @@ import {
 } from './userProvider';
 
 
-export const getUserDefaultProfile = async (req, res) => {
+export const getUserProfile = async (req, res) => {
     const {id} = req.params;
 
     // 빈 아이디 체크
@@ -19,13 +19,6 @@ export const getUserDefaultProfile = async (req, res) => {
     return res.send(getAllResponse);
 };
 
-export const getUserIntroProfile = async (req, res) => {
-    const {id} = req.params;
-
-    if (!id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
-    const getIntroResponse = await showUserIntroProfile(id, 0);
-    return res.send(getIntroResponse);
-};
 
     export const postProfile = async (req, res) => {
     const defaultInfo = {

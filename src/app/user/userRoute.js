@@ -2,15 +2,13 @@
 
 import express from 'express';
 import {
-    getUserDefaultProfile,
-    getUserIntroProfile,
+    getUserProfile,
     postUserIntroProfile
 } from "./userController";
 
 const userRouter = express.Router();
 
-userRouter.get('/profile/:id', getUserDefaultProfile);
-userRouter.get('/profile/:id', getUserIntroProfile);
+userRouter.get('/profile/:id', getUserProfile);
 // userRouter.post('/profile/:id', postUserIntroProfile)
 
 export default userRouter;
