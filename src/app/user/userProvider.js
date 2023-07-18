@@ -16,5 +16,8 @@ export const showUserDefaultProfile= async (id) => {
 export const showUserIntroProfile = async (id) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const showUserIntroProfileResult = selectUserIntroProfilebyId(connection, id);
+
+    connection.release();
+    return showUserIntroProfileResult;
 }
 

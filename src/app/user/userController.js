@@ -14,7 +14,9 @@ export const getUserDefaultProfile = async (req, res) => {
     // 빈 아이디 체크
     if (!id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
     const getDefaultResponse = await showUserDefaultProfile(id, 0);
-    return res.send(getDefaultResponse);
+    const getIntroResponse = await showUserIntroProfile(id, 0);
+    const getAllResponse = {getDefaultResponse, getIntroResponse};
+    return res.send(getAllResponse);
 };
 
 export const getUserIntroProfile = async (req, res) => {

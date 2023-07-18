@@ -6,7 +6,7 @@ export const selectUserDefaultProfilebyId = async (connection, id) => {
         SELECT nickname, profile_img, major, class_of, 
                participant_num, reported_num FROM user WHERE user_id = ?;`;
 
-    const DefaultprofileRows = await connection.query(selectUserDefaultProfilebyIdquery, id);
+    const [DefaultprofileRows] = await connection.query(selectUserDefaultProfilebyIdquery, id);
     return DefaultprofileRows;
 
 };
@@ -15,7 +15,7 @@ export const selectUserIntroProfilebyId = async (connection, id) => {
     const selectUserIntroProfilebyIdquery = `
     SELECT nickname, gender, profile_img, interest, introduce FROM user WHERE user_id = ?;`;
 
-    const IntroprofileRows = await connection.query(selectUserDefaultProfilebyIdquery, id);
+    const [IntroprofileRows] = await connection.query(selectUserIntroProfilebyIdquery, id);
     return IntroprofileRows;
 
 };

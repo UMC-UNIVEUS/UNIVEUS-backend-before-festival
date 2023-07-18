@@ -9,7 +9,8 @@ import {
 
 const userRouter = express.Router();
 
-userRouter.get('/profile/:id', getUserDefaultProfile, getUserIntroProfile);
+userRouter.get('/profile/:id', getUserDefaultProfile);
+userRouter.get('/profile/:id', getUserIntroProfile);
 // userRouter.post('/profile/:id', postUserIntroProfile)
 
 export default userRouter;
