@@ -1,12 +1,20 @@
 import pool from '../../../config/database';
-import { selectUserProfilebyId } from './userDao';
+import {
+    selectUserDefaultProfilebyId,
+    selectUserIntroProfilebyId
+} from './userDao';
 
-export const showUserProfile = async (id) => {
+export const showUserDefaultProfile= async (id) => {
     const connection = await pool.getConnection(async (conn) => conn);
-    const showUserProfileResult = selectUserProfilebyId(connection, id);
+    const showUserDefaultProfileResult = selectUserDefaultProfilebyId(connection, id);
 
     connection.release();
-    return showUserProfileResult;
+    return showUserDefaultProfileResult;
 
+}
+
+export const showUserIntroProfile = async (id) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const showUserIntroProfileResult = selectUserIntroProfilebyId(connection, id);
 }
 

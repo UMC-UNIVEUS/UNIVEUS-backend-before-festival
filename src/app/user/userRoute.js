@@ -1,10 +1,15 @@
 /*Request에서 보낸 라우팅 처리*/
 
 import express from 'express';
-import { getUserProfileListAll } from "./userController";
+import {
+    getUserDefaultProfile,
+    getUserIntroProfile,
+    postUserIntroProfile
+} from "./userController";
 
 const userRouter = express.Router();
 
-userRouter.get('/profile/:id', getUserProfileListAll);
+userRouter.get('/profile/:id', getUserDefaultProfile, getUserIntroProfile);
+// userRouter.post('/profile/:id', postUserIntroProfile)
 
 export default userRouter;
