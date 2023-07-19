@@ -16,6 +16,7 @@ export const getPost = async(req, res) => {
        const Post = await retrievePost(post_id); 
        const Participant = await retrieveParticipant(post_id); 
        
+
        if(Post){ // Post가 존재한다면
            return res.status(200).json(response(baseResponse.SUCCESS, {Post,Participant}));
        } 
