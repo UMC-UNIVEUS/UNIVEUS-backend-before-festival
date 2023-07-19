@@ -8,6 +8,7 @@ import userRouter from "../src/app/user/userRoute";
 
 const app = express();  
 
+dotenv.config();
 
 app.use(compression()); 
 app.use(express.json());   
@@ -17,6 +18,7 @@ app.use(cors());
 
 app.use('/user', userRouter);
 
-dotenv.config();
+
+
 
 export default app;

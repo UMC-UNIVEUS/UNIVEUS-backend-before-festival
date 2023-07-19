@@ -1,2 +1,30 @@
-/*데이터베이스와 상호작용하여 사용자 관련 기능을 수행
-(CRUD에 해당하는 서버 로직 처리) */
+import { insertUser, insertToken } from "./userDao"
+import pool from "../../../config/database"
+
+export const createUser = async(userEmail) => {
+    try {
+        const connection = await pool.getConnection(async conn => conn);
+        const createUserResult = await insertUser(connection,userEmail);
+        connection.release();
+        return createUserResult; 
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+export const insertRefreshToken = async(refreshToken, email) => {
+    try {
+        console.log(email)
+        const connection = await pool.getConnection(async conn => conn);
+        const insertRefreshTokenResult = await insertToken(connection, refreshToken, email);
+        connection.release();
+        return insertRefreshTokenResult; 
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+export const validEmailCheck = (email) => {
+    const pattern = /^[a-zA-Z0-9_.+-]+@kyonggi\.ac\.kr$/i;
+    return pattern.test(email);
+}
