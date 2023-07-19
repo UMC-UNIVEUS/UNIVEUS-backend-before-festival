@@ -31,31 +31,42 @@ export const getPost = async(req, res) => {
 
 /**
  * API name : 게시글 작성
- * POST: /post/{post_id}
+ * POST: /post
  */
 
 export const postPost = async(req, res) => {
     try{
-        const {user_id, title, category, content,  scrapes, location, meeting_date, 
-            end_date, current_people, limit_people, openchat, post_status} = req.body;
+        const {user_id, category, limit_people, location, meeting_date, openchat, 
+            end_date, post_status, title, content} = req.body;
         
-        const postPostResult = await createPost(user_id, title, category, content, scrapes, location, meeting_date, 
-            end_date, current_people, limit_people, openchat, post_status);
+        const postPostResult = await createPost(user_id, category, limit_people, location, meeting_date, openchat, 
+            end_date, post_status, title, content);
         
         return res.status(200).json(response(baseResponse.SUCCESS, postPostResult));
     }
     catch(error){
         return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
     }
-
 };
 
-/**
+
+/**3
  * API name : 게시글 수정
  * PUT: /post/{post_id}
  */
-export const updatePost =  async(req, res) => {
-	
+export const patchPost =  async(req, res) => {
+	try{
+        const {category, limit_people, location, meeting_date, openchat, 
+            end_date, post_status, title,content} = req.body;
+        
+        const patchPostResult = await editPost(category, limit_people, location, meeting_date, openchat, 
+            end_date, post_status, title,content);
+        
+        return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
+    }
+    catch(error){
+        return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
+    }
 };
 
 /**

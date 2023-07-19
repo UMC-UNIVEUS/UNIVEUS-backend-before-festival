@@ -2,15 +2,15 @@
 (CRUD에 해당하는 서버 로직 처리) */
 
 import pool from "../../../config/database"
-import {baseResponse, response, errResponse } from "../../../config/response";
+import { baseResponse, response, errResponse } from "../../../config/response";
 import { insertPost } from "./postDao";
 
 
-export const createPost = async(user_id, title, category, content, scrapes, location, meeting_date, 
-    end_date, current_people, limit_people, openchat, post_status) =>{
+export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, 
+    end_date, post_status, title, content) =>{
     try{
-        const insertPostParams =[user_id, title, category, content, scrapes, location, meeting_date, 
-            end_date, current_people, limit_people, openchat, post_status]; // 이 부분에서 [] 가 {}로 바뀌면 Db에러가 발생함.
+        const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
+            end_date, post_status, title, content]; 
     
         const connection = await pool.getConnection(async conn => conn);
         const createpostResult = await insertPost(connection,insertPostParams);
@@ -23,4 +23,24 @@ export const createPost = async(user_id, title, category, content, scrapes, loca
     catch(error){
         return errResponse(baseResponse.DB_ERROR)
     }
+};
+
+export const updatePost = async(category, limit_people, location, meeting_date, openchat, 
+    end_date, post_status, title,content)=>{
+        try{
+            const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
+                end_date, post_status, title, content]; 
+        
+            const connection = await pool.getConnection(async conn => conn);
+            const createpostResult = await insertPost(connection,insertPostParams);
+            console.log(createpostResult);
+            
+            connection.release();
+            
+            return response(baseResponse.SUCCESS);
+        }
+        catch(error){
+            return errResponse(baseResponse.DB_ERROR)
+        }
+
 };
