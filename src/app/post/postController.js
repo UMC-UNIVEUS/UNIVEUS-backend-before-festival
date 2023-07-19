@@ -36,11 +36,11 @@ export const getPost = async(req, res) => {
 
 export const postPost = async(req, res) => {
     try{
-        const {post_id, user_id, title,category,content,created_at,scrapes,location,
-            meeting_date,end_date,current_people,limit_people,openchat,post_status} = req.body;
-    
-        const postPostResult = await createPost(post_id, user_id, title,category,content,created_at,scrapes,location,
-            meeting_date,end_date,current_people,limit_people,openchat,post_status);
+        const {user_id, title, category, content,  scrapes, location, meeting_date, 
+            end_date, current_people, limit_people, openchat, post_status} = req.body;
+        
+        const postPostResult = await createPost(user_id, title, category, content, scrapes, location, meeting_date, 
+            end_date, current_people, limit_people, openchat, post_status);
         
         return res.status(200).json(response(baseResponse.SUCCESS, postPostResult));
     }

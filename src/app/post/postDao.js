@@ -23,14 +23,15 @@ export const selectParticipant = async(connection, post_id)=>{
 };
 
 
-export const insertPost = async(connection, insertPostInfoParams)=>{
+export const insertPost = async(connection, insertPostParams)=>{
         const postPostQuery = `
-        INSERT INTO post (user_id, title, category, content, created_at, scrapes, location,
-            meeting_date, end_date, current_people, limit_people, openchat, post_status) 
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
+        INSERT INTO post(user_id, title, category, content, created_at,
+            scrapes, location, meeting_date, end_date, current_people,
+            limit_people, openchat, post_status) 
+        VALUES (?,?,?,?,now(), ?,?,?,?,?, ?,?,?);
 
     `;
-    const [insertPostInfoRow] = await connection.query(postPostQuery, insertPostInfoParams);
-    return insertPostInfoRow;
+    const insertPostRow = await connection.query(postPostQuery, insertPostParams);
+    return insertPostRow;
 };
  

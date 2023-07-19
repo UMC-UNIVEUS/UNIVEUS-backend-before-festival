@@ -5,17 +5,19 @@ import pool from "../../../config/database"
 import {baseResponse, response, errResponse } from "../../../config/response";
 import { insertPost } from "./postDao";
 
-export const createPost = async(post_id, user_id, title,category,content,created_at,scrapes,location,
-    meeting_date,end_date,current_people,limit_people,openchat,post_status) =>{
+
+export const createPost = async(user_id, title, category, content, scrapes, location, meeting_date, 
+    end_date, current_people, limit_people, openchat, post_status) =>{
     try{
-        const insertPostInfoParams ={post_id, user_id, title,category,content,created_at,scrapes,location,
-            meeting_date,end_date,current_people,limit_people,openchat,post_status};
+        const insertPostParams =[user_id, title, category, content, scrapes, location, meeting_date, 
+            end_date, current_people, limit_people, openchat, post_status]; // 이 부분에서 [] 가 {}로 바뀌면 Db에러가 발생함.
     
         const connection = await pool.getConnection(async conn => conn);
-        const createpostResult = await insertPost(connection,insertPostInfoParams);
-    
+        const createpostResult = await insertPost(connection,insertPostParams);
+        console.log(createpostResult);
+        
         connection.release();
-    
+        
         return response(baseResponse.SUCCESS);
     }
     catch(error){
