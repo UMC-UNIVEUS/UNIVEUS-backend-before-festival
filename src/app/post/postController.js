@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse } from "../../../config/response";
 import { retrievePost, retrieveParticipant} from "./postProvider";
-import { createPost, editPost} from "./postService";
+import { createPost, editPost, removePost} from "./postService";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -10,7 +10,7 @@ import { createPost, editPost} from "./postService";
  */
 export const getPost = async(req, res) => {
 	
-    const {params:{post_id}} = req;
+    const {post_id} = req.params;
 
     try{
        const Post = await retrievePost(post_id); 
@@ -52,7 +52,7 @@ export const postPost = async(req, res) => {
 
 /**3
  * API name : 게시글 수정
- * PUT: /post/{post_id}
+ * PUT: /post/{post_id} 
  */
 export const patchPost =  async(req, res) => {
 	try{
@@ -82,5 +82,20 @@ export const patchPost =  async(req, res) => {
  * DELETE: /post/{post_id}
  */
 export const deletePost =  async(req, res) => {
-	
+	try{
+        const {post_id} = req.params;
+        
+        const Post = await retrievePost(post_id); 
+        
+        if(Post){ // Post가 존재한다면
+            const deletePostResult = await removePost(post_id);
+            return res.status(200).json(response(baseResponse.SUCCESS, deletePostResult));
+        } 
+        else{ 
+            return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))        
+        }
+    }
+    catch(error){
+        return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
+    }
 };

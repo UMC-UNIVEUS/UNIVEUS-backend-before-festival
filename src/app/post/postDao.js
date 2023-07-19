@@ -50,7 +50,17 @@ export const updatePost = async(connection, updatePostParams)=>{
         updated_at = now()
         WHERE post_id =?;
     `;
-const updatePostRow = await connection.query(patchPostQuery, updatePostParams);
-return updatePostRow;
+    const updatePostRow = await connection.query(patchPostQuery, updatePostParams);
+    return updatePostRow;
+};
+
+export const erasePost = async(connection, deletePostParams)=>{
+    const deletePostQuery = `
+        DELETE 
+        FROM post
+        WHERE post_id = ?;
+    `;
+    const deletePostRow = await connection.query(deletePostQuery, deletePostParams);
+    return deletePostRow;
 };
  

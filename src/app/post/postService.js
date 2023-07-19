@@ -3,7 +3,7 @@
 
 import pool from "../../../config/database"
 import { baseResponse, response, errResponse } from "../../../config/response";
-import { insertPost, updatePost } from "./postDao";
+import { insertPost, updatePost, erasePost } from "./postDao";
 
 
 export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, 
@@ -34,6 +34,23 @@ export const editPost = async(category, limit_people, location, meeting_date, op
             const connection = await pool.getConnection(async conn => conn);
             const editPostResult = await updatePost(connection,updatePostParams); 
             console.log(editPostResult);
+            
+            connection.release();
+            
+            return response(baseResponse.SUCCESS);
+        }
+        catch(error){
+            return errResponse(baseResponse.DB_ERROR)
+        }
+};
+
+export const removePost = async(post_id)=>{
+        try{
+            const deletePostParams =[post_id]; 
+        
+            const connection = await pool.getConnection(async conn => conn);
+            const removePostResult = await erasePost(connection,deletePostParams); 
+            console.log(removePostResult);
             
             connection.release();
             
