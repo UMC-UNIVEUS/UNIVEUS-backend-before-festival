@@ -1,12 +1,11 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse } from "../../../config/response";
-import { retrievePost} from "./postProvider";
+import { retrievePost, retrieveParticipant} from "./postProvider";
 import { createPost} from "./postService";
 
-
 /**
- * API name : 게시글 조회
+ * API name : 게시글 조회(게시글 + 참여자 목록)
  * GET: /post/{post_id}
  */
 export const getPost = async(req, res) => {
@@ -15,9 +14,11 @@ export const getPost = async(req, res) => {
 
     try{
        const Post = await retrievePost(post_id); 
+       const Participant = await retrieveParticipant(post_id); 
+       
 
        if(Post){
-           return res.status(200).json(response(baseResponse.SUCCESS, Post));
+           return res.status(200).json(response(baseResponse.SUCCESS, {Post,Participant}));
        } 
        else{ 
            return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))

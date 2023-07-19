@@ -8,8 +8,20 @@ export const selectPost = async(connection, post_id)=>{
     `;
     const [PostRow] = await connection.query(selectPostQuery, post_id);
     return PostRow;
-
 };
+
+export const selectParticipant = async(connection, post_id)=>{
+    const selectParticipantQuery = `
+        SELECT user.gender, user.nickname, user.major, user.class_of  
+        FROM participant_users
+        INNER JOIN user
+        ON participant_users.user_id = user.user_id
+        WHERE post_id = ?;
+    `;
+    const [ParticipantRow] = await connection.query(selectParticipantQuery, post_id);
+    return ParticipantRow;
+};
+
 
 export const insertPost = async(connection, insertPostInfoParams)=>{
         const postPostQuery = `

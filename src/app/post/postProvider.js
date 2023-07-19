@@ -1,5 +1,5 @@
 import pool from "../../../config/database"
-import { selectPost } from "./postDao";
+import { selectPost, selectParticipant } from "./postDao";
 
 export const retrievePost = async(post_id) =>{
     
@@ -16,5 +16,18 @@ export const retrievePost = async(post_id) =>{
     }
 };
 
+export const retrieveParticipant = async(post_id)=>{
+    try{
+        const connection = await pool.getConnection(async conn => conn);
+        const participantResult = await selectParticipant(connection,post_id);
+    
+        connection.release();
+    
+        return participantResult;
+    }
+    catch(error){
+        return errResponse(baseResponse.DB_ERROR)
+    }
+};
 
 
