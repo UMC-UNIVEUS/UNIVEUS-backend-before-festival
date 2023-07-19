@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse } from "../../../config/response";
 import { retrievePost, retrieveParticipant} from "./postProvider";
-import { createPost} from "./postService";
+import { createPost, editPost} from "./postService";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -56,11 +56,12 @@ export const postPost = async(req, res) => {
  */
 export const patchPost =  async(req, res) => {
 	try{
+        const {post_id} = req.params;
         const {category, limit_people, location, meeting_date, openchat, 
             end_date, post_status, title,content} = req.body;
         
         const patchPostResult = await editPost(category, limit_people, location, meeting_date, openchat, 
-            end_date, post_status, title,content);
+            end_date, post_status, title,content, post_id);
         
         return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
     }

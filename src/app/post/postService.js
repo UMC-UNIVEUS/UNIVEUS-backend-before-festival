@@ -3,7 +3,7 @@
 
 import pool from "../../../config/database"
 import { baseResponse, response, errResponse } from "../../../config/response";
-import { insertPost } from "./postDao";
+import { insertPost, updatePost } from "./postDao";
 
 
 export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, 
@@ -25,15 +25,15 @@ export const createPost = async(user_id, category, limit_people, location, meeti
     }
 };
 
-export const updatePost = async(category, limit_people, location, meeting_date, openchat, 
-    end_date, post_status, title,content)=>{
+export const editPost = async(category, limit_people, location, meeting_date, openchat, 
+    end_date, post_status, title,content, post_id)=>{
         try{
-            const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
-                end_date, post_status, title, content]; 
+            const updatePostParams =[category, limit_people, location, meeting_date, openchat, 
+                end_date, post_status, title,content,post_id]; 
         
             const connection = await pool.getConnection(async conn => conn);
-            const createpostResult = await insertPost(connection,insertPostParams);
-            console.log(createpostResult);
+            const editPostResult = await updatePost(connection,updatePostParams); 
+            console.log(editPostResult);
             
             connection.release();
             
@@ -42,5 +42,4 @@ export const updatePost = async(category, limit_people, location, meeting_date, 
         catch(error){
             return errResponse(baseResponse.DB_ERROR)
         }
-
 };

@@ -24,14 +24,33 @@ export const selectParticipant = async(connection, post_id)=>{
 
 
 export const insertPost = async(connection, insertPostParams)=>{
-        const postPostQuery = `
+    const postPostQuery = `
         INSERT INTO post(user_id, category, current_people, limit_people, location, 
-            meeting_date, openchat, end_date, post_status, title, 
-            content, created_at) 
+        meeting_date, openchat, end_date, post_status, title, 
+        content, created_at) 
         VALUES (?,?,1,?,?, ?,?,?,?,?, ?,now());
 
     `;
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
     return insertPostRow;
+};
+
+export const updatePost = async(connection, updatePostParams)=>{
+    const patchPostQuery = `
+        UPDATE post 
+        SET category =?,
+        limit_people =?,
+        location =?, 
+        meeting_date =?, 
+        openchat =?, 
+        end_date =?, 
+        post_status =?, 
+        title =?,
+        content =?,
+        updated_at = now()
+        WHERE post_id =?;
+    `;
+const updatePostRow = await connection.query(patchPostQuery, updatePostParams);
+return updatePostRow;
 };
  
