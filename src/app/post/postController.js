@@ -17,7 +17,7 @@ export const getPost = async(req, res) => {
        const Participant = await retrieveParticipant(post_id); 
        
 
-       if(Post){
+       if(Post){ // Post가 존재한다면
            return res.status(200).json(response(baseResponse.SUCCESS, {Post,Participant}));
        } 
        else{ 
@@ -61,9 +61,16 @@ export const patchPost =  async(req, res) => {
             end_date, post_status, title,content} = req.body;
         
         const patchPostResult = await editPost(category, limit_people, location, meeting_date, openchat, 
-            end_date, post_status, title,content, post_id);
+            end_date, post_status, title,content, post_id);   
+        const Post = await retrievePost(post_id); 
         
-        return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
+        if(Post){ // Post가 존재한다면
+            return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
+        } 
+        else{ 
+            return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        }
+       
     }
     catch(error){
         return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
