@@ -9,24 +9,23 @@ import {
 
 
 export const getUserProfile = async (req, res) => {
-    const {id} = req.params;
+    const {user_id} = req.params;
     // 빈 아이디 체크
-    if (!id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
-    try {
-        const getDefaultResponse = await showUserDefaultProfile(id, 0);
-        if(!getDefaultResponse[0]) {
-            return res.status(404).json(response(baseResponse.PROFILE_INFO_NOT_EXIST))
-        };
-        const getIntroResponse = await showUserIntroProfile(id, 0);
-        if(!getIntroResponse[0]) {
-            return res.status(404).json(response(baseResponse.PROFILE_INFO_NOT_EXIST))
-        };
+    if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+        const getDefaultResponse = await showUserDefaultProfile(user_id, 0);
+        const getIntroResponse = await showUserIntroProfile(user_id, 0);
+    if(getDefaultResponse.isSuccess == false || getIntroResponse.isSuccess == false) { // default 프로필 정보가 없거나, intro 프로필 정보가 없는 경우
+        if(getIntroResponse.isSuccess != false) { // intro 프로필 정보는 있는 경우
+            return res.status(404).json(errResponse(baseResponse.PROFILE_DEFAULT_INFO_NOT_EXIST)); // default 프로필 정보가 없음을 응답.
+        } else if (getDefaultResponse.isSuccess != false) { // default 프로필 정보는 있는 경우
+            return res.status(404).json(errResponse(baseResponse.PROFILE_INTRO_INFO_NOT_EXIST)); // intro 프로필 정보가 없음을 응답.
+        } else { // default 프로필 정보와 intro 프로필 정보 둘 다 없는 경우
+            return res.status(404).json(errResponse(baseResponse.PROFILE_INFO_NOT_EXIST)); // (default, intro)프로필 정보가 아예 없음을 응답.
+        }
+    } else { // 프로필 정보 둘 다 존재하는 경우.
         const getAllResponse = {getDefaultResponse, getIntroResponse};
         return res.status(200).json(response(baseResponse.SUCCESS, getAllResponse));
     }
-    catch(error){
-            return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
-        }
 };
 
 

@@ -11,6 +11,9 @@ export const baseResponse = {
 
     PROFILE_INFO_NOT_EXIST : { "isSuccess": false, "code": 2004, "message": "유저 프로필 정보가 존재하지 않습니다." },
 
+    PROFILE_DEFAULT_INFO_NOT_EXIST : { "isSuccess": false, "code": 2005, "message": "유저 기본 프로필 정보가 존재하지 않습니다." },
+
+    PROFILE_INTRO_INFO_NOT_EXIST : { "isSuccess": false, "code": 2006, "message": "유저 자기소개 프로필 정보가 존재하지 않습니다." },
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

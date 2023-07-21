@@ -8,7 +8,7 @@ import {
 
 const userRouter = express.Router();
 
-userRouter.get('/profile/:id', getUserProfile);
+userRouter.get('/profile/:user_id', getUserProfile);
 // userRouter.post('/profile/:id', postUserIntroProfile)
 
 export default userRouter;
