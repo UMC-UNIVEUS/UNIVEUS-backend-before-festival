@@ -1,5 +1,13 @@
 /*User 관련 데이터베이스, Query가 작성되어 있는 곳*/
 
+export const selectUserbyId = async (connetion, user_id) => {
+    const selectUserbyIdQuery = `
+  SELECT * FROM user WHERE user_id = ?;`;
+
+    const userRows = await connetion.query(selectUserbyIdQuery, user_id);
+    return userRows;
+};
+
 
 export const selectUserDefaultProfilebyId = async (connection, user_id) => {
     const selectUserDefaultProfilebyIdquery = `
@@ -19,4 +27,14 @@ export const selectUserIntroProfilebyId = async (connection, user_id) => {
     return IntroprofileRows;
 
 };
+
+export const modifyProfilebyId = async (connection, params) => {
+    const modifyProfileQuery = `
+UPDATE user
+SET nickname = ?, gender = ?, profile_img = ?, interest = ?, introduce = ?
+WHERE user_id = ?;`;
+
+    const modifyProfileRows = await connection.query(modifyProfileQuery, params);
+    return modifyProfileRows;
+}
 

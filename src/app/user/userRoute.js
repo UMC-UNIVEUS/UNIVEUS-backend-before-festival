@@ -3,12 +3,11 @@
 import express from 'express';
 import {
     getUserProfile,
-    postUserIntroProfile
+    putUserProfile
 } from "./userController";
 
 const userRouter = express.Router();
 
 userRouter.get('/profile/:user_id', getUserProfile);
-// userRouter.post('/profile/:id', postUserIntroProfile)
-
+userRouter.put('/profile/:user_id', putUserProfile);
 export default userRouter;
