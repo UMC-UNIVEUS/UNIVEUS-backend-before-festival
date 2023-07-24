@@ -8,7 +8,7 @@ export const baseResponse = {
          
      POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3002, "message": "해당 게시글이 존재하지 않습니다." },
 
-     COMMENT_COMMENTID_NOT_EXIST : { "isSuccess": false, "code": 3003, "message": "해당 게시글에 댓글이 존재하지 않습니다." },
+     COMMENT_COMMENTID_NOT_EXIST : { "isSuccess": false, "code": 3003, "message": "댓글이 존재하지 않습니다." },
     
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

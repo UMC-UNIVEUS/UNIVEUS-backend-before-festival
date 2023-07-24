@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse } from "../../../config/response";
 import {retrievePost} from "../post/postProvider";
-import {retrieveComment} from "./commProvider";
+import {retrieveComment, retrieveOneComment} from "./commProvider";
 import {createComment, removeComment} from "./commService";
 
 /**
@@ -19,7 +19,7 @@ export const getComment = async(req, res) => {
        if(Post){ // Post가 존재한다면
         const Comment = await retrieveComment(post_id); 
        
-        if(Comment[0]){ // Comment가 존재한다면
+        if(Comment[0]){ // post에 Comment가 한 개라도 존재한다면
             
             return res.status(200).json(response(baseResponse.SUCCESS, Comment));
         }
@@ -30,6 +30,28 @@ export const getComment = async(req, res) => {
        else{ 
            return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
        }
+    }
+    catch(error){
+       return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
+    }
+};
+/**
+ * API name : 댓글 개별 조회 
+ * GET: /comments/one_comment/{comments_id}
+ */
+ export const getOneComment = async(req, res) => {
+	
+    const {comments_id} = req.params;
+
+    try{
+        const Comment = await retrieveOneComment(comments_id); 
+       
+        if(Comment[0]){ // Comment가 존재한다면
+            return res.status(200).json(response(baseResponse.SUCCESS, Comment));
+        }
+        else{
+            return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        }
     }
     catch(error){
        return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
@@ -59,7 +81,6 @@ export const postComment = async(req, res) => {
         catch(error){
             return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
         }
-
 };
 
 /**
@@ -78,5 +99,4 @@ export const deleteComment = async(req, res) => {
         catch(error){
             return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
         }
-   
 };
