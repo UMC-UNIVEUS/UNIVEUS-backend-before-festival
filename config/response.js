@@ -5,7 +5,7 @@ export const baseResponse = {
 
      //유저 관련 오류
      USER_USERID_NOT_EXIST : { "isSuccess": false, "code": 2002, "message": "해당 유저가 존재하지 않습니다." },
-         
+      
      POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3002, "message": "해당 게시글이 존재하지 않습니다." },
 
      COMMENT_COMMENTID_NOT_EXIST : { "isSuccess": false, "code": 3003, "message": "댓글이 존재하지 않습니다." },

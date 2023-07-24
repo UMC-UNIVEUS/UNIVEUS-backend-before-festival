@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import compression from "compression";
 import methodOverride from "method-override";
+import postRouter from "../src/app/post/postRoute";
 import commentRouter from "../src/app/comment/commRoute";
 
 
@@ -15,6 +16,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride());
 app.use(cors());
 
+app.use('/post',postRouter);
 app.use('/comments',commentRouter);
 
 
