@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse } from "../../../config/response";
-import { retrievePost} from "../post/postProvider";
-import { retrieveComment} from "./commProvider";
+import {retrievePost} from "../post/postProvider";
+import {retrieveComment} from "./commProvider";
+import {createComment} from "./commService";
 
 /**
  * API name : 댓글 조회
@@ -15,7 +16,6 @@ export const getComment = async(req, res) => {
     try{
        const Post = await retrievePost(post_id); 
        
-
        if(Post){ // Post가 존재한다면
         const Comment = await retrieveComment(post_id); 
        
@@ -40,9 +40,26 @@ export const getComment = async(req, res) => {
  * API name : 댓글 작성
  * POST: /comments/{post_id}
  */
-
 export const postComment = async(req, res) => {
-   
+
+        const {post_id} = req.params;
+        const {user_id, contents} = req.body; //user_id(댓글 작성자)와 contents(댓글 내용)를 body로 받아옴
+        try{
+            const Post = await retrievePost(post_id); 
+            
+            if(Post){ // Post가 존재한다면
+                const postCommentResult = await createComment(post_id, user_id, contents);
+                
+                return res.status(200).json(response(baseResponse.SUCCESS, postCommentResult));
+            }
+            else{
+                return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+            }
+        }
+        catch(error){
+            return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
+        }
+
 };
 
 /**

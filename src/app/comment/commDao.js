@@ -11,3 +11,13 @@ export const selectComment = async(connection, post_id) => {
     const [CommentRow] = await connection.query(selectCommentQuery, post_id);
     return CommentRow;
 };
+
+export const insertComment = async(connection, insertPostParams) => {
+    const postCommentQuery = `
+        INSERT INTO comments(post_id, user_id, contents, created_at) 
+        VALUES (?,?,?,now());
+    `;
+
+    const insertCommentRow = await connection.query(postCommentQuery, insertPostParams);
+    return insertCommentRow;
+};
