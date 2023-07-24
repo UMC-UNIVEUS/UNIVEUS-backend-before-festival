@@ -32,9 +32,9 @@ export const modifyProfilebyId = async (connection, params) => {
     const modifyProfileQuery = `
 UPDATE user
 SET nickname = ?, gender = ?, profile_img = ?, interest = ?, introduce = ?
-WHERE user_id = ?;`;
+WHERE user_id = ? ;`;
 
     const modifyProfileRows = await connection.query(modifyProfileQuery, params);
     return modifyProfileRows;
-}
+};
 
