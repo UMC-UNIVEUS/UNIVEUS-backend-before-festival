@@ -15,6 +15,8 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride());
 app.use(cors());
 
+app.use('/post',postRouter);
+app.use('/comments',commentRouter);
 
 app.use('/mypage', userRouter);
 
