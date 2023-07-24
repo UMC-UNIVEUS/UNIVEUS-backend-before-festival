@@ -91,10 +91,16 @@ export const deleteComment = async(req, res) => {
     
         try{
             const {comments_id} = req.params;
-            
-            const deleteCommentResult = await removeComment(comments_id);
-            return res.status(200).json(response(baseResponse.SUCCESS, deleteCommentResult));
-        
+            const Comment = await retrieveOneComment(comments_id); 
+
+            if(Comment[0]){ // Comment가 존재한다면
+                const deleteCommentResult = await removeComment(comments_id);
+
+                return res.status(200).json(response(baseResponse.SUCCESS, deleteCommentResult));
+            }
+            else{
+                return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+            }
         }
         catch(error){
             return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
