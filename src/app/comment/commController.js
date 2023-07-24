@@ -3,10 +3,10 @@ dotenv.config();
 import {baseResponse, response, errResponse } from "../../../config/response";
 import {retrievePost} from "../post/postProvider";
 import {retrieveComment} from "./commProvider";
-import {createComment} from "./commService";
+import {createComment, removeComment} from "./commService";
 
 /**
- * API name : 댓글 조회
+ * API name : 댓글 조회 (게시글의 모든 댓글 조회)
  * GET: /comments/{post_id}
  */
 export const getComment = async(req, res) => {
@@ -66,6 +66,17 @@ export const postComment = async(req, res) => {
  * API name : 댓글 삭제
  * DELETE: /comments/{comments_id}
  */
-export const deleteComment =  async(req, res) => {
-	
+export const deleteComment = async(req, res) => {
+    
+        try{
+            const {comments_id} = req.params;
+            
+            const deleteCommentResult = await removeComment(comments_id);
+            return res.status(200).json(response(baseResponse.SUCCESS, deleteCommentResult));
+        
+        }
+        catch(error){
+            return res.status(500).json(errResponse(baseResponse.SERVER_ERROR));
+        }
+   
 };

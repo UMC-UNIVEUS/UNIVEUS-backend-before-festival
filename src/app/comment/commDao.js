@@ -8,6 +8,7 @@ export const selectComment = async(connection, post_id) => {
         ON comments.user_id = user.user_id
         WHERE post_id = ?;
     `;
+   
     const [CommentRow] = await connection.query(selectCommentQuery, post_id);
     return CommentRow;
 };
@@ -20,4 +21,14 @@ export const insertComment = async(connection, insertPostParams) => {
 
     const insertCommentRow = await connection.query(postCommentQuery, insertPostParams);
     return insertCommentRow;
+};
+
+export const eraseComment = async(connection, comments_id)=>{
+    const deleteCommentQuery = `
+        DELETE 
+        FROM comments
+        WHERE comments_id = ?;
+    `;
+    const deleteCommentRow = await connection.query(deleteCommentQuery, comments_id);
+    return deleteCommentRow;
 };
