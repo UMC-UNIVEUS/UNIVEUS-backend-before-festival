@@ -45,8 +45,6 @@ export const selectUserMyUnivebyId = async (connection, user_id)=> {
     FROM post 
     WHERE user_id = ?
     ;`;
-    const selectUserMyUniveRows = awiat connection.query(selectUserMyUniveQuery, user_id);
+    const selectUserMyUniveRows = await connection.query(selectUserMyUniveQuery, user_id);
     return selectUserMyUniveRows;
 }
-
-export const selectUserMyUniveimg = async (connection, post_id)=> {
