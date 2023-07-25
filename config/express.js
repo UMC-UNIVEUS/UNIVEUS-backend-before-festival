@@ -3,11 +3,15 @@ import express from "express";
 import cors from "cors";
 import compression from "compression";
 import methodOverride from "method-override";
+import dotenv from "dotenv";
+import userRouter from "../src/app/user/userRoute";
 import postRouter from "../src/app/post/postRoute";
 import commentRouter from "../src/app/comment/commRoute";
-import userRouter from "../src/app/user/userRoute";
+
+
 const app = express();  
 
+dotenv.config();
 
 app.use(compression()); 
 app.use(express.json());   
@@ -15,6 +19,8 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride());
 app.use(cors());
 
+
+app.use('/user', userRouter);
 app.use('/post',postRouter);
 app.use('/comments',commentRouter);
 

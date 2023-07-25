@@ -1,3 +1,10 @@
-/*Request에서 보낸 라우팅 처리*/
+import express from "express"
+import {login, loginRedirect, signup, signupRedirect} from "./userController"
+const userRouter = express.Router();
 
-import express from 'express';
+userRouter.get('/login', login);
+userRouter.get('/login/redirect', loginRedirect);
+userRouter.get('/signup', signup);
+userRouter.get('/signup/redirect', signupRedirect);
+
+export default userRouter;
