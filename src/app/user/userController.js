@@ -51,12 +51,12 @@ export const loginRedirect = async(req, res) => {
             if (!await isUser(userEmail)) {
                 res.send(errResponse(baseResponse.LOGIN_NOT_USER));
             }
-            const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '1m', issuer : 'univeus' });
-            const refreshToken = await jwt.sign({ userEmail : userEmail }, process.env.REFRESH_TOKEN_SECRET, { expiresIn : '24days', issuer : 'univeus' });
-            const insertRefreshTokenResult = await insertRefreshToken(refreshToken, userEmail);
+            const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '24days', issuer : 'univeus' });
+            // const refreshToken = await jwt.sign({ userEmail : userEmail }, process.env.REFRESH_TOKEN_SECRET, { expiresIn : '24days', issuer : 'univeus' });
+            // const insertRefreshTokenResult = await insertRefreshToken(refreshToken, userEmail);
 
-            if (accessToken && refreshToken) {
-                return res.send(response(baseResponse.SUCCESS,{ accessToken, refreshToken }));
+            if (accessToken /*&& refreshToken*/) {
+                return res.send(response(baseResponse.SUCCESS,{ accessToken/*, refreshToken */}));
             }
         } catch(err) {
             console.log(err)

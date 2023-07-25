@@ -4,14 +4,14 @@ import { baseResponse, errResponse } from "./response"
 
 
 export const jwtMiddleware = (req, res, next) =>{
-    // read the token from header or url
+    /** 헤더에서 토큰 추출 */
     const token = req.headers['x-access-token']
     // token does not exist
     if(!token) {
         return res.send(errResponse(baseResponse.TOKEN_EMPTY))
     }
 
-    // create a promise that decodes the token
+    /** 토큰 검증 */
     const p = new Promise(
         (resolve, reject) => {
             jwt.verify(token, process.env.TOKEN_SECRET , (err, verifiedToken) => {
@@ -21,13 +21,12 @@ export const jwtMiddleware = (req, res, next) =>{
         }
     );
 
-    // if it has failed to verify, it will return an error message
+    /** 토큰 검증 실패 시 오류 발생*/
     const onError = (error) => {
         return res.send(errResponse(baseResponse.TOKEN_VERIFICATION_FAILURE))
     };
-    // process the promise
+    /** 토큰 검증 성공 */
     p.then((verifiedToken) => {
-        //비밀 번호 바뀌었을 때 검증 부분 추가 할 곳
         req.verifiedToken = verifiedToken;
         console.log(verifiedToken);
                                 
