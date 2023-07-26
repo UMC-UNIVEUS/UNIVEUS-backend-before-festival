@@ -3,7 +3,7 @@
 export const baseResponse = {
     SUCCESS : { "isSuccess": true, "code": 1000, "message":"성공" },
 
-    //유저 관련 오류
+    //유저 관련 response msg
     USER_USERID_NOT_EXIST : { "isSuccess": false, "code": 2002, "message": "해당 유저가 존재하지 않습니다." },
     
     SIGNUP_EMAIL_DUPLICATE : {"isSuccess" : false, "code" : 2003, "message" : "이미 존재하는 이메일입니다."},
@@ -24,7 +24,11 @@ export const baseResponse = {
     
     SEND_AUTH_NUMBER_MSG_FAIL : {"isSuccess" : false, "code" : 2011, "message" : "인증번호 문자 전송을 실패했습니다."},
 
+    VERIFY_NUMBER_SUCCESS : {"isSuccess" : true, "code" : 2012, "message" : "휴대폰 본인인증을 성공하였습니다." },
     
+    VERIFY_NUMBER_FAIL : {"isSuccess" : false, "code" : 2013, "message" : "인증번호가 올바르지 않습니다." },
+
+
     POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3002, "message": "해당 게시글이 존재하지 않습니다." },
 
     

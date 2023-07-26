@@ -5,6 +5,9 @@ import { isUser } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
+import NodeCache from "node-cache";
+
+const cache = new NodeCache();
 
 
 
@@ -133,12 +136,27 @@ export const sendAuthNumber = async(req, res) => {
     const sendAuth = createAuthNum();
     const content = `[UNIVEUS] 인증번호 [${sendAuth}]`;
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    
+    // 서버 캐시에 인증번호 임시 저장, 5분동안 유효
+    cache.set("authNumber", sendAuth, 300);
     if (!success) {
         res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
     } else {
         res.send(response(baseResponse.SEND_AUTH_NUMBER_MSG))
     };
+}
+
+/** 인증번호 검증 API */
+export const verifyNumber = (req, res) => {
+    const number = req.body.number;
+    const authNumber = cache.get("authNumber");
+    if (authNumber == number) {
+        cache.del("authNumber");
+        res.send(response(baseResponse.VERIFY_NUMBER_SUCCESS));
+    }
+    else {
+        res.send(errResponse(baseResponse.VERIFY_NUMBER_FAIL));
+    }
+
 }
 
 // export const authUser = (req, res) => {
