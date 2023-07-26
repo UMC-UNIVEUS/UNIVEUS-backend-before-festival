@@ -1,8 +1,10 @@
-import { baseResponse, errResponse, response } from "../../../config/response"
+import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createUser, insertRefreshToken, validEmailCheck } from "../user/userService";
+import { createUser, insertRefreshToken, validEmailCheck, createAuthNum } from "../user/userService";
 import { isUser } from "./userProvider";
 import jwt from "jsonwebtoken";
+import { sendSMS } from "../../../config/NaverCloudClient";
+import { naverCloudSensSecret } from "../../../config/configs";
 
 
 
@@ -123,13 +125,32 @@ export const signupRedirect = async(req, res) => {
     }
 }
 
+
+
+/** 인증번호 문자 전송 API */
+export const sendAuthNumber = async(req, res) => {
+    const to = req.body.phoneNumber;
+    const sendAuth = createAuthNum();
+    const content = `[UNIVEUS] 인증번호 [${sendAuth}]`;
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    
+    if (!success) {
+        res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
+    } else {
+        res.send(response(baseResponse.SEND_AUTH_NUMBER_MSG))
+    };
+}
+
 // export const authUser = (req, res) => {
 //     try {
 //         const { nickName, gender, major, studenId } = req.body;
 
 //         if (typeof nickName == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
+
 //         if (typeof gender == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
+
 //         if (typeof major == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
+
 //         if (typeof studenId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));
 
 //         // 유저 본인인증 코드 작성

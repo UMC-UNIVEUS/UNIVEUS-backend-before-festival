@@ -28,3 +28,7 @@ export const validEmailCheck = (email) => {
     const pattern = /^[a-zA-Z0-9_.+-]+@kyonggi\.ac\.kr$/i;
     return pattern.test(email);
 }
+/** 랜덤 인증번호 생성 */
+export const createAuthNum = () => {
+    return Math.floor(Math.random() * 9000) + 1000;
+}

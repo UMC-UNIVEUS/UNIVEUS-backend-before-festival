@@ -20,6 +20,10 @@ export const baseResponse = {
     
     LOGIN_NOT_USER : {"isSuccess" : false, "code" : 2009, "message" : "회원이 아닙니다." },
 
+    SEND_AUTH_NUMBER_MSG : {"isSuccess" : true, "code" : 2010, "message" : "인증번호 문자 전송이 완료되었습니다."},
+    
+    SEND_AUTH_NUMBER_MSG_FAIL : {"isSuccess" : false, "code" : 2011, "message" : "인증번호 문자 전송을 실패했습니다."},
+
     
     POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3002, "message": "해당 게시글이 존재하지 않습니다." },
 
