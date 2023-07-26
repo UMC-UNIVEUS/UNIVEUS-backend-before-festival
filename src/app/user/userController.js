@@ -138,9 +138,8 @@ export const sendAuthNumber = async(req, res) => {
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     // 서버 캐시에 인증번호 임시 저장, 5분동안 유효
     cache.set("authNumber", sendAuth, 300);
-    res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
     if (!success) {
-        // res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
+        res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
     } else {
         res.send(response(baseResponse.SEND_AUTH_NUMBER_MSG))
     };
