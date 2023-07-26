@@ -1,7 +1,7 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { createUser, insertRefreshToken, validEmailCheck, createAuthNum } from "../user/userService";
-import { isUser } from "./userProvider";
+import { isUser, isNicknameDuplicate } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
@@ -157,6 +157,21 @@ export const verifyNumber = (req, res) => {
         res.send(errResponse(baseResponse.VERIFY_NUMBER_FAIL));
     }
 
+}
+
+/**닉네임 중복 체크 API */
+export const checkNickNameDuplicate = async (req, res) => {
+    const nickname = req.body.nickname;
+    try {
+        if (await isNicknameDuplicate(nickname)){
+             return res.send(errResponse(baseResponse.NICK_NAME_DUPLICATE));
+        }
+        else {
+            return res.send(response(baseResponse.SUCCESS));
+        }
+    } catch(err) {
+        res.send(errResponse(baseResponse.SERVER_ERROR));
+    }
 }
 
 // export const authUser = (req, res) => {
