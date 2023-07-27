@@ -18,3 +18,10 @@ export const insertToken = async(connection, refreshToken, email_id) => {
     const insertTokenRow = await connection.query(insertTokenQuery);
     return insertTokenRow[0];
 }
+
+export const selectUserByNickname = async(connection, nickname) => {
+
+    const selectUserQuery = `SELECT nickname FROM user WHERE nickname = '${nickname}'`;
+    const selectUserRow = await connection.query(selectUserQuery);
+    return selectUserRow[0];
+}
