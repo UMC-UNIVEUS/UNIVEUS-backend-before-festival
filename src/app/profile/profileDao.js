@@ -40,11 +40,19 @@ WHERE user_id = ? ;`;
 
 export const selectUserMyUnivebyId = async (connection, user_id)=> {
     const selectUserMyUniveQuery = `
-    SELECT post_id, title, category, created_at, scrapes, location, meeting_date, end_date,
+    SELECT post_id, main_img, title, category, created_at, scrapes, location, meeting_date, end_date,
     current_people, limit_people
     FROM post 
     WHERE user_id = ?
     ;`;
     const selectUserMyUniveRows = await connection.query(selectUserMyUniveQuery, user_id);
     return selectUserMyUniveRows;
-}
+};
+
+export const selectUserParticipatebyId = async (connection, user_id)=> {
+    const selectUserParticipateQuery = `
+    SELECT post_id, user_id, title, category, created_at, scrapes, location, meeting_date, end_date,
+    current_people, limit_people
+    From post
+    WHERE post_id IN (SELECT post_id FROM participant_users WHERE user_id = ? );`;
+};

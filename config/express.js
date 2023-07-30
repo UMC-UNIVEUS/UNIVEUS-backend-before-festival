@@ -5,7 +5,7 @@ import compression from "compression";
 import methodOverride from "method-override";
 import postRouter from "../src/app/post/postRoute";
 import commentRouter from "../src/app/comment/commRoute";
-import userRouter from "../src/app/user/userRoute";
+import profileRouter from "../src/app/profile/profileRoute";
 const app = express();  
 
 
@@ -17,7 +17,6 @@ app.use(cors());
 
 app.use('/post',postRouter);
 app.use('/comments',commentRouter);
-
-app.use('/mypage', userRouter);
+app.use('/mypage', profileRouter);
 
 export default app;

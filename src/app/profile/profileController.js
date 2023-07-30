@@ -6,7 +6,8 @@ import {
     showUserDefaultProfile,
     showUserIntroProfile,
     showUserMyUnive,
-    showUserParticipate
+    showUserParticipate,
+    showUserScrapes
 } from './profileProvider';
 import {
     ModifyIntroProfile
@@ -69,4 +70,13 @@ export const getUserParticipate = async (req, res) => {
     if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
     const getUserParticipateResponse = await showUserParticipate(user_id);
     return res.status(200).json(response(baseResponse.SUCCESS, getUserParticipateResponse));
+}
+
+export const getUserScrapes = async (req, res) => {
+    const {user_id} = req.params;
+    // 빈 아이디 체크
+    if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    const getUserParticipateResponse = await showUserScrapes(user_id);
+    return res.status(200).json(response(baseResponse.SUCCESS, getUserScrapes));
+
 }

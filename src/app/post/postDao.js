@@ -27,8 +27,8 @@ export const insertPost = async(connection, insertPostParams)=>{
     const postPostQuery = `
         INSERT INTO post(user_id, category, current_people, limit_people, location, 
         meeting_date, openchat, end_date, post_status, title, 
-        content, created_at) 
-        VALUES (?,?,1,?,?, ?,?,?,?,?, ?,now());
+        content) 
+        VALUES (?,?,1,?,?,?,?,?,?,?,?);
 
     `;
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);

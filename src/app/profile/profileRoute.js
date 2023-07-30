@@ -5,13 +5,15 @@ import {
     getUserProfile,
     putUserProfile,
     getUserMyUnive,
-    getUserParticipate
+    getUserParticipate,
+    getUserScrapes
 } from "./profileController";
 
 const profileRouter = express.Router();
 
 profileRouter.get('/profile/:user_id', getUserProfile);
 profileRouter.put('/profile/:user_id', putUserProfile);
-profileRouter.get('profile/myunive/:user_id', getUserMyUnive);
-profileRouter.get('profile/participate/:user_id', getUserParticipate);
+profileRouter.get('/profile/myunive/:user_id', getUserMyUnive);
+profileRouter.get('/profile/participate/:user_id', getUserParticipate);
+profileRouter.get('profile/participate/:user_id', getUserScrapes);
 export default profileRouter;
