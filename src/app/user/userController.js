@@ -1,6 +1,6 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createUser, insertRefreshToken, validEmailCheck, createAuthNum } from "../user/userService";
+import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser } from "../user/userService";
 import { isUser, isNicknameDuplicate } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
@@ -174,21 +174,31 @@ export const checkNickNameDuplicate = async (req, res) => {
     }
 }
 
-// export const authUser = (req, res) => {
-//     try {
-//         const { nickName, gender, major, studenId } = req.body;
+/**유니버스 시작하기 API */
+export const startUniveUs = (req, res) => {
+    try {
+        if (typeof req.body.phone == "undefined") return res.send(errResponse(baseResponse.SIGNUP_PHONE_NUMBER_EMPTY));
 
-//         if (typeof nickName == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
+        if (typeof req.body.nickname == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
 
-//         if (typeof gender == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
+        if (typeof req.body.gender == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
 
-//         if (typeof major == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
+        if (typeof req.body.major == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
 
-//         if (typeof studenId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));
+        if (typeof req.body.studentId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));   
+            
+            /** 토큰에서 userEmail 추출 */
+            const userEmail = req.verifiedToken.userEmail;
+            const user = { userInfo : req.body, userEmail : userEmail};
+        
+        try {
+            authUser(user);
+            return res.send(response(baseResponse.SUCCESS));
+        } catch(err) {
+            return res.send(errResponse(baseResponse.SERVER_ERROR));
+        }
 
-//         // 유저 본인인증 코드 작성
-
-//     }catch(err) {
-//         console.log(err);
-//     }
-// }
+    }catch(err) {
+        return res.send(errResponse(baseResponse.SERVER_ERROR));
+    }
+}
