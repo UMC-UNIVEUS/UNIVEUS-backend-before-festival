@@ -22,6 +22,11 @@ export const baseResponse = {
 
     PROFILE_INTRO_INFO_NOT_EXIST : { "isSuccess": false, "code": 2203, "message": "유저 자기소개 프로필 정보가 존재하지 않습니다." },
 
+    USER_MYUNIVE_NOT_EXIST : { "isSuccess": false, "code": 2301, "message": "내가 만든 유니버스가 없습니다." },
+
+    USER_PARTICIPATE_NOT_EXIST : { "isSuccess": false, "code": 2302, "message": "내가 참여한 유니버스가 없습니다." },
+
+    USER_SCRAPES_NOT_EXIST : { "isSuccess": false, "code": 2303, "message": "내가 스크랩한 유니버스가 없습니다." },
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},

@@ -40,10 +40,14 @@ WHERE user_id = ? ;`;
 
 export const selectUserMyUnivebyId = async (connection, user_id)=> {
     const selectUserMyUniveQuery = `
-    SELECT post_id, main_img, title, category, created_at, scrapes, location, meeting_date, end_date,
-    current_people, limit_people
+    SELECT post.post_id, post.category, post.main_img, post.title, post.location, 
+           post.meeting_date, post.end_date,
+           user.profile_img, user.nickname, user.major, user.class_of, 
+           post.current_people, post.limit_people, post.scrapes
     FROM post 
-    WHERE user_id = ?
+    INNER JOIN user
+    ON post.user_id = user.user_id
+    WHERE post.user_id = ?
     ;`;
     const selectUserMyUniveRows = await connection.query(selectUserMyUniveQuery, user_id);
     return selectUserMyUniveRows;
@@ -51,8 +55,24 @@ export const selectUserMyUnivebyId = async (connection, user_id)=> {
 
 export const selectUserParticipatebyId = async (connection, user_id)=> {
     const selectUserParticipateQuery = `
-    SELECT post_id, user_id, title, category, created_at, scrapes, location, meeting_date, end_date,
-    current_people, limit_people
+    SELECT post.post_id, post.category, post.main_img, post.title, post.location,
+           post.meeting_date, post.end_date,
+           user.profile_img, user.nickname, user.major, user.class_of,
+           post.current_people, post.limit_people, post.scrapes
     From post
+    INNER JOIN user
+    ON post.user_id = user.user_id
     WHERE post_id IN (SELECT post_id FROM participant_users WHERE user_id = ? );`;
 };
+
+export const selectUserScrapesbyId = async(connection, user_id) => {
+    const selectUserScrapesQuery = `
+     SELECT post.post_id, post.category, post.main_img, post.title, post.location,
+            post.meeting_date, post.end_date,
+            user.profile_img, user.nickname, user.major, user.class_of,
+            post.current_people, post.limit_people, post.scrapes
+    From post
+    INNER JOIN user
+    ON post.user_id = user.user_id
+    WHERE post_id IN (SELECT post_id FROM post_scrapes WHERE user_id = ? );`;
+}

@@ -4,7 +4,8 @@ import {
     selectUserDefaultProfilebyId,
     selectUserIntroProfilebyId,
     selectUserMyUnivebyId,
-    selectUserParticipatebyId
+    selectUserParticipatebyId,
+    selectUserScrapesbyId
 } from './profileDao';
 import {baseResponse, response} from "../../../config/response";
 
@@ -43,24 +44,23 @@ export const showUserIntroProfile = async (user_id) => {
 
 export const showUserMyUnive = async (user_id) => {
     const connection = await pool.getConnection(async (conn) => conn);
-    const showUserMyUniveResult1 = await selectUserMyUnivebyId(connection, user_id);
+    const showUserMyUniveResult = await selectUserMyUnivebyId(connection, user_id);
     connection.release();
-    if(showUserMyUniveResult[0]) {
-        return showUserMyUniveResult[0];
-    } else {
-        return response(baseResponse.PROFILE_INFO_NOT_EXIST);
-    }
-}
+    return showUserMyUniveResult[0];
+};
 
 export const showUserParticipate = async (user_id) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const showUserParticipateResult = await selectUserParticipatebyId(connection, user_id);
     connection.release();
-    if(showUserParticipateResult[0]) {
-        return showUserParticipateResult[0];
-    } else {
-        return response(baseResponse.PROFILE_INFO_NOT_EXIST);
-    }
+    return showUserParticipateResult[0];
+};
+
+export const showUserScrapes = async (user_id) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const showUserScrapesResult = await selectUserScrapesbyId(connection, user_id);
+    connection.release();
+    return showUserScrapesResult[0];
 }
 
 

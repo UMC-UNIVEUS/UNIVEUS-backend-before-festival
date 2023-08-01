@@ -60,7 +60,11 @@ export const getUserMyUnive = async (req, res) => {
     // 빈 아이디 체크
     if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
     const getUserMyUniveResponse = await showUserMyUnive(user_id);
-    return res.status(200).json(response(baseResponse.SUCCESS, getUserMyUniveResponse));
+    if(!getUserMyUniveResponse[0]) {
+        return res.json(response(baseResponse.USER_MYUNIVE_NOT_EXIST));
+    } else {
+        return res.status(200).json(response(baseResponse.SUCCESS, getUserMyUniveResponse));
+    }
 };
 
 
@@ -69,14 +73,21 @@ export const getUserParticipate = async (req, res) => {
     // 빈 아이디 체크
     if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
     const getUserParticipateResponse = await showUserParticipate(user_id);
-    return res.status(200).json(response(baseResponse.SUCCESS, getUserParticipateResponse));
-}
+    if (!getUserParticipateResponse[0]) {
+        return res.json(response(baseResponse.USER_PARTICIPATE_NOT_EXIST));
+    } else {
+        return res.status(200).json(response(baseResponse.SUCCESS, getUserParticipateResponse));
+    }
+};
 
 export const getUserScrapes = async (req, res) => {
     const {user_id} = req.params;
     // 빈 아이디 체크
     if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
     const getUserParticipateResponse = await showUserScrapes(user_id);
-    return res.status(200).json(response(baseResponse.SUCCESS, getUserScrapes));
-
-}
+    if(!getUserParticipateResponse[0]) {
+        return res.json(response(baseResponse.USER_SCRAPES_NOT_EXIST));
+    } else {
+        return res.status(200).json(response(baseResponse.SUCCESS, getUserScrapes));
+    }
+};
