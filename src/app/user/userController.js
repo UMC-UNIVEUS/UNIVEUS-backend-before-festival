@@ -1,6 +1,6 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createUser, insertRefreshToken, validEmailCheck, createAuthNum } from "../user/userService";
+import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser } from "../user/userService";
 import { isUser, isNicknameDuplicate } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
@@ -15,16 +15,16 @@ const cache = new NodeCache();
 export const login = async(req, res) => {
     const GOOGLE_LOGIN_REDIRECT_URI = 'http://localhost:3000/user/login/redirect';
 
-    try {
+    // try {
         let url = 'https://accounts.google.com/o/oauth2/v2/auth';
         url += `?client_id=${process.env.GOOGLE_CLIENT_ID}`
         url += `&redirect_uri=${GOOGLE_LOGIN_REDIRECT_URI}`
         url += '&response_type=code'
         url += '&scope=email profile'    
         res.redirect(url);
-    } catch(err) {
-        console.log(err)
-    }
+    // } catch(err) {
+    //     console.log(err)
+    // }
 }
 
 /**구글 로그인 후 회원이면 토큰 발급, 회원이 아니면 err 발송 */
@@ -33,7 +33,7 @@ export const loginRedirect = async(req, res) => {
     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
-    try {
+    // try {
         const { code } = req.query;
         console.log(`code : ${ code }`);
         const resp = await axios.post(GOOGLE_TOKEN_URL, {
@@ -48,7 +48,7 @@ export const loginRedirect = async(req, res) => {
               Authorization: `Bearer ${resp.data.access_token}`,
           },
       });
-        try {
+        // try {
             const userEmail = resp2.data.email;   
             if (validEmailCheck(userEmail) == false) {
                 return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
@@ -63,12 +63,12 @@ export const loginRedirect = async(req, res) => {
             if (accessToken /*&& refreshToken*/) {
                 return res.send(response(baseResponse.SUCCESS,{ accessToken/*, refreshToken */}));
             }
-        } catch(err) {
-            console.log(err)
-        }
-    } catch(err) {
-        console.log(err);
-    }
+        // } catch(err) {
+        //     console.log(err)
+        // }
+    // } catch(err) {
+    //     console.log(err);
+    // }
 }
 
 
@@ -78,16 +78,16 @@ export const loginRedirect = async(req, res) => {
 /**회원가입 */
 export const signup = async(req, res) => {
     const GOOGLE_SIGNUP_REDIRECT_URI = 'http://localhost:3000/user/signup/redirect';
-    try {
+    // try {
         let url = 'https://accounts.google.com/o/oauth2/v2/auth';
         url += `?client_id=${process.env.GOOGLE_CLIENT_ID}`;
         url += `&redirect_uri=${GOOGLE_SIGNUP_REDIRECT_URI}`;
         url += '&response_type=code';
         url += '&scope=email profile';
         res.redirect(url);
-    } catch(err) {
-        console.log(err)
-    }
+    // } catch(err) {
+    //     console.log(err)
+    // }
 }
 
 export const signupRedirect = async(req, res) => {
@@ -95,7 +95,7 @@ export const signupRedirect = async(req, res) => {
     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
-    try {
+    // try {
         const { code } = req.query;
         console.log(`code : ${ code }`);
         const resp = await axios.post(GOOGLE_TOKEN_URL, {
@@ -110,7 +110,7 @@ export const signupRedirect = async(req, res) => {
               Authorization: `Bearer ${resp.data.access_token}`,
           },
       });
-        try {
+        // try {
             const userEmail = resp2.data.email;   
             if (validEmailCheck(userEmail) == false) {
                 return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
@@ -120,12 +120,12 @@ export const signupRedirect = async(req, res) => {
             }
             const signupResult = await createUser(userEmail);
             res.send(response(baseResponse.SUCCESS));
-        } catch(err) {
-            console.log(err)
-        }
-    } catch(err) {
-        console.log(err);
-    }
+    //     } catch(err) {
+    //         console.log(err)
+    //     }
+    // } catch(err) {
+    //     console.log(err);
+    // }
 }
 
 
@@ -162,33 +162,43 @@ export const verifyNumber = (req, res) => {
 /**닉네임 중복 체크 API */
 export const checkNickNameDuplicate = async (req, res) => {
     const nickname = req.body.nickname;
-    try {
+    // try {
         if (await isNicknameDuplicate(nickname)){
              return res.send(errResponse(baseResponse.NICK_NAME_DUPLICATE));
         }
         else {
             return res.send(response(baseResponse.SUCCESS));
         }
-    } catch(err) {
-        res.send(errResponse(baseResponse.SERVER_ERROR));
-    }
+    // } catch(err) {
+    //     res.send(errResponse(baseResponse.SERVER_ERROR));
+    // }
 }
 
-// export const authUser = (req, res) => {
-//     try {
-//         const { nickName, gender, major, studenId } = req.body;
+/**유니버스 시작하기 API */
+export const startUniveUs = (req, res) => {
+    // try {
+        if (typeof req.body.phone == "undefined") return res.send(errResponse(baseResponse.SIGNUP_PHONE_NUMBER_EMPTY));
 
-//         if (typeof nickName == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
+        if (typeof req.body.nickname == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
 
-//         if (typeof gender == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
+        if (typeof req.body.gender == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
 
-//         if (typeof major == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
+        if (typeof req.body.major == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
 
-//         if (typeof studenId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));
+        if (typeof req.body.studentId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));   
+            
+            /** 토큰에서 userEmail 추출 */
+            const userEmail = req.verifiedToken.userEmail;
+            const user = { userInfo : req.body, userEmail : userEmail};
+        
+        // try {
+            authUser(user);
+            return res.send(response(baseResponse.SUCCESS));
+        // } catch(err) {
+            // return res.send(errResponse(baseResponse.SERVER_ERROR));
+        // }
 
-//         // 유저 본인인증 코드 작성
-
-//     }catch(err) {
-//         console.log(err);
-//     }
-// }
+    // }catch(err) {
+    //     return res.send(errResponse(baseResponse.SERVER_ERROR));
+    // }
+}

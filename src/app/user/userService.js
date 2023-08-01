@@ -1,4 +1,4 @@
-import { insertUser, insertToken } from "./userDao"
+import { insertUser, insertToken, insertAuthUser } from "./userDao"
 import pool from "../../../config/database"
 
 export const createUser = async(userEmail) => {
@@ -31,4 +31,15 @@ export const validEmailCheck = (email) => {
 /** 랜덤 인증번호 생성 */
 export const createAuthNum = () => {
     return Math.floor(Math.random() * 9000) + 1000;
+}
+
+export const authUser = async(user) => {
+    try {
+        const connection = await pool.getConnection(async conn => conn);
+        const authUserResult = await insertAuthUser(connection, user);
+        connection.release();
+        return authUserResult;
+    } catch(err) {
+        console.log(err);
+    }
 }

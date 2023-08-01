@@ -14,7 +14,7 @@ export const jwtMiddleware = (req, res, next) =>{
     /** 토큰 검증 */
     const p = new Promise(
         (resolve, reject) => {
-            jwt.verify(token, process.env.TOKEN_SECRET , (err, verifiedToken) => {
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET , (err, verifiedToken) => {
                 if(err) reject(err);
                 resolve(verifiedToken)
             })
