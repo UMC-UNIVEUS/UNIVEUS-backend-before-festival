@@ -55,7 +55,7 @@ export const patchPost =  async(req, res) => {
     const {category, limit_people, location, meeting_date, openchat, 
         end_date, post_status, title,content} = req.body;
 
-    if(title.length > 48){
+    if(title.length > 48){ // 글자 수 제한 프론트에서 할 지 백엔드에서 할 지 정해야 함.
         return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
     }
     if(location.length > 24){
