@@ -2,7 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response} from "../../../config/response";
 import { retrievePost, retrieveParticipant} from "./postProvider";
-import { createPost, createImg, editPost, removePost} from "./postService";
+import { createPost, createImg, editPost, removePost, addScrap, addLike} from "./postService";
+import {getUserIdByEmail} from "../user/userProvider";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -34,23 +35,6 @@ export const postPost = async(req, res) => {
         end_date, post_status, title, content);
     
     return res.status(200).json(response(baseResponse.SUCCESS, postPostResult));
-};
-
-/**
- * API name : 이미지 등록
- * PUT: /post/{post_id}/img 
- */
-export const postImg = async(req, res) => {
-    
-   // const {post_id} = req.params;
-    const filePath = req.file.location // 업로드 된 이미지 경로
-    const {img_file} = req.body;
-    if (!filePath) {
-        return res.status(400).json(errResponse(baseResponse.INVALID_FILE_PATH));
-    }
-    console.log(`req.fiel: ${req.file}, req.file.location: ${filePath}`);
-    //const postImgResult = await createImg(post_id, filePath, img_file);
-    return res.status(200).json(response(baseResponse.SUCCESS, postImgResult));
 };
 
 /**
@@ -91,4 +75,44 @@ export const deletePost =  async(req, res) => {
     else{ 
         return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))        
     }
+};
+
+/**
+ * API name : 게시글 스크랩
+ * PATCH: /post/{post_id}/scrap
+ */
+export const patchScrap = async(req, res) => {
+
+    const {post_id} = req.params;
+    const userEmail = req.verifiedToken.userEmail;
+    const user_id = await getUserIdByEmail(userEmail); //토큰을 통한 이메일로 유저 id 구하기
+
+    const addScrapResult = await addScrap(post_id, user_id);   
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면
+        return res.status(200).json(response(baseResponse.SUCCESS, addScrapResult));
+    } 
+    else{ 
+        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+    } 
+};
+
+/**
+ * API name : 게시글 좋아요
+ * PATCH: /post/{post_id}/like
+ */
+export const patchLike = async(req, res) => {
+
+    const {post_id} = req.params;
+    
+    const addLikeResult = await addLike(post_id);   
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면
+        return res.status(200).json(response(baseResponse.SUCCESS, addLikeResult));
+    } 
+    else{ 
+        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+    } 
 };

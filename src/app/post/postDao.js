@@ -1,6 +1,6 @@
 /*posting 관련 데이터베이스, Query가 작성되어 있는 곳*/
 
-export const selectPost = async(connection, post_id)=>{
+export const selectPost = async(connection, post_id)=>{ // 게시글 조회
     const selectPostQuery = `
         SELECT title, category, scrapes, meeting_date, end_date, current_people, limit_people, openchat
         FROM post
@@ -10,7 +10,7 @@ export const selectPost = async(connection, post_id)=>{
     return PostRow;
 };
 
-export const selectParticipant = async(connection, post_id)=>{
+export const selectParticipant = async(connection, post_id)=>{ // 참여자 목록 조회
     const selectParticipantQuery = `
         SELECT user.gender, user.nickname, user.major, user.class_of  
         FROM participant_users
@@ -23,7 +23,7 @@ export const selectParticipant = async(connection, post_id)=>{
 };
 
 
-export const insertPost = async(connection, insertPostParams)=>{
+export const insertPost = async(connection, insertPostParams)=>{// 게시글 생성
     const postPostQuery = `
         INSERT INTO post(user_id, category, current_people, limit_people, location, 
         meeting_date, openchat, end_date, post_status, title, 
@@ -35,16 +35,7 @@ export const insertPost = async(connection, insertPostParams)=>{
     return insertPostRow;
 };
 
-export const insertImg = async(connection, insertImgParams)=>{
-    const postImgQuery = `
-        INSERT INTO post_img(img_url,post_id) 
-        VALUES (?,?);
-    `;
-    const insertImgRow = await connection.query(postImgQuery, insertImgParams);
-    return insertImgRow;
-};
-
-export const updatePost = async(connection, updatePostParams)=>{
+export const updatePost = async(connection, updatePostParams)=>{// 게시글 수정
     const patchPostQuery = `
         UPDATE post 
         SET category =?,
@@ -63,7 +54,7 @@ export const updatePost = async(connection, updatePostParams)=>{
     return updatePostRow;
 };
 
-export const erasePost = async(connection, deletePostParams)=>{
+export const erasePost = async(connection, deletePostParams)=>{// 게시글 삭제
     const deletePostQuery = `
         DELETE 
         FROM post
@@ -73,3 +64,29 @@ export const erasePost = async(connection, deletePostParams)=>{
     return deletePostRow;
 };
  
+export const insertScrap = async(connection, addScarpParams)=>{// 게시글 스크랩 수 증가 + post_scrapes 테이블 생성
+    const addScrapQuery = `
+        UPDATE post 
+        SET scrapes = scrapes + 1
+        WHERE post_id = ?;
+    `;
+    const postScrapTableQuery = `
+        INSERT INTO post_scrapes(post_id, user_id) 
+        VALUES (?,?);
+    `;
+  
+    const updateScrapRow = await connection.query(addScrapQuery, addScarpParams[0]);
+    const insertScrapTableRow = await connection.query(postScrapTableQuery, addScarpParams); // 여기 (postScrapTableQuery, post_id, user_id)처럼 인수를 3개 넘겨주면 에러남 
+
+    return updateScrapRow;
+};
+
+export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
+    const addLikeQuery = `
+        UPDATE post 
+        SET likes = likes + 1
+        WHERE post_id = ?;
+    `;
+    const insertLikeRow = await connection.query(addLikeQuery, post_id);
+    return insertLikeRow;
+};
