@@ -25,3 +25,23 @@ export const selectUserByNickname = async(connection, nickname) => {
     const selectUserRow = await connection.query(selectUserQuery);
     return selectUserRow[0];
 }
+
+/** 본인인증 후 userInfo 삽입 DB에 PHONE 컬럼 추가*/
+export const insertAuthUser = async(connection, insertUserParams) => {
+    const userInfo = insertUserParams.userInfo;
+    const userEmail = insertUserParams.userEmail;
+
+    const updateUserQuery = `UPDATE user SET phone = ?, nickname = ?, gender = ?, major = ?, class_of = ? WHERE email_id = ?`;
+
+    const values = [
+      userInfo.phone,      
+      userInfo.nickname,  
+      userInfo.gender,      
+      userInfo.major,       
+      userInfo.studentId,    
+      userEmail
+    ];
+  
+    const updateUserRow = await connection.query(updateUserQuery, values);
+    return updateUserRow;
+  };
