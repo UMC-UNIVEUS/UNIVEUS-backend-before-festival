@@ -3,7 +3,7 @@
 
 import pool from "../../../config/database"
 import { baseResponse, response } from "../../../config/response";
-import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike } from "./postDao";
+import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant } from "./postDao";
 
 export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, post_status, title, content) =>{
@@ -64,4 +64,15 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
     
     return response(baseResponse.SUCCESS);
 
+};
+
+export const createParticipant = async(post_id, user_id) =>{// 게시글 참여자 등록
+
+    const insertParticipantParams =[post_id, user_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const createParticipantResult = await insertParticipant(connection,insertParticipantParams);
+    connection.release();
+
+    return response(baseResponse.SUCCESS);
 };

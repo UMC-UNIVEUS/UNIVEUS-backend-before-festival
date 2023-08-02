@@ -76,11 +76,11 @@ export const insertScrap = async(connection, addScarpParams)=>{// 게시글 스�
         SET scrapes = scrapes + 1
         WHERE post_id = ?;
     `;
+
     const postScrapTableQuery = `
         INSERT INTO post_scrapes(post_id, user_id) 
         VALUES (?,?);
     `;
-  
     const updateScrapRow = await connection.query(addScrapQuery, addScarpParams[0]);
     const insertScrapTableRow = await connection.query(postScrapTableQuery, addScarpParams); // 여기 (postScrapTableQuery, post_id, user_id)처럼 인수를 3개 넘겨주면 에러남 
 
@@ -95,4 +95,21 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
     `;
     const insertLikeRow = await connection.query(addLikeQuery, post_id);
     return insertLikeRow;
+};
+
+export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록
+    const postParticipantQuery = `
+        INSERT INTO participant_users(post_id, user_id) 
+        VALUES (?,?);
+    `;
+    
+    const addCurrentPeopleQuery = `
+        UPDATE post 
+        SET current_people = current_people + 1
+        WHERE post_id = ?;
+    `;
+    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
+    const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
+
+    return postParticipantRow;
 };
