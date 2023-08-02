@@ -35,6 +35,15 @@ export const insertPost = async(connection, insertPostParams)=>{
     return insertPostRow;
 };
 
+export const insertImg = async(connection, insertImgParams)=>{
+    const postImgQuery = `
+        INSERT INTO post_img(img_url,post_id) 
+        VALUES (?,?);
+    `;
+    const insertImgRow = await connection.query(postImgQuery, insertImgParams);
+    return insertImgRow;
+};
+
 export const updatePost = async(connection, updatePostParams)=>{
     const patchPostQuery = `
         UPDATE post 

@@ -3,7 +3,7 @@
 
 import pool from "../../../config/database"
 import { baseResponse, response } from "../../../config/response";
-import { insertPost, updatePost, erasePost } from "./postDao";
+import { insertPost, insertImg, updatePost, erasePost } from "./postDao";
 
 
 export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, 
@@ -14,6 +14,17 @@ export const createPost = async(user_id, category, limit_people, location, meeti
 
     const connection = await pool.getConnection(async conn => conn);
     const createpostResult = await insertPost(connection,insertPostParams);
+    connection.release();
+    
+    return response(baseResponse.SUCCESS);
+};
+
+export const createImg = async(post_id, img_url) =>{
+ 
+    const insertImgParams =[post_id, img_url]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const createImgResult = await insertImg(connection,insertImgParams);
     connection.release();
     
     return response(baseResponse.SUCCESS);

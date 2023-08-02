@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response} from "../../../config/response";
 import { retrievePost, retrieveParticipant} from "./postProvider";
-import { createPost, editPost, removePost} from "./postService";
+import { createPost, createImg, editPost, removePost} from "./postService";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -26,7 +26,6 @@ export const getPost = async(req, res) => {
  * API name : 게시글 작성
  * POST: /post
  */
-
 export const postPost = async(req, res) => {
     
     const {user_id, category, limit_people, location, meeting_date, openchat, 
@@ -43,8 +42,16 @@ export const postPost = async(req, res) => {
  */
 export const postImg = async(req, res) => {
     
+   // const {post_id} = req.params;
+    const filePath = req.file.location // 업로드 된 이미지 경로
+    const {img_file} = req.body;
+    if (!filePath) {
+        return res.status(400).json(errResponse(baseResponse.INVALID_FILE_PATH));
+    }
+    console.log(`req.fiel: ${req.file}, req.file.location: ${filePath}`);
+    //const postImgResult = await createImg(post_id, filePath, img_file);
+    return res.status(200).json(response(baseResponse.SUCCESS, postImgResult));
 };
-
 
 /**
  * API name : 게시글 수정
