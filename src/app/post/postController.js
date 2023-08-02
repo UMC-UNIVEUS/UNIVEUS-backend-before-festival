@@ -47,7 +47,7 @@ export const postPost = async(req, res) => {
 
 /**
  * API name : 게시글 수정
- * PUT: /post/{post_id} 
+ * PATCH: /post/{post_id} 
  */
 export const patchPost =  async(req, res) => {
 
