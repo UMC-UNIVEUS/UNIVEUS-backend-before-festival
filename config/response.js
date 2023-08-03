@@ -32,8 +32,14 @@ export const baseResponse = {
     
     SIGNUP_PHONE_NUMBER_EMPTY : {"isSuccess" : false, "code" : 2015, "message" : "전화번호를 입력해주세요."},
     
-    POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3002, "message": "해당 게시글이 존재하지 않습니다." },
-    
+    //게시글 관련
+    POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3000, "message": "해당 게시글이 존재하지 않습니다." },
+    POST_TITLE_LENGTH : { "isSuccess": false, "code": 3001, "message": "제목은 최대 48자리를 입력해주세요." },
+    POST_LOCATION_LENGTH : { "isSuccess": false, "code": 3002, "message": "모임장소는 최대 24자리를 입력해주세요." },
+
+    //댓글 관련
+    COMMENT_COMMENTID_NOT_EXIST : { "isSuccess": false, "code": 3100, "message": "댓글이 존재하지 않습니다." },
+    COMMENT_COMMENT_LENGTH : { "isSuccess": false, "code": 3101, "message": "댓글은 최대 50자리를 입력해주세요." },
 
     
     //Connection, Transaction 등의 서버 오류
@@ -50,11 +56,6 @@ export const baseResponse = {
   
     USER_USER_NICKNAME_LENGTH : { "isSuccess": false, "code": 2004, "message": "닉네임 길이 제한을 초과하였습니다." },
 
-    POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3002, "message": "해당 게시글이 존재하지 않습니다." },
-
-    COMMENT_COMMENTID_NOT_EXIST : { "isSuccess": false, "code": 3003, "message": "댓글이 존재하지 않습니다." },
-
-  
     // 프로필 관련 오류 
     PROFILE_INFO_NOT_EXIST : { "isSuccess": false, "code": 2201, "message": "유저 프로필 정보가 존재하지 않습니다." },
 

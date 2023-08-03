@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import {baseResponse, response} from "../../../config/response";
+import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant} from "./postProvider";
 import { createPost, createImg, editPost, removePost, addScrap, addLike} from "./postService";
 import {getUserIdByEmail} from "../user/userProvider";
@@ -31,6 +31,14 @@ export const postPost = async(req, res) => {
     
     const {user_id, category, limit_people, location, meeting_date, openchat, 
         end_date, post_status, title, content} = req.body;
+    
+    if(title.length > 48){
+        return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
+    }
+    if(location.length > 24){
+        return res.status(400).json(errResponse(baseResponse.POST_LOCATION_LENGTH));
+    }
+    
     const postPostResult = await createPost(user_id, category, limit_people, location, meeting_date, openchat, 
         end_date, post_status, title, content);
     
@@ -39,13 +47,20 @@ export const postPost = async(req, res) => {
 
 /**
  * API name : 게시글 수정
- * PUT: /post/{post_id} 
+ * PATCH: /post/{post_id} 
  */
 export const patchPost =  async(req, res) => {
 
     const {post_id} = req.params;
     const {category, limit_people, location, meeting_date, openchat, 
         end_date, post_status, title,content} = req.body;
+
+    if(title.length > 48){ // 글자 수 제한 프론트에서 할 지 백엔드에서 할 지 정해야 함.
+        return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
+    }
+    if(location.length > 24){
+        return res.status(400).json(errResponse(baseResponse.POST_LOCATION_LENGTH));
+    }
     
     const patchPostResult = await editPost(category, limit_people, location, meeting_date, openchat, 
         end_date, post_status, title,content, post_id);   

@@ -4,6 +4,7 @@ import {baseResponse, response} from "../../../config/response";
 import {retrievePost} from "../post/postProvider";
 import {retrieveComment, retrieveOneComment} from "./commProvider";
 import {createComment, removeComment} from "./commService";
+import {getUserIdByEmail} from "../user/userProvider";
 
 /**
  * API name : 댓글 조회 (게시글의 모든 댓글 조회)
@@ -53,7 +54,14 @@ export const getComment = async(req, res) => {
 export const postComment = async(req, res) => {
 
     const {post_id} = req.params;
-    const {user_id, contents} = req.body; //user_id(댓글 작성자)와 contents(댓글 내용)를 body로 받아옴
+    const {contents} = req.body; 
+    const userEmail = req.verifiedToken.userEmail;
+    const user_id = await getUserIdByEmail(userEmail); //토큰을 통한 이메일로 유저 id 구하기
+
+    if(contents.length > 50){
+        return res.status(400).json(errResponse(baseResponse.COMMENT_COMMENT_LENGTH));
+    }
+
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면
