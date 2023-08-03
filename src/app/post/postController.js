@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike} from "./postService";
+import { createPost, createImg, editPost, removePost, addScrap, addLike, createParticipant} from "./postService";
 import {getUserIdByEmail} from "../user/userProvider";
 
 /**
@@ -13,9 +13,9 @@ export const getPost = async(req, res) => {
 	
     const {post_id} = req.params;
     const Post = await retrievePost(post_id); 
-    const Participant = await retrieveParticipant(post_id); 
-
+    
     if(Post){ // Post가 존재한다면
+        const Participant = await retrieveParticipant(post_id); 
         return res.status(200).json(response(baseResponse.SUCCESS, {Post,Participant}));
     } 
     else{ 
@@ -62,11 +62,11 @@ export const patchPost =  async(req, res) => {
         return res.status(400).json(errResponse(baseResponse.POST_LOCATION_LENGTH));
     }
     
-    const patchPostResult = await editPost(category, limit_people, location, meeting_date, openchat, 
-        end_date, post_status, title,content, post_id);   
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면
+        const patchPostResult = await editPost(category, limit_people, location, meeting_date, openchat, 
+            end_date, post_status, title,content, post_id);   
         return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
     } 
     else{ 
@@ -102,10 +102,10 @@ export const patchScrap = async(req, res) => {
     const userEmail = req.verifiedToken.userEmail;
     const user_id = await getUserIdByEmail(userEmail); //토큰을 통한 이메일로 유저 id 구하기
 
-    const addScrapResult = await addScrap(post_id, user_id);   
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면
+        const addScrapResult = await addScrap(post_id, user_id);   
         return res.status(200).json(response(baseResponse.SUCCESS, addScrapResult));
     } 
     else{ 
@@ -121,13 +121,34 @@ export const patchLike = async(req, res) => {
 
     const {post_id} = req.params;
     
-    const addLikeResult = await addLike(post_id);   
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면
+        const addLikeResult = await addLike(post_id);   
         return res.status(200).json(response(baseResponse.SUCCESS, addLikeResult));
     } 
     else{ 
         return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
     } 
+};
+
+/**
+ * API name : 게시글 참여자 등록
+ * POST: /post/{post_id}/participant
+ */
+export const postParticipant = async(req, res) => {
+    
+    const {post_id} = req.params;
+    const userEmail = req.verifiedToken.userEmail;
+    const user_id = await getUserIdByEmail(userEmail); //참여 신청자의 user_id
+    
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면 
+        const postParticipantResult = await createParticipant(post_id, user_id);
+        return res.status(200).json(response(baseResponse.SUCCESS, postParticipantResult));
+    } 
+    else{ 
+        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+    }
 };
