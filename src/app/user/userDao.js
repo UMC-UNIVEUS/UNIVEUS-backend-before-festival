@@ -45,3 +45,13 @@ export const insertAuthUser = async(connection, insertUserParams) => {
     const updateUserRow = await connection.query(updateUserQuery, values);
     return updateUserRow;
   };
+
+  export const selectUserIdByEmail= async(connection,email_id) => {// 이메일로 유저 id 조회
+    const selectUserIdQuery = `
+        SELECT user_id
+        FROM user
+        WHERE email_id = ?;
+    `;
+    const selectUserIdRow = await connection.query(selectUserIdQuery,email_id);
+    return selectUserIdRow[0];
+}

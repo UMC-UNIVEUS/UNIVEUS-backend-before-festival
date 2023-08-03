@@ -2,61 +2,66 @@
 (CRUD에 해당하는 서버 로직 처리) */
 
 import pool from "../../../config/database"
-import { baseResponse, response, errResponse } from "../../../config/response";
-import { insertPost, updatePost, erasePost } from "./postDao";
+import { baseResponse, response } from "../../../config/response";
+import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike } from "./postDao";
 
-
-export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, 
+export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, post_status, title, content) =>{
-    try{
-        const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
-            end_date, post_status, title, content]; 
+ 
+    const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
+        end_date, post_status, title, content]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const createpostResult = await insertPost(connection,insertPostParams);
+    connection.release();
     
-        const connection = await pool.getConnection(async conn => conn);
-        const createpostResult = await insertPost(connection,insertPostParams);
-        console.log(createpostResult);
-        
-        connection.release();
-        
-        return response(baseResponse.SUCCESS);
-    }
-    catch(error){
-        return errResponse(baseResponse.DB_ERROR)
-    }
+    return response(baseResponse.SUCCESS);
 };
 
-export const editPost = async(category, limit_people, location, meeting_date, openchat, 
+export const editPost = async(category, limit_people, location, meeting_date, openchat, // 게시글 수정
     end_date, post_status, title,content, post_id)=>{
-        try{
-            const updatePostParams =[category, limit_people, location, meeting_date, openchat, 
-                end_date, post_status, title,content,post_id]; 
-        
-            const connection = await pool.getConnection(async conn => conn);
-            const editPostResult = await updatePost(connection,updatePostParams); 
-            console.log(editPostResult);
-            
-            connection.release();
-            
-            return response(baseResponse.SUCCESS);
-        }
-        catch(error){
-            return errResponse(baseResponse.DB_ERROR)
-        }
+  
+    const updatePostParams =[category, limit_people, location, meeting_date, openchat, 
+        end_date, post_status, title,content,post_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const editPostResult = await updatePost(connection,updatePostParams); 
+    connection.release();
+    
+    return response(baseResponse.SUCCESS);
+
 };
 
-export const removePost = async(post_id)=>{
-        try{
-            const deletePostParams =[post_id]; 
+export const removePost = async(post_id)=>{// 게시글 삭제
         
-            const connection = await pool.getConnection(async conn => conn);
-            const removePostResult = await erasePost(connection,deletePostParams); 
-            console.log(removePostResult);
-            
-            connection.release();
-            
-            return response(baseResponse.SUCCESS);
-        }
-        catch(error){
-            return errResponse(baseResponse.DB_ERROR)
-        }
+    const deletePostParams =[post_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const removePostResult = await erasePost(connection,deletePostParams); 
+    connection.release();
+    
+    return response(baseResponse.SUCCESS);    
+};
+
+export const addScrap = async(post_id,user_id)=>{// 게시글 스크랩
+
+    const addScarpParams =[post_id, user_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const insertScrapResult = await insertScrap(connection, addScarpParams); 
+    connection.release();
+    
+    return response(baseResponse.SUCCESS);
+
+};
+
+
+export const addLike = async(post_id)=>{// 게시글 좋아요
+
+    const connection = await pool.getConnection(async conn => conn);
+    const insertLikeResult = await insertLike(connection,post_id); 
+    connection.release();
+    
+    return response(baseResponse.SUCCESS);
+
 };
