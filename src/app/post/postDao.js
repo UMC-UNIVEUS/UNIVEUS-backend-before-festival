@@ -111,7 +111,7 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
 
     const addParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,?,ParticipantAlarm);
+        VALUES (?,?,"ParticipantAlarm");
     `;
     const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
