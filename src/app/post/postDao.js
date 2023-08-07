@@ -97,7 +97,7 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
     return insertLikeRow;
 };
 
-export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록
+export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록 + 참여자 승인 알람
     const postParticipantQuery = `
         INSERT INTO participant_users(post_id, user_id) 
         VALUES (?,?);
@@ -108,8 +108,14 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
         SET current_people = current_people + 1
         WHERE post_id = ?;
     `;
+
+    const addParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,?,ParticipantAlarm);
+    `;
     const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
+    const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, insertParticipantParams);
 
     return postParticipantRow;
 };
