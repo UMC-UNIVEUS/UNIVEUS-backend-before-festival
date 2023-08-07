@@ -27,13 +27,29 @@ export const selectOneComment = async(connection, comments_id) => {
 };
 
 
-export const insertComment = async(connection, insertPostParams) => {
+export const insertComment = async(connection, insertPostParams) => { // 댓글 작성 + 댓글 알람
     const postCommentQuery = `
         INSERT INTO comments(post_id, user_id, contents, created_at) 
         VALUES (?,?,?,now());
     `;
 
+    const selectUserByPostIdQuery = `
+        SELECT user_id 
+        FROM post 
+        WHERE post_id = ?;
+    `;
+
+    const addCommentAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, participant_id, alarm_type) 
+        VALUES (?,?,?,"CommentAlarm");
+    `;
+    console.log(insertPostParams);
+
     const insertCommentRow = await connection.query(postCommentQuery, insertPostParams);
+    const user_id = await connection.query(selectUserByPostIdQuery, insertPostParams[0]);
+
+   // const addAlarmParams =[post_id, user_id, userIdFromJWT]; 
+    const addCommentAlarmRow = await connection.query(addCommentAlarmQuery, insertPostParams);
     return insertCommentRow;
 };
 
