@@ -1,7 +1,7 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser } from "../user/userService";
-import { isUser, isNicknameDuplicate } from "./userProvider";
+import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
@@ -201,4 +201,34 @@ export const startUniveUs = (req, res) => {
     // }catch(err) {
     //     return res.send(errResponse(baseResponse.SERVER_ERROR));
     // }
-}
+};
+
+/**
+ * API name : 알림 내역 조회
+ * GET: /uesr/{user_id}/alarm
+ */
+export const getAlarms = async(req, res) => {
+	
+    const {user_id} = req.params; // 알림 받은 유저의 ID
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 접속 중인 유저 ID
+
+    if(userIdFromJWT == user_id){
+        const getAlarmsResult = await retrieveAlarms(userIdFromJWT); 
+        return res.status(200).json(response(baseResponse.SUCCESS, getAlarmsResult));
+    }
+    else{
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }  
+};
+
+
+
+/**
+ * API name : 알림 확인 >> 아직 안 만듬
+ * PATCH: /uesr/{user_id}/alarm
+ */
+export const patchAlarms = async(req, res) => {
+
+   
+};

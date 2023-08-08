@@ -46,7 +46,7 @@ export const insertAuthUser = async(connection, insertUserParams) => {
     return updateUserRow;
   };
 
-  export const selectUserIdByEmail= async(connection,email_id) => {// 이메일로 유저 id 조회
+  export const selectUserIdByEmail = async(connection,email_id) => {// 이메일로 유저 id 조회
     const selectUserIdQuery = `
         SELECT user_id
         FROM user
@@ -54,4 +54,14 @@ export const insertAuthUser = async(connection, insertUserParams) => {
     `;
     const selectUserIdRow = await connection.query(selectUserIdQuery,email_id);
     return selectUserIdRow[0];
-}
+};
+
+export const selectAlarms = async(connection, userIdFromJWT) => {// 알림 내역 조회
+    const selectAlarmsQuery = `
+        SELECT *
+        FROM alarm
+        WHERE user_id = ?;
+    `;
+    const selectAlarmsRow = await connection.query(selectAlarmsQuery,userIdFromJWT);
+    return selectAlarmsRow;
+};

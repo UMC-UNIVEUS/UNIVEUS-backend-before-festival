@@ -1,4 +1,4 @@
-import { selectUser, selectUserByNickname, selectUserIdByEmail } from "./userDao"
+import { selectUser, selectUserByNickname, selectUserIdByEmail, selectAlarms } from "./userDao"
 import pool from "../../../config/database"
 
 export const isUser = async(email_id) => {
@@ -19,4 +19,11 @@ export const getUserIdByEmail = async(email_id) => {// 이메일로 유저 id �
     const connection = await pool.getConnection(async (conn) => conn);
     const [UserId] = await selectUserIdByEmail(connection, email_id);
     return UserId.user_id;
+}
+
+export const retrieveAlarms = async(userIdFromJWT) => {// 알림 내역 조회
+
+    const connection = await pool.getConnection(async (conn) => conn);
+    const [alarmsResult] = await selectAlarms(connection, userIdFromJWT);
+    return alarmsResult;
 }
