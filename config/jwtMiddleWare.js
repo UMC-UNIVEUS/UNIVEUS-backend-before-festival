@@ -28,7 +28,7 @@ export const jwtMiddleware = (req, res, next) =>{
     /** 토큰 검증 성공 */
     p.then((verifiedToken) => {
         req.verifiedToken = verifiedToken;
-        console.log(verifiedToken);
+        // console.log(verifiedToken);
                                 
         next();
     }).catch(onError);
