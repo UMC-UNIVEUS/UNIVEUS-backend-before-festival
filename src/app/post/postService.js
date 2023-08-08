@@ -6,10 +6,10 @@ import { baseResponse, response } from "../../../config/response";
 import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant, updateParticipant } from "./postDao";
 
 export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, // 게시글 생성
-    end_date, post_status, title, content) =>{
+    end_date, title, content) =>{
  
     const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
-        end_date, post_status, title, content]; 
+        end_date, title, content]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const createpostResult = await insertPost(connection,insertPostParams);
@@ -78,9 +78,9 @@ export const applyParticipant = async(post_id, user_id) =>{// 게시글 참여 �
 };
 
 
-export const registerParticipant = async(post_id, user_id) =>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
+export const registerParticipant = async(post_id, user_id, participant_id) =>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
 
-    const updateParticipantParams =[post_id, user_id]; 
+    const updateParticipantParams =[post_id, user_id, participant_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const registerParticipantResult = await updateParticipant(connection,updateParticipantParams);

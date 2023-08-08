@@ -30,7 +30,7 @@ export const getPost = async(req, res) => {
 export const postPost = async(req, res) => {
     
     const {user_id, category, limit_people, location, meeting_date, openchat, 
-        end_date, post_status, title, content} = req.body;
+        end_date, title, content} = req.body;
     
     if(title.length > 48){
         return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
@@ -40,7 +40,7 @@ export const postPost = async(req, res) => {
     }
     
     const postPostResult = await createPost(user_id, category, limit_people, location, meeting_date, openchat, 
-        end_date, post_status, title, content);
+        end_date, title, content);
     
     return res.status(200).json(response(baseResponse.SUCCESS, postPostResult));
 };
@@ -160,6 +160,10 @@ export const postParticipant = async(req, res) => {
 export const getParticipant = async(req, res) => {
 	
     const {post_id} = req.params;
+     // post_id로 찾은 user_id와 userIdFromJWT가 일치해야만 이 API를 호출할 수 있도록 구현해야 하는지 (혹여나 작성자가 아닌 유저가 이 api를 호출할 수도 있으므로)
+     // OR
+     // JWT미들웨어만 추가해서 토큰이 유효한지(로그인을 했는지) 체크만 할 지(토큰이 만료가 되면 어떤 사용자가 이 api를 호출했고, 데이터를 DB에 저장할 수 없음)
+     // 뭐가 더 나을까요?!?! >> 보류
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면
@@ -185,7 +189,7 @@ export const patchParticipant = async(req, res) => {
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면 
-        const patchParticipantResult = await registerParticipant(post_id, user_id);
+        const patchParticipantResult = await registerParticipant(post_id, user_id, participant_id);
         return res.status(200).json(response(baseResponse.SUCCESS, patchParticipantResult));
     } 
     else{ 
