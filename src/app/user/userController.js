@@ -13,7 +13,7 @@ const cache = new NodeCache();
 
 /**로그인 버튼 클릭 시 발생, 구글 인증페이지로 이동*/
 export const login = async(req, res) => {
-    const GOOGLE_LOGIN_REDIRECT_URI = 'https://univeus.site/user/login/redirect';
+    const GOOGLE_LOGIN_REDIRECT_URI = 'http://localhost:3000/user/login/redirect';
 
     // try {
         let url = 'https://accounts.google.com/o/oauth2/v2/auth';
@@ -29,7 +29,7 @@ export const login = async(req, res) => {
 
 /**구글 로그인 후 회원이면 토큰 발급, 회원이 아니면 err 발송 */
 export const loginRedirect = async(req, res) => {
-    const GOOGLE_LOGIN_REDIRECT_URI = 'https://univeus.site/user/login/redirect';
+    const GOOGLE_LOGIN_REDIRECT_URI = 'http://localhost:3000/user/login/redirect';
     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
@@ -77,7 +77,7 @@ export const loginRedirect = async(req, res) => {
 
 /**회원가입 */
 export const signup = async(req, res) => {
-    const GOOGLE_SIGNUP_REDIRECT_URI = 'https://univeus.site/user/signup/redirect';
+    const GOOGLE_SIGNUP_REDIRECT_URI = 'http://localhost:3000/user/signup/redirect';
     // try {
         let url = 'https://accounts.google.com/o/oauth2/v2/auth';
         url += `?client_id=${process.env.GOOGLE_CLIENT_ID}`;
@@ -91,7 +91,7 @@ export const signup = async(req, res) => {
 }
 
 export const signupRedirect = async(req, res) => {
-    const GOOGLE_SIGNUP_REDIRECT_URI = 'https://univeus.site/user/signup/redirect';
+    const GOOGLE_SIGNUP_REDIRECT_URI = 'http://localhost:3000/user/signup/redirect';
     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 

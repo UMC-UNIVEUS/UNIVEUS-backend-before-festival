@@ -57,7 +57,7 @@ export const postComment = async(req, res) => {
     const {contents} = req.body; 
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); //토큰을 통한 이메일로 유저 id 구하기
-
+    console.log("Length: "+ contents.length);
     if(contents.length > 50){
         return res.status(400).json(errResponse(baseResponse.COMMENT_COMMENT_LENGTH));
     }
