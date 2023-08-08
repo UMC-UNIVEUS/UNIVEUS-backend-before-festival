@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant,registerParticipant } from "./postService";
+import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
+import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant } from "./postService";
 import {getUserIdByEmail} from "../user/userProvider";
 
 /**
@@ -154,12 +154,31 @@ export const postParticipant = async(req, res) => {
 };
 
 /**
+ * API name  게시글 참여자 신청 내역 조회 
+ * GET: /post/{post_id}/participant
+ */
+export const getParticipant = async(req, res) => {
+	
+    const {post_id} = req.params;
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면
+        const getParticipantList = await retrieveParticipantList(post_id); 
+        return res.status(200).json(response(baseResponse.SUCCESS, getParticipantList));
+    } 
+    else{ 
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+    }  
+};
+
+/**
  * API name : 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
  * PATCH: /post/{post_id}/participant/register
  */
 export const patchParticipant = async(req, res) => {
     
     const {post_id} = req.params;
+    const {participant_id} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const user_id = await getUserIdByEmail(userEmail); //참여 신청자의 user_id
     
@@ -170,6 +189,6 @@ export const patchParticipant = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, patchParticipantResult));
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     }
 };

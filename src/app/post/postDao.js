@@ -108,19 +108,32 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
         VALUES (?,(SELECT user_id FROM post WHERE post_id = ?),?,"ParticipantAlarm");
     `;
 
-    console.log("insertParticipantParams: "+ insertParticipantParams);
-    console.log("insertParticipantParams[0]: "+ insertParticipantParams[0]);
-
     const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
     const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, [insertParticipantParams[0],insertParticipantParams[0],insertParticipantParams[1]]);
     //insertParticipantParams[0]은 post_id, insertParticipantParams[1]은 user_id
     return postParticipantRow;
 };
 
+export const selectParticipantList = async(connection, post_id)=>{ //참여자 신청 내역 조회
+    const selectParticipantListQuery = `
+        SELECT participant_users.participant_id, user.user_id, user.gender, 
+        user.nickname, user.major, user.class_of, participant_users.status
+        FROM participant_users
+        INNER JOIN user
+        ON participant_users.user_id = user.user_id
+        WHERE post_id = ? AND status= "Waiting";
+    `;
+    const [selectParticipantListRow] = await connection.query(selectParticipantListQuery, post_id);
+    return selectParticipantListRow;
+};
+
 export const updateParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
-    const postParticipantQuery = `
-        INSERT INTO participant_users(post_id, user_id) 
-        VALUES (?,?);
+    //여기서 참여자 승인을 할 때, participant_id를 프론트로부터 받아와서 승인을 할 지 user_id와 post_id를 통해서 승인을 할 지 의논해야 함.
+    // participant_id를 받아오면 더 빠르고, user_id + post_id로 찾아내는 건 db에서 탐색을 해야 해서 더 오래 걸린다. 8/8 알바 가기 전 하다가 맘
+    const approveParticipantQuery = `
+        UPDATE participant_users
+        SET status = "Approved"
+        WHERE  ;
     `;
     
     const addCurrentPeopleQuery = `
@@ -133,7 +146,7 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
         INSERT INTO alarm(post_id, user_id, alarm_type) 
         VALUES (?,?,"ParticipantAlarm");
     `;
-    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
+    const approveParticipantRow = await connection.query(approveParticipantQuery, insertParticipantParams);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
     const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, insertParticipantParams);
 
