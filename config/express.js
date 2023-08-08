@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import userRouter from "../src/app/user/userRoute";
 import postRouter from "../src/app/post/postRoute";
 import commentRouter from "../src/app/comment/commRoute";
+import reportRouter from "../src/app/report/reportRoute";
 
 
 const app = express();  
@@ -23,6 +24,7 @@ app.use(cors());
 app.use('/user', userRouter);
 app.use('/post',postRouter);
 app.use('/comments',commentRouter);
+app.use('/report', reportRouter);
 
 app.use('/mypage', userRouter);
 
