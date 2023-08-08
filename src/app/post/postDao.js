@@ -104,12 +104,16 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
     `;
 
     const applyParticipantAlarmQuery = `
-        INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,?,"ParticipantAlarm");
+        INSERT INTO alarm(post_id, user_id, participant_id,alarm_type) 
+        VALUES (?,(SELECT user_id FROM post WHERE post_id = ?),?,"ParticipantAlarm");
     `;
-    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
-    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
 
+    console.log("insertParticipantParams: "+ insertParticipantParams);
+    console.log("insertParticipantParams[0]: "+ insertParticipantParams[0]);
+
+    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
+    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, [insertParticipantParams[0],insertParticipantParams[0],insertParticipantParams[1]]);
+    //insertParticipantParams[0]은 post_id, insertParticipantParams[1]은 user_id
     return postParticipantRow;
 };
 

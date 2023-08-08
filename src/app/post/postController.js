@@ -145,7 +145,7 @@ export const postParticipant = async(req, res) => {
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면 
-        const postParticipantResult = await applyParticipant(post_id, post_id, user_id);// 두 번째 post_id는 작성자의 id를 알기 위함
+        const postParticipantResult = await applyParticipant(post_id, user_id);// 두 번째 post_id는 작성자의 id를 알기 위함
         return res.status(200).json(response(baseResponse.SUCCESS, postParticipantResult));
     } 
     else{ 

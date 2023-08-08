@@ -66,9 +66,9 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
 
 };
 
-export const applyParticipant = async(post_id, post_id, user_id) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
+export const applyParticipant = async(post_id, user_id) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
 
-    const insertParticipantParams =[post_id, post_id, user_id]; 
+    const insertParticipantParams =[post_id, user_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const applyParticipantResult = await insertParticipant(connection,insertParticipantParams);
