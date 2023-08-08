@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike, createParticipant} from "./postService";
+import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant,registerParticipant } from "./postService";
 import {getUserIdByEmail} from "../user/userProvider";
 
 /**
@@ -133,8 +133,8 @@ export const patchLike = async(req, res) => {
 };
 
 /**
- * API name : 게시글 참여자 등록
- * POST: /post/{post_id}/participant
+ * API name : 게시글 참여 신청 + 참여 신청 알람(to 작성자)
+ * POST: /post/{post_id}/participant/apply
  */
 export const postParticipant = async(req, res) => {
     
@@ -145,8 +145,29 @@ export const postParticipant = async(req, res) => {
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면 
-        const postParticipantResult = await createParticipant(post_id, user_id);
+        const postParticipantResult = await applyParticipant(post_id, post_id, user_id);// 두 번째 post_id는 작성자의 id를 알기 위함
         return res.status(200).json(response(baseResponse.SUCCESS, postParticipantResult));
+    } 
+    else{ 
+        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+    }
+};
+
+/**
+ * API name : 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
+ * PATCH: /post/{post_id}/participant/register
+ */
+export const patchParticipant = async(req, res) => {
+    
+    const {post_id} = req.params;
+    const userEmail = req.verifiedToken.userEmail;
+    const user_id = await getUserIdByEmail(userEmail); //참여 신청자의 user_id
+    
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면 
+        const patchParticipantResult = await registerParticipant(post_id, user_id);
+        return res.status(200).json(response(baseResponse.SUCCESS, patchParticipantResult));
     } 
     else{ 
         return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))

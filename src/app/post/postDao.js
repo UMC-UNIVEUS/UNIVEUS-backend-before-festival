@@ -32,8 +32,8 @@ export const insertPost = async(connection, insertPostParams)=>{// 게시글 생
     `;
 
     const postParticipantTableQuery = `
-        INSERT INTO participant_users(user_id, post_id) 
-        VALUES (?,?);
+        INSERT INTO participant_users(user_id, post_id, status) 
+        VALUES (?,?,"Writer");
     `;
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
     const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]); 
@@ -97,7 +97,23 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
     return insertLikeRow;
 };
 
-export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록 + 참여자 승인 알람
+export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
+    const postParticipantQuery = `
+        INSERT INTO participant_users(post_id, user_id) 
+        VALUES (?,?);
+    `;
+
+    const applyParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,?,"ParticipantAlarm");
+    `;
+    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
+    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
+
+    return postParticipantRow;
+};
+
+export const updateParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
     const postParticipantQuery = `
         INSERT INTO participant_users(post_id, user_id) 
         VALUES (?,?);
