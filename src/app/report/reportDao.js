@@ -13,3 +13,19 @@ export const insertUserReportReason = async(connection, insertUserReportReasonPa
     const insertUserReportReasonRow = await connection.query(insertUserReportReasonQuery, insertUserReportReasonParams);
     return insertUserReportReasonRow;
 }
+
+/** 게시글 신고 insert */
+export const insertPostReport = async(connection, insertPostReportParams) => {
+    const insertPostReportQuery =  `INSERT INTO post_reports (report_reason_text, reported_by, 
+        post_id, report_status) VALUES (?, ?, ?, 0);`;
+    const [insertPostReportRow] = await connection.query(insertPostReportQuery, insertPostReportParams);
+    /** insert후 테이블 id 반환 */
+    return insertPostReportRow.insertId;
+}
+
+/** 게시글 신고 사유 insert */
+export const insertPostReportReason = async(connection, insertPostReportReasonParams) => {
+    const insertPostReportReasonQuery = `INSERT INTO post_report_reasons (report_reason, post_report_id) VALUES (?, ?)`;
+    const insertPostReportReasonRow = await connection.query(insertPostReportReasonQuery, insertPostReportReasonParams);
+    return insertPostReportReasonRow;
+}
