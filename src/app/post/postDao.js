@@ -105,7 +105,7 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
 
     const applyParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, participant_id,alarm_type) 
-        VALUES (?,(SELECT user_id FROM post WHERE post_id = ?),?,"ParticipantAlarm");
+        VALUES (?,(SELECT user_id FROM post WHERE post_id = ?),?,"참여 신청 알람");
     `;
 
     const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
@@ -133,7 +133,7 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
     const approveParticipantQuery = `
         UPDATE participant_users
         SET status = "Approved"
-        WHERE  participant_id= ?;
+        WHERE participant_id= ?;
     `;
     
     const addCurrentPeopleQuery = `
@@ -144,11 +144,11 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
 
     const addParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,?,"ParticipantAlarm");
+        VALUES (?,?,"참여 승인 알람");
     `;
     const approveParticipantRow = await connection.query(approveParticipantQuery, insertParticipantParams[2]);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
     const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, insertParticipantParams);
 
-    return postParticipantRow;
+    return addParticipantAlarmRow;
 };
