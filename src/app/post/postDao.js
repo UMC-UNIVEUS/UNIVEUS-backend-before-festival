@@ -104,13 +104,12 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
     `;
 
     const applyParticipantAlarmQuery = `
-        INSERT INTO alarm(post_id, user_id, participant_id,alarm_type) 
-        VALUES (?,(SELECT user_id FROM post WHERE post_id = ?),?,"참여 신청 알람");
+        INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
+        VALUES (?,?,?,"참여 신청 알람");
     `;
 
     const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
-    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, [insertParticipantParams[0],insertParticipantParams[0],insertParticipantParams[1]]);
-    //insertParticipantParams[0]은 post_id, insertParticipantParams[1]은 user_id
+    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
     return postParticipantRow;
 };
 
@@ -127,9 +126,7 @@ export const selectParticipantList = async(connection, post_id)=>{ //참여자 �
     return selectParticipantListRow;
 };
 
-export const updateParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
-    //여기서 참여자 승인을 할 때, participant_id를 프론트로부터 받아와서 승인을 할 지 user_id와 post_id를 통해서 승인을 할 지 의논해야 함.
-    // participant_id를 받아오면 더 빠르고, user_id + post_id로 찾아내는 건 db에서 탐색을 해야 해서 더 오래 걸린다. >> 일단 이 방법으로 함
+export const updateParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 승인 + 참여 승인 알람(to 참여자)
     const approveParticipantQuery = `
         UPDATE participant_users
         SET status = "Approved"
@@ -144,9 +141,9 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
 
     const addParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,?,"참여 승인 알람");
+        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 승인 알람");
     `;
-    const approveParticipantRow = await connection.query(approveParticipantQuery, insertParticipantParams[2]);
+    const approveParticipantRow = await connection.query(approveParticipantQuery, insertParticipantParams[1]);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
     const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, insertParticipantParams);
 

@@ -66,9 +66,9 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
 
 };
 
-export const applyParticipant = async(post_id, user_id) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
+export const applyParticipant = async(post_id, userIdFromJWT, userIdFromPostId) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
 
-    const insertParticipantParams =[post_id, user_id]; 
+    const insertParticipantParams =[post_id, userIdFromJWT, userIdFromPostId]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const applyParticipantResult = await insertParticipant(connection,insertParticipantParams);
@@ -78,7 +78,18 @@ export const applyParticipant = async(post_id, user_id) =>{// 게시글 참여 �
 };
 
 
-export const registerParticipant = async(post_id, user_id, participant_id) =>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
+export const registerParticipant = async(post_id, participant_id) =>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
+
+    const updateParticipantParams =[post_id, participant_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const registerParticipantResult = await updateParticipant(connection,updateParticipantParams);
+    connection.release();
+
+    return response(baseResponse.SUCCESS);
+};
+
+export const refuseParticipant = async(post_id, user_id, participant_id) =>{// 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
 
     const updateParticipantParams =[post_id, user_id, participant_id]; 
 

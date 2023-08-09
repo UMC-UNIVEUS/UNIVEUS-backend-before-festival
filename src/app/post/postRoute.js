@@ -1,5 +1,5 @@
 import express from "express"
-import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, getParticipant, patchParticipant} from "./postController";
+import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, getParticipant, patchParticipant, deleteParticipant} from "./postController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 
 const postRouter = express.Router();
@@ -10,9 +10,10 @@ postRouter.patch('/:post_id', patchPost); // 게시글 수정 API
 postRouter.delete('/:post_id', deletePost); // 게시글 삭제 API
 postRouter.patch('/:post_id/scrap', jwtMiddleware, patchScrap); // 게시글 스크랩 API
 postRouter.patch('/:post_id/like', patchLike); // 게시글 좋아요 API
-postRouter.post('/:post_id/participant/apply', jwtMiddleware, postParticipant); // 게시글 참여 신청 API + 참여 신청 알람(to 작성자) API
 postRouter.get('/:post_id/participant', jwtMiddleware, getParticipant); // 게시글 참여자 신청 내역 조회 API
-postRouter.patch('/:post_id/participant/register', jwtMiddleware, patchParticipant); // 게시글 참여자 등록 API + 참여 승인 알람(to 참여자) API >> 수정해야 함
+postRouter.post('/:post_id/participant/apply', jwtMiddleware, postParticipant); // 게시글 참여 신청 API + 참여 신청 알람(to 작성자) API
+postRouter.patch('/:post_id/participant/register', jwtMiddleware, patchParticipant); // 게시글 참여자 승인 API + 참여 승인 알람(to 참여자) API 
+postRouter.delete('/:post_id/participant/refuse', jwtMiddleware, deleteParticipant); // 게시글 참여자 거절 API + 참여 거절 알람(to 참여자) API 
 
 
 export default postRouter;

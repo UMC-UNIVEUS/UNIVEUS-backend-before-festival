@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant } from "./postService";
-import {getUserIdByEmail} from "../user/userProvider";
+import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant, refuseParticipant } from "./postService";
+import {getUserIdByEmail, getUserIdByPostId} from "../user/userProvider";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -140,12 +140,13 @@ export const postParticipant = async(req, res) => {
     
     const {post_id} = req.params;
     const userEmail = req.verifiedToken.userEmail;
-    const user_id = await getUserIdByEmail(userEmail); //참여 신청자의 user_id
+    const userIdFromPostId = await getUserIdByPostId(post_id); // 작성자의 ID
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
     
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면 
-        const postParticipantResult = await applyParticipant(post_id, user_id);// 두 번째 post_id는 작성자의 id를 알기 위함
+        const postParticipantResult = await applyParticipant(post_id, userIdFromJWT, userIdFromPostId);
         return res.status(200).json(response(baseResponse.SUCCESS, postParticipantResult));
     } 
     else{ 
@@ -160,23 +161,27 @@ export const postParticipant = async(req, res) => {
 export const getParticipant = async(req, res) => {
 	
     const {post_id} = req.params;
-     // post_id로 찾은 user_id와 userIdFromJWT가 일치해야만 이 API를 호출할 수 있도록 구현해야 하는지 (혹여나 작성자가 아닌 유저가 이 api를 호출할 수도 있으므로)
-     // OR
-     // JWT미들웨어만 추가해서 토큰이 유효한지(로그인을 했는지) 체크만 할 지(토큰이 만료가 되면 어떤 사용자가 이 api를 호출했고, 데이터를 DB에 저장할 수 없음)
-     // 뭐가 더 나을까요?!?! >> 보류
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromPostId = await getUserIdByPostId(post_id); // 작성자의 ID
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
     const Post = await retrievePost(post_id); 
     
-    if(Post){ // Post가 존재한다면
-        const getParticipantList = await retrieveParticipantList(post_id); 
-        return res.status(200).json(response(baseResponse.SUCCESS, getParticipantList));
-    } 
-    else{ 
-        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
-    }  
+    if(userIdFromPostId == userIdFromJWT){ //접속한 유저가 작정자라면
+        if(Post){ // Post가 존재한다면
+            const getParticipantList = await retrieveParticipantList(post_id); 
+            return res.status(200).json(response(baseResponse.SUCCESS, getParticipantList));
+        } 
+        else{ 
+            return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
+        }  
+    }
+    else{
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }
 };
 
 /**
- * API name : 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
+ * API name : 게시글 참여자 승인 + 참여 승인 알람(to 참여자)
  * PATCH: /post/{post_id}/participant/register
  */
 export const patchParticipant = async(req, res) => {
@@ -184,13 +189,41 @@ export const patchParticipant = async(req, res) => {
     const {post_id} = req.params;
     const {participant_id} = req.body;
     const userEmail = req.verifiedToken.userEmail;
-    const user_id = await getUserIdByEmail(userEmail); //참여 신청자의 user_id
+    const userIdFromPostId = await getUserIdByPostId(post_id); // 작성자의 ID
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
+    
+    const Post = await retrievePost(post_id); 
+    
+    if(userIdFromPostId == userIdFromJWT){
+        if(Post){ // Post가 존재한다면 
+            const patchParticipantResult = await registerParticipant(post_id, participant_id);
+            return res.status(200).json(response(baseResponse.SUCCESS, patchParticipantResult));
+        } 
+        else{ 
+            return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
+        }
+    }
+    else{
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }
+};
+
+/**
+ * API name : 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
+ * DELETE: /{post_id}/participant/refuse
+ */
+export const deleteParticipant = async(req, res) => {
+    
+    const {post_id} = req.params;
+    const {participant_id} = req.body;
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID
     
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면 
-        const patchParticipantResult = await registerParticipant(post_id, user_id, participant_id);
-        return res.status(200).json(response(baseResponse.SUCCESS, patchParticipantResult));
+        const deleteParticipantResult = await refuseParticipant(post_id, userIdFromJWT, participant_id);
+        return res.status(200).json(response(baseResponse.SUCCESS, deleteParticipantResult));
     } 
     else{ 
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
