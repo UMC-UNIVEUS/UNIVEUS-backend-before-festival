@@ -194,7 +194,7 @@ export const patchParticipant = async(req, res) => {
     
     const Post = await retrievePost(post_id); 
     
-    if(userIdFromPostId == userIdFromJWT){
+    if(userIdFromPostId == userIdFromJWT){//접속한 유저가 작정자라면
         if(Post){ // Post가 존재한다면 
             const patchParticipantResult = await registerParticipant(post_id, participant_id);
             return res.status(200).json(response(baseResponse.SUCCESS, patchParticipantResult));
@@ -217,15 +217,21 @@ export const deleteParticipant = async(req, res) => {
     const {post_id} = req.params;
     const {participant_id} = req.body;
     const userEmail = req.verifiedToken.userEmail;
-    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID
+    const userIdFromPostId = await getUserIdByPostId(post_id); // 작성자의 ID
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
     
     const Post = await retrievePost(post_id); 
     
-    if(Post){ // Post가 존재한다면 
-        const deleteParticipantResult = await refuseParticipant(post_id, userIdFromJWT, participant_id);
-        return res.status(200).json(response(baseResponse.SUCCESS, deleteParticipantResult));
-    } 
-    else{ 
-        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+    if(userIdFromPostId == userIdFromJWT){//접속한 유저가 작정자라면
+        if(Post){ // Post가 존재한다면  
+            const deleteParticipantResult = await refuseParticipant(post_id, participant_id);
+            return res.status(200).json(response(baseResponse.SUCCESS, deleteParticipantResult));
+        } 
+        else{ 
+            return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
+        }
+    }
+    else{
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     }
 };

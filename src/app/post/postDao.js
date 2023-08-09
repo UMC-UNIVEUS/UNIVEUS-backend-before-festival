@@ -149,3 +149,19 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
 
     return addParticipantAlarmRow;
 };
+
+export const deleteParticipant = async(connection, deleteParticipantParams)=>{// 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
+    const addParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 거부 알람");
+    `;
+
+    const deleteParticipantQuery = `
+        DELETE FROM participant_users
+        WHERE participant_id= ?;
+    `;
+    const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, deleteParticipantParams);
+    const approveParticipantRow = await connection.query(deleteParticipantQuery, deleteParticipantParams[1]);
+
+    return addParticipantAlarmRow;
+};
