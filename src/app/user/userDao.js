@@ -65,3 +65,13 @@ export const selectAlarms = async(connection, userIdFromJWT) => {// 알림 내�
     const selectAlarmsRow = await connection.query(selectAlarmsQuery,userIdFromJWT);
     return selectAlarmsRow;
 };
+
+export const updateAlarms = async(connection, alarm_id) => {// 알림 확인 
+    const updateAlarmsQuery = `
+        UPDATE alarm
+        SET ischecked = 1
+        WHERE alarm_id= ?;
+    `;
+    const updateAlarmsRow = await connection.query(updateAlarmsQuery,alarm_id);
+    return updateAlarmsRow;
+};

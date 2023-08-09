@@ -19,7 +19,7 @@ export const getPost = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, {Post,Participant}));
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     }  
 };
 
@@ -70,7 +70,7 @@ export const patchPost =  async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     } 
 };
 
@@ -88,7 +88,7 @@ export const deletePost =  async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, deletePostResult));
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))        
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))        
     }
 };
 
@@ -109,7 +109,7 @@ export const patchScrap = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, addScrapResult));
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     } 
 };
 
@@ -128,7 +128,7 @@ export const patchLike = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, addLikeResult));
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     } 
 };
 
@@ -149,7 +149,7 @@ export const postParticipant = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, postParticipantResult));
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     }
 };
 

@@ -1,6 +1,6 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser } from "../user/userService";
+import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser, checkAlarms } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
@@ -225,10 +225,21 @@ export const getAlarms = async(req, res) => {
 
 
 /**
- * API name : 알림 확인 >> 아직 안 만듬
+ * API name : 알림 확인 
  * PATCH: /uesr/{user_id}/alarm
  */
 export const patchAlarms = async(req, res) => {
 
-   
+    const {user_id} = req.params; //알림을 확인하려는 유저 ID
+    const {alarm_id} = req.body;
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 접속 중인 유저 ID
+    
+    if(userIdFromJWT == user_id){
+        const patchAlarmsResult = await checkAlarms(alarm_id);   
+        return res.status(200).json(response(baseResponse.SUCCESS, patchAlarmsResult));
+    } 
+    else{ 
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    } 
 };

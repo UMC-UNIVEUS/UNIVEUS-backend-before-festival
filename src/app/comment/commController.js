@@ -22,11 +22,11 @@ export const getComment = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, Comment));
     }
     else{
-        return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
     }
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     }
 };
 
@@ -43,7 +43,7 @@ export const getComment = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, Comment));
     }
     else{
-        return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
     }
 };
 
@@ -87,6 +87,6 @@ export const deleteComment = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, deleteCommentResult));
     }
     else{
-        return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
     }
 };
