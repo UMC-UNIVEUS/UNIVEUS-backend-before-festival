@@ -3,13 +3,13 @@
 
 import pool from "../../../config/database"
 import { baseResponse, response } from "../../../config/response";
-import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant } from "./postDao";
+import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant, updateParticipant,deleteParticipant } from "./postDao";
 
 export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, // 게시글 생성
-    end_date, post_status, title, content) =>{
+    end_date, title, content) =>{
  
     const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
-        end_date, post_status, title, content]; 
+        end_date, title, content]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const createpostResult = await insertPost(connection,insertPostParams);
@@ -66,12 +66,35 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
 
 };
 
-export const createParticipant = async(post_id, user_id) =>{// 게시글 참여자 등록
+export const applyParticipant = async(post_id, userIdFromJWT, userIdFromPostId) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
 
-    const insertParticipantParams =[post_id, user_id]; 
+    const insertParticipantParams =[post_id, userIdFromJWT, userIdFromPostId]; 
 
     const connection = await pool.getConnection(async conn => conn);
-    const createParticipantResult = await insertParticipant(connection,insertParticipantParams);
+    const applyParticipantResult = await insertParticipant(connection,insertParticipantParams);
+    connection.release();
+
+    return response(baseResponse.SUCCESS);
+};
+
+
+export const registerParticipant = async(post_id, participant_id) =>{// 게시글 참여자 등록 + 참여 승인 알람(to 참여자)
+
+    const updateParticipantParams =[post_id, participant_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const registerParticipantResult = await updateParticipant(connection,updateParticipantParams);
+    connection.release();
+
+    return response(baseResponse.SUCCESS);
+};
+
+export const refuseParticipant = async(post_id, participant_id) =>{// 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
+
+    const deleteParticipantParams =[post_id, participant_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const refuseParticipantResult = await deleteParticipant(connection,deleteParticipantParams);
     connection.release();
 
     return response(baseResponse.SUCCESS);

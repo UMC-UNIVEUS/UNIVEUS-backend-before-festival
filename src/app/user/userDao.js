@@ -46,7 +46,7 @@ export const insertAuthUser = async(connection, insertUserParams) => {
     return updateUserRow;
   };
 
-  export const selectUserIdByEmail= async(connection,email_id) => {// 이메일로 유저 id 조회
+export const selectUserIdByEmail = async(connection,email_id) => {// 이메일로 유저 id 조회
     const selectUserIdQuery = `
         SELECT user_id
         FROM user
@@ -54,4 +54,34 @@ export const insertAuthUser = async(connection, insertUserParams) => {
     `;
     const selectUserIdRow = await connection.query(selectUserIdQuery,email_id);
     return selectUserIdRow[0];
-}
+};
+
+export const selectUserIdByPostId = async(connection,post_id) => {// 이메일로 유저 id 조회
+    const selectUserIdByPostIdQuery = `
+        SELECT user_id
+        FROM post
+        WHERE post_id = ?;
+    `;
+    const selectUserIdByPostIdRow = await connection.query(selectUserIdByPostIdQuery,post_id);
+    return selectUserIdByPostIdRow[0];
+};
+
+export const selectAlarms = async(connection, userIdFromJWT) => {// 알림 내역 조회
+    const selectAlarmsQuery = `
+        SELECT *
+        FROM alarm
+        WHERE user_id = ?;
+    `;
+    const selectAlarmsRow = await connection.query(selectAlarmsQuery,userIdFromJWT);
+    return selectAlarmsRow;
+};
+
+export const updateAlarms = async(connection, alarm_id) => {// 알림 확인 
+    const updateAlarmsQuery = `
+        UPDATE alarm
+        SET ischecked = 1
+        WHERE alarm_id= ?;
+    `;
+    const updateAlarmsRow = await connection.query(updateAlarmsQuery,alarm_id);
+    return updateAlarmsRow;
+};

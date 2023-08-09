@@ -26,14 +26,14 @@ export const selectParticipant = async(connection, post_id)=>{ // 참여자 목�
 export const insertPost = async(connection, insertPostParams)=>{// 게시글 생성 + 게시글 참여자 테이블 생성
     const postPostQuery = `
         INSERT INTO post(user_id, category, current_people, limit_people, location, 
-        meeting_date, openchat, end_date, post_status, title, 
+        meeting_date, openchat, end_date, title, 
         content, created_at) 
-        VALUES (?,?,1,?,?, ?,?,?,?,?, ?,now());
+        VALUES (?,?,1,?,?, ?,?,?,?, ?,now());
     `;
 
     const postParticipantTableQuery = `
-        INSERT INTO participant_users(user_id, post_id) 
-        VALUES (?,?);
+        INSERT INTO participant_users(user_id, post_id, status) 
+        VALUES (?,?,"Writer");
     `;
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
     const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]); 
@@ -97,10 +97,40 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
     return insertLikeRow;
 };
 
-export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 등록
+export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
     const postParticipantQuery = `
         INSERT INTO participant_users(post_id, user_id) 
         VALUES (?,?);
+    `;
+
+    const applyParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
+        VALUES (?,?,?,"참여 신청 알람");
+    `;
+
+    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
+    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
+    return postParticipantRow;
+};
+
+export const selectParticipantList = async(connection, post_id)=>{ //참여자 신청 내역 조회
+    const selectParticipantListQuery = `
+        SELECT participant_users.participant_id, user.user_id, user.gender, 
+        user.nickname, user.major, user.class_of, participant_users.status
+        FROM participant_users
+        INNER JOIN user
+        ON participant_users.user_id = user.user_id
+        WHERE post_id = ? AND status= "Waiting";
+    `;
+    const [selectParticipantListRow] = await connection.query(selectParticipantListQuery, post_id);
+    return selectParticipantListRow;
+};
+
+export const updateParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 승인 + 참여 승인 알람(to 참여자)
+    const approveParticipantQuery = `
+        UPDATE participant_users
+        SET status = "Approved"
+        WHERE participant_id= ?;
     `;
     
     const addCurrentPeopleQuery = `
@@ -108,8 +138,30 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
         SET current_people = current_people + 1
         WHERE post_id = ?;
     `;
-    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
-    const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
 
-    return postParticipantRow;
+    const addParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 승인 알람");
+    `;
+    const approveParticipantRow = await connection.query(approveParticipantQuery, insertParticipantParams[1]);
+    const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
+    const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, insertParticipantParams);
+
+    return addParticipantAlarmRow;
+};
+
+export const deleteParticipant = async(connection, deleteParticipantParams)=>{// 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
+    const addParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 거부 알람");
+    `;
+
+    const deleteParticipantQuery = `
+        DELETE FROM participant_users
+        WHERE participant_id= ?;
+    `;
+    const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, deleteParticipantParams);
+    const approveParticipantRow = await connection.query(deleteParticipantQuery, deleteParticipantParams[1]);
+
+    return addParticipantAlarmRow;
 };

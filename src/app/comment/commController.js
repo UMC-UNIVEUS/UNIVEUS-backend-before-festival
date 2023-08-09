@@ -22,11 +22,11 @@ export const getComment = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, Comment));
     }
     else{
-        return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
     }
     } 
     else{ 
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     }
 };
 
@@ -43,7 +43,7 @@ export const getComment = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, Comment));
     }
     else{
-        return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
     }
 };
 
@@ -56,8 +56,8 @@ export const postComment = async(req, res) => {
     const {post_id} = req.params;
     const {contents} = req.body; 
     const userEmail = req.verifiedToken.userEmail;
-    const user_id = await getUserIdByEmail(userEmail); //토큰을 통한 이메일로 유저 id 구하기
-
+    const userIdFromJWT = await getUserIdByEmail(userEmail); //토큰을 통한 이메일로 유저 id 구하기
+    console.log("Length: "+ contents.length);
     if(contents.length > 50){
         return res.status(400).json(errResponse(baseResponse.COMMENT_COMMENT_LENGTH));
     }
@@ -65,11 +65,11 @@ export const postComment = async(req, res) => {
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면
-        const postCommentResult = await createComment(post_id, user_id, contents);
+        const postCommentResult = await createComment(post_id, userIdFromJWT, contents);
         return res.status(200).json(response(baseResponse.SUCCESS, postCommentResult));
     }
     else{
-        return res.status(404).json(response(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     }   
 };
 
@@ -87,6 +87,6 @@ export const deleteComment = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, deleteCommentResult));
     }
     else{
-        return res.status(404).json(response(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
     }
 };

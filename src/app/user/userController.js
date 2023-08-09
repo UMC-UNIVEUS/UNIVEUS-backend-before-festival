@@ -1,7 +1,7 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser } from "../user/userService";
-import { isUser, isNicknameDuplicate } from "./userProvider";
+import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser, checkAlarms } from "../user/userService";
+import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
@@ -77,7 +77,7 @@ export const loginRedirect = async(req, res) => {
 
 /**회원가입 */
 export const signup = async(req, res) => {
-    const GOOGLE_SIGNUP_REDIRECT_URI = 'https://univeus.site/user/signup/redirect';
+    const GOOGLE_SIGNUP_REDIRECT_URI = 'http://localhost:3000/user/signup/redirect';
     // try {
         let url = 'https://accounts.google.com/o/oauth2/v2/auth';
         url += `?client_id=${process.env.GOOGLE_CLIENT_ID}`;
@@ -91,7 +91,7 @@ export const signup = async(req, res) => {
 }
 
 export const signupRedirect = async(req, res) => {
-    const GOOGLE_SIGNUP_REDIRECT_URI = 'https://univeus.site/user/signup/redirect';
+    const GOOGLE_SIGNUP_REDIRECT_URI = 'http://localhost:3000/user/signup/redirect';
     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
@@ -201,4 +201,45 @@ export const startUniveUs = (req, res) => {
     // }catch(err) {
     //     return res.send(errResponse(baseResponse.SERVER_ERROR));
     // }
-}
+};
+
+/**
+ * API name : 알림 내역 조회
+ * GET: /uesr/{user_id}/alarm
+ */
+export const getAlarms = async(req, res) => {
+	
+    const {user_id} = req.params; // 알림 받은 유저의 ID
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 접속 중인 유저 ID
+
+    if(userIdFromJWT == user_id){
+        const getAlarmsResult = await retrieveAlarms(userIdFromJWT); 
+        return res.status(200).json(response(baseResponse.SUCCESS, getAlarmsResult));
+    }
+    else{
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }  
+};
+
+
+
+/**
+ * API name : 알림 확인 
+ * PATCH: /uesr/{user_id}/alarm
+ */
+export const patchAlarms = async(req, res) => {
+
+    const {user_id} = req.params; //알림을 확인하려는 유저 ID
+    const {alarm_id} = req.body;
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 접속 중인 유저 ID
+    
+    if(userIdFromJWT == user_id){
+        const patchAlarmsResult = await checkAlarms(alarm_id);   
+        return res.status(200).json(response(baseResponse.SUCCESS, patchAlarmsResult));
+    } 
+    else{ 
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    } 
+};

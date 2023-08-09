@@ -31,6 +31,8 @@ export const baseResponse = {
     NICK_NAME_DUPLICATE : {"isSuccess" : false, "code" : 2014, "message" : "닉네임이 중복됩니다." },
     
     SIGNUP_PHONE_NUMBER_EMPTY : {"isSuccess" : false, "code" : 2015, "message" : "전화번호를 입력해주세요."},
+
+    USER_USERID_USERIDFROMJWT_NOT_MATCH : {"isSuccess":false, "code":2016, "message":"user_id와 userIdFromJWT가 일치하지 않습니다."},
     
     //게시글 관련
     POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3000, "message": "해당 게시글이 존재하지 않습니다." },
