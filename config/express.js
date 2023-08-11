@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import userRouter from "../src/app/user/userRoute";
 import postRouter from "../src/app/post/postRoute";
 import commentRouter from "../src/app/comment/commRoute";
+import mainRouter from "../src/app/main/mainRoute"
 import reportRouter from "../src/app/report/reportRoute";
 
 
@@ -27,5 +28,6 @@ app.use('/comments',commentRouter);
 app.use('/report', reportRouter);
 
 app.use('/mypage', userRouter);
+app.use('/', mainRouter)
 
 export default app;
