@@ -17,7 +17,6 @@ export const removeComment = async(comments_id)=>{
   
     const connection = await pool.getConnection(async conn => conn);
     const removeCommnentResult = await eraseComment(connection,comments_id); 
-    console.log(`삭제된 댓글의 comments_id = ${comments_id}`);
     connection.release();
     
     return response(baseResponse.SUCCESS);

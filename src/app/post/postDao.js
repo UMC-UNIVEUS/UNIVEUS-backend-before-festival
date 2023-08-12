@@ -2,7 +2,7 @@
 
 export const selectPost = async(connection, post_id)=>{ // 게시글 조회
     const selectPostQuery = `
-        SELECT title, category, scrapes, meeting_date, end_date, current_people, limit_people, openchat
+        SELECT *
         FROM post
         WHERE post_id = ?;
     `;
@@ -12,11 +12,11 @@ export const selectPost = async(connection, post_id)=>{ // 게시글 조회
 
 export const selectParticipant = async(connection, post_id)=>{ // 참여자 목록 조회
     const selectParticipantQuery = `
-        SELECT user.gender, user.nickname, user.major, user.class_of  
+        SELECT user.user_id, user.gender, user.nickname, user.major, user.class_of, participant_users.status
         FROM participant_users
         INNER JOIN user
         ON participant_users.user_id = user.user_id
-        WHERE post_id = ?;
+        WHERE post_id = ? AND status = "Approved";
     `;
     const [ParticipantRow] = await connection.query(selectParticipantQuery, post_id);
     return ParticipantRow;
@@ -60,13 +60,13 @@ export const updatePost = async(connection, updatePostParams)=>{// 게시글 수
     return updatePostRow;
 };
 
-export const erasePost = async(connection, deletePostParams)=>{// 게시글 삭제
+export const erasePost = async(connection, post_id)=>{// 게시글 삭제
     const deletePostQuery = `
         DELETE 
         FROM post
         WHERE post_id = ?;
     `;
-    const deletePostRow = await connection.query(deletePostQuery, deletePostParams);
+    const deletePostRow = await connection.query(deletePostQuery, post_id);
     return deletePostRow;
 };
  

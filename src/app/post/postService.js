@@ -5,10 +5,10 @@ import pool from "../../../config/database"
 import { baseResponse, response } from "../../../config/response";
 import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant, updateParticipant,deleteParticipant } from "./postDao";
 
-export const createPost = async(user_id, category, limit_people, location, meeting_date, openchat, // 게시글 생성
+export const createPost = async(userIdFromJWT, category, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, title, content) =>{
  
-    const insertPostParams =[user_id, category, limit_people, location, meeting_date, openchat, 
+    const insertPostParams =[userIdFromJWT, category, limit_people, location, meeting_date, openchat, 
         end_date, title, content]; 
 
     const connection = await pool.getConnection(async conn => conn);
@@ -34,18 +34,16 @@ export const editPost = async(category, limit_people, location, meeting_date, op
 
 export const removePost = async(post_id)=>{// 게시글 삭제
         
-    const deletePostParams =[post_id]; 
-
     const connection = await pool.getConnection(async conn => conn);
-    const removePostResult = await erasePost(connection,deletePostParams); 
+    const removePostResult = await erasePost(connection,post_id); 
     connection.release();
     
     return response(baseResponse.SUCCESS);    
 };
 
-export const addScrap = async(post_id,user_id)=>{// 게시글 스크랩
+export const addScrap = async(post_id,userIdFromJWT)=>{// 게시글 스크랩
 
-    const addScarpParams =[post_id, user_id]; 
+    const addScarpParams =[post_id, userIdFromJWT]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const insertScrapResult = await insertScrap(connection, addScarpParams); 
@@ -66,9 +64,9 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
 
 };
 
-export const applyParticipant = async(post_id, userIdFromJWT, userIdFromPostId) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
+export const applyParticipant = async(post_id, userIdFromJWT, user_id) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
 
-    const insertParticipantParams =[post_id, userIdFromJWT, userIdFromPostId]; 
+    const insertParticipantParams =[post_id, userIdFromJWT, user_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const applyParticipantResult = await insertParticipant(connection,insertParticipantParams);

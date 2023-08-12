@@ -1,7 +1,7 @@
 
 export const selectComment = async(connection, post_id) => {
     const selectCommentQuery = `
-        SELECT user.gender, user.nickname, user.major, user.class_of,
+        SELECT user.user_id, user.gender, user.nickname, user.major, user.class_of,
         comments.contents, comments.created_at
         FROM comments
         INNER JOIN user
@@ -37,11 +37,8 @@ export const insertComment = async(connection, insertPostParams) => { // 댓글 
         INSERT INTO alarm(post_id, user_id, participant_id, alarm_type)
         VALUES (?, (SELECT user_id FROM post WHERE post_id = ?),?,"CommentAlarm");
     `;
-    //console.log("insertPostParms: " + insertPostParams);
-   // console.log("insertPostParms[0]: " + insertPostParams[0]);
-    const addcommentAlarmParms = [insertPostParams[0],insertPostParams[0],insertPostParams[1]]
-   // console.log("addcommentAlarmParms: " + addcommentAlarmParms);
 
+    const addcommentAlarmParms = [insertPostParams[0],insertPostParams[0],insertPostParams[1]]
     const insertCommentRow = await connection.query(postCommentQuery, insertPostParams);
     const addCommentAlarmRow = await connection.query(addCommentAlarmQuery, addcommentAlarmParms);
     return insertCommentRow;
