@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import {baseResponse, response} from "../../../config/response";
+import {baseResponse, response, errResponse} from "../../../config/response";
 import {retrievePost} from "../post/postProvider";
 import {retrieveComment, retrieveOneComment} from "./commProvider";
 import {createComment, removeComment} from "./commService";
@@ -53,11 +53,11 @@ export const getComment = async(req, res) => {
  */
 export const postComment = async(req, res) => {
 
-    const {post_id} = req.params;
+    const {post_id} = req.params; // 여기도 post_id로 작성자 id를 받아올 지 vs body로 user_id를 받아올 지 정해야 함
     const {contents} = req.body; 
     const userEmail = req.verifiedToken.userEmail;
-    const userIdFromJWT = await getUserIdByEmail(userEmail); //토큰을 통한 이메일로 유저 id 구하기
-    console.log("Length: "+ contents.length);
+    const userIdFromJWT = await getUserIdByEmail(userEmail); //토큰을 통한 유저 id 
+  
     if(contents.length > 50){
         return res.status(400).json(errResponse(baseResponse.COMMENT_COMMENT_LENGTH));
     }
@@ -80,13 +80,21 @@ export const postComment = async(req, res) => {
 export const deleteComment = async(req, res) => {
     
     const {comments_id} = req.params;
-    const Comment = await retrieveOneComment(comments_id); 
-
-    if(Comment[0]){ // Comment가 존재한다면
-        const deleteCommentResult = await removeComment(comments_id);
-        return res.status(200).json(response(baseResponse.SUCCESS, deleteCommentResult));
+    const {user_id} = req.body;// 댓글 작성자 ID
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); //토큰을 통한 유저 ID
+    
+    if(user_id == userIdFromJWT){
+        const Comment = await retrieveOneComment(comments_id); 
+        if(Comment[0]){ // Comment가 존재한다면
+            const deleteCommentResult = await removeComment(comments_id);
+            return res.status(200).json(response(baseResponse.SUCCESS, deleteCommentResult));
+        }
+        else{
+            return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST));
+        }
     }
     else{
-        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     }
 };
