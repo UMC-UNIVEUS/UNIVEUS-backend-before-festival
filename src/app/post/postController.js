@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant, refuseParticipant } from "./postService";
+import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm } from "./postService";
 import {getUserIdByEmail, getUserIdByPostId} from "../user/userProvider";
 
 /**
@@ -247,5 +247,25 @@ export const deleteParticipant = async(req, res) => {
     }
     else{
         return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }
+};
+
+/**
+ * API name : 게시글 모임 1일 전 알림 
+ * POST: post/{post_id}/participant/onedayalarm
+ */
+export const postOneDayAlarm = async(req, res) => {
+    
+    const {post_id} = req.params;
+    const {user_id} = req.body;// 참여자 ID들을 다 받아와야 함 >> 보류
+    
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ 
+        const postOneDayAlarmResult = await addOneDayAlarm(post_id, user_id);
+        return res.status(200).json(response(baseResponse.SUCCESS, postOneDayAlarmResult));
+    } 
+    else{ 
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
     }
 };

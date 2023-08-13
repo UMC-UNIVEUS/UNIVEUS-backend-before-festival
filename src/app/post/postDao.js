@@ -12,7 +12,7 @@ export const selectPost = async(connection, post_id)=>{ // 게시글 조회
 
 export const selectParticipant = async(connection, post_id)=>{ // 참여자 목록 조회
     const selectParticipantQuery = `
-        SELECT user.user_id, user.gender, user.nickname, user.major, user.class_of, participant_users.status
+        SELECT participant_users.participant_id, user.user_id, user.gender, user.nickname, user.major, user.class_of, participant_users.status
         FROM participant_users
         INNER JOIN user
         ON participant_users.user_id = user.user_id
@@ -27,8 +27,8 @@ export const insertPost = async(connection, insertPostParams)=>{// 게시글 생
     const postPostQuery = `
         INSERT INTO post(user_id, category, current_people, limit_people, location, 
         meeting_date, openchat, end_date, title, 
-        content, created_at) 
-        VALUES (?,?,1,?,?, ?,?,?,?, ?,now());
+        content, created_at, post_status) 
+        VALUES (?,?,1,?,?, ?,?,?,?, ?,now(), "모집 중");
     `;
 
     const postParticipantTableQuery = `
@@ -151,14 +151,14 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
 };
 
 export const deleteParticipant = async(connection, deleteParticipantParams)=>{// 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
-    const addParticipantAlarmQuery = `
-        INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 거부 알람");
-    `;
-
     const deleteParticipantQuery = `
         DELETE FROM participant_users
         WHERE participant_id= ?;
+    `;
+
+    const addParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 거부 알람");
     `;
     const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, deleteParticipantParams);
     const approveParticipantRow = await connection.query(deleteParticipantQuery, deleteParticipantParams[1]);
