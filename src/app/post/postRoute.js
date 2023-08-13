@@ -1,5 +1,5 @@
 import express from "express"
-import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, getParticipant, patchParticipant, deleteParticipant} from "./postController";
+import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, getParticipant, patchParticipant, deleteParticipant, postOneDayAlarm} from "./postController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 
 const postRouter = express.Router();
@@ -14,6 +14,10 @@ postRouter.get('/:post_id/participant', jwtMiddleware, getParticipant); // 게�
 postRouter.post('/:post_id/participant/apply', jwtMiddleware, postParticipant); // 게시글 참여 신청 API + 참여 신청 알람(to 작성자) API
 postRouter.patch('/:post_id/participant/register', jwtMiddleware, patchParticipant); // 게시글 참여자 승인 API + 참여 승인 알람(to 참여자) API 
 postRouter.delete('/:post_id/participant/refuse', jwtMiddleware, deleteParticipant); // 게시글 참여자 거절 API + 참여 거절 알람(to 참여자) API 
+//postRouter.patch('/:post_id/status', jwtMiddleware, patchStatus); // 모집 상태 변경 API >> 일단 보류
+postRouter.post('/:post_id/participant/onedayalarm', postOneDayAlarm); // 게시글 모임 1일 전 알림 API
+
+
 
 
 export default postRouter;
