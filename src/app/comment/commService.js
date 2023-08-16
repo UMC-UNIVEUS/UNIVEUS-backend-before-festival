@@ -3,9 +3,9 @@ import { baseResponse, response } from "../../../config/response";
 import {insertComment, eraseComment} from "./commDao";
 
 
-export const createComment = async(post_id, userIdFromJWT, contents) =>{
+export const createComment = async(post_id, userIdFromJWT, contents, user_id) =>{
 
-    const insertPostParams =[post_id, userIdFromJWT, contents]; 
+    const insertPostParams =[post_id, userIdFromJWT, contents, user_id]; 
     const connection = await pool.getConnection(async conn => conn);
     const createCommentResult = await insertComment(connection,insertPostParams);
     connection.release();

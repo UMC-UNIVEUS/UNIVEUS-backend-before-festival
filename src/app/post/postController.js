@@ -3,7 +3,7 @@ dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
 import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm } from "./postService";
-import {getUserIdByEmail, getUserIdByPostId} from "../user/userProvider";
+import {getUserIdByEmail} from "../user/userProvider";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -24,23 +24,35 @@ export const getPost = async(req, res) => {
 };
 
 /**
- * API name : 게시글 작성
+ * API name : 게시글 작성 >> 넘어온 데이터 형식에 따라 모임, 마감 시간 저장할 방식 수정해야 함
  * POST: /post
  */
 export const postPost = async(req, res) => {
     
-    const {category, limit_people, location, meeting_date, openchat, 
-        end_date, title, content} = req.body;
+    const {category, limit_gender, limit_people, location, meeting_date, openchat, 
+        end_date, title, content } = req.body; // 축제용 >> limit_gender
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
     
-    if(title.length > 48){ //이 조건도 프론트에서 하면 좋을지? 백엔드에서 하면 좋을지? 의논해봐야 함
-        return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
+    if(category == null || meeting_date == null || end_date == null || location == null || openchat == null){// 축제용 조건문
+        return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
     }
+    if(category != "축제"){ // 축제용 조건문
+        return res.status(400).json(errResponse(baseResponse.POST_CATEGORY_LIMIT));
+    }    
+    if(limit_people != 4 && limit_people != 6){ // 축제용 조건문
+        return res.status(400).json(errResponse(baseResponse.POST_PEOPLE_LIMIT));
+    }    
     if(location.length > 24){
         return res.status(400).json(errResponse(baseResponse.POST_LOCATION_LENGTH));
     }    
-    const postPostResult = await createPost(userIdFromJWT, category, limit_people, location, meeting_date, openchat, 
+    if(title.length > 48){ 
+        return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
+    }
+    if(content.length > 500){ // 축제용 조건문
+        return res.status(400).json(errResponse(baseResponse.POST_CONTENT_LENGTH));
+    }
+    const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content);
     
     return res.status(200).json(response(baseResponse.SUCCESS, postPostResult));
@@ -53,7 +65,7 @@ export const postPost = async(req, res) => {
 export const patchPost =  async(req, res) => {
 
     const {post_id} = req.params;
-    const {user_id, category, limit_people, location, meeting_date, openchat, 
+    const {user_id, category, limit_gender,limit_people, location, meeting_date, openchat, 
         end_date, post_status, title,content} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
@@ -61,14 +73,25 @@ export const patchPost =  async(req, res) => {
     if(user_id == userIdFromJWT){  //접속한 유저가 작성자라면
         const Post = await retrievePost(post_id); 
         if(Post){
-        
-            if(title.length > 48){ // 글자 수 제한 프론트에서 할 지 백엔드에서 할 지 정해야 함.
-                return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
+            if(category == null || meeting_date == null || end_date == null || location == null || openchat == null){// 축제용 조건문
+                return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
             }
+            if(category != "축제"){ // 축제용 조건문
+                return res.status(400).json(errResponse(baseResponse.POST_CATEGORY_LIMIT));
+            }    
+            if(limit_people != 4 && limit_people != 6){ // 축제용 조건문
+                return res.status(400).json(errResponse(baseResponse.POST_PEOPLE_LIMIT));
+            }    
             if(location.length > 24){
                 return res.status(400).json(errResponse(baseResponse.POST_LOCATION_LENGTH));
+            }    
+            if(title.length > 48){ 
+                return res.status(400).json(errResponse(baseResponse.POST_TITLE_LENGTH));
             }
-            const patchPostResult = await editPost(category, limit_people, location, meeting_date, openchat, 
+            if(content.length > 500){ // 축제용 조건문
+                return res.status(400).json(errResponse(baseResponse.POST_CONTENT_LENGTH));
+            }
+            const patchPostResult = await editPost(category, limit_gender,limit_people, location, meeting_date, openchat, 
                 end_date, post_status, title,content, post_id);   
             return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
         } 
@@ -109,7 +132,7 @@ export const deletePost =  async(req, res) => {
 };
 
 /**
- * API name : 게시글 스크랩
+ * API name : 게시글 스크랩 >> 축제 때는 필요 X
  * PATCH: /post/{post_id}/scrap
  */
 export const patchScrap = async(req, res) => {
@@ -130,13 +153,12 @@ export const patchScrap = async(req, res) => {
 };
 
 /**
- * API name : 게시글 좋아요
+ * API name : 게시글 좋아요 >> 축제 때는 필요 X
  * PATCH: /post/{post_id}/like
  */
 export const patchLike = async(req, res) => {
 
     const {post_id} = req.params;
-
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면

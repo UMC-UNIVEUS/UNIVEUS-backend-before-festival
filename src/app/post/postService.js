@@ -5,10 +5,10 @@ import pool from "../../../config/database"
 import { baseResponse, response } from "../../../config/response";
 import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant, updateParticipant,deleteParticipant } from "./postDao";
 
-export const createPost = async(userIdFromJWT, category, limit_people, location, meeting_date, openchat, // 게시글 생성
+export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, title, content) =>{
  
-    const insertPostParams =[userIdFromJWT, category, limit_people, location, meeting_date, openchat, 
+    const insertPostParams =[userIdFromJWT, category,limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content]; 
 
     const connection = await pool.getConnection(async conn => conn);
@@ -18,10 +18,10 @@ export const createPost = async(userIdFromJWT, category, limit_people, location,
     return response(baseResponse.SUCCESS);
 };
 
-export const editPost = async(category, limit_people, location, meeting_date, openchat, // 게시글 수정
+export const editPost = async(category, limit_gender,limit_people, location, meeting_date, openchat, // 게시글 수정
     end_date, post_status, title,content, post_id)=>{
   
-    const updatePostParams =[category, limit_people, location, meeting_date, openchat, 
+    const updatePostParams =[category, limit_gender,limit_people, location, meeting_date, openchat, 
         end_date, post_status, title,content,post_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
