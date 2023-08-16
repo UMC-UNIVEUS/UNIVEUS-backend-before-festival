@@ -20,7 +20,12 @@ export const selectPopularPostList = async(connection, getPostParams) => {
 /** select 최신순 postList - 축제용 */
 export const selectRecentlyPostList = async(connection, getPostParams) => {
     const selectPostListQuery = 
-    `SELECT * FROM post WHERE category = ? ORDER BY created_at DESC`
+    `SELECT post.*, user.profile_img, user.profile_img, user.gender, user.nickname, user.class_of
+    FROM post
+    INNER JOIN user ON post.user_id = user.user_id
+    WHERE post.category = ?
+    ORDER BY post.created_at DESC;
+    `
     const [rows] = await connection.query(selectPostListQuery, getPostParams);
 
     return rows;
