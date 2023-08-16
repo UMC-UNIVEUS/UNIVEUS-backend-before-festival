@@ -25,10 +25,10 @@ export const selectParticipant = async(connection, post_id)=>{ // 참여자 목�
 
 export const insertPost = async(connection, insertPostParams)=>{// 게시글 생성 + 게시글 참여자 테이블 생성
     const postPostQuery = `
-        INSERT INTO post(user_id, category, current_people, limit_people, location, 
+        INSERT INTO post(user_id, category, limit_gender, current_people, limit_people, location, 
         meeting_date, openchat, end_date, title, 
         content, created_at, post_status) 
-        VALUES (?,?,1,?,?, ?,?,?,?, ?,now(), "모집 중");
+        VALUES (?,?,?,1,?,?, ?,?,?,?, ?,now(), "모집 중");
     `;
 
     const postParticipantTableQuery = `
@@ -45,6 +45,7 @@ export const updatePost = async(connection, updatePostParams)=>{// 게시글 수
     const patchPostQuery = `
         UPDATE post 
         SET category =?,
+        limit_gender =?,
         limit_people =?,
         location =?, 
         meeting_date =?, 

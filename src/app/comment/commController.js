@@ -16,14 +16,14 @@ export const getComment = async(req, res) => {
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면
-    const Comment = await retrieveComment(post_id); 
-    
-    if(Comment[0]){ // post에 Comment가 한 개라도 존재한다면
-        return res.status(200).json(response(baseResponse.SUCCESS, Comment));
-    }
-    else{
-        return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
-    }
+        const Comment = await retrieveComment(post_id); 
+        
+        if(Comment[0]){ // post에 Comment가 한 개라도 존재한다면
+            return res.status(200).json(response(baseResponse.SUCCESS, Comment));
+        }
+        else{
+            return res.status(404).json(errResponse(baseResponse.COMMENT_COMMENTID_NOT_EXIST))
+        }
     } 
     else{ 
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
@@ -53,19 +53,21 @@ export const getComment = async(req, res) => {
  */
 export const postComment = async(req, res) => {
 
-    const {post_id} = req.params; // 여기도 post_id로 작성자 id를 받아올 지 vs body로 user_id를 받아올 지 정해야 함
-    const {contents} = req.body; 
+    const {post_id} = req.params; 
+    const {contents, user_id} = req.body; //게시글 작성자 id
     const userEmail = req.verifiedToken.userEmail;
-    const userIdFromJWT = await getUserIdByEmail(userEmail); //토큰을 통한 유저 id 
+    const userIdFromJWT = await getUserIdByEmail(userEmail); //댓글 작성자의 id 
   
+    if(contents == null || contents.length == 0){
+        return res.status(400).json(errResponse(baseResponse.COMMENT_COMMENT_EMPTY));
+    }
     if(contents.length > 50){
         return res.status(400).json(errResponse(baseResponse.COMMENT_COMMENT_LENGTH));
     }
 
     const Post = await retrievePost(post_id); 
-    
     if(Post){ // Post가 존재한다면
-        const postCommentResult = await createComment(post_id, userIdFromJWT, contents);
+        const postCommentResult = await createComment(post_id, userIdFromJWT, contents,user_id);
         return res.status(200).json(response(baseResponse.SUCCESS, postCommentResult));
     }
     else{
