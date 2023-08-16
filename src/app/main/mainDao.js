@@ -8,10 +8,19 @@ export const selectPopularPostList = async(connection, getPostParams) => {
     return rows;
 }
 
-/** select 최신순 postList */
+/** select 최신순 postList - 업데이트용 */
+// export const selectRecentlyPostList = async(connection, getPostParams) => {
+//     const selectPostListQuery = 
+//     `SELECT * FROM post WHERE category = ? ORDER BY created_at DESC LIMIT ?, ?`
+//     const [rows] = await connection.query(selectPostListQuery, getPostParams);
+
+//     return rows;
+// }
+
+/** select 최신순 postList - 축제용 */
 export const selectRecentlyPostList = async(connection, getPostParams) => {
     const selectPostListQuery = 
-    `SELECT * FROM post WHERE category = ? ORDER BY created_at DESC LIMIT ?, ?`
+    `SELECT * FROM post WHERE category = ? ORDER BY created_at DESC`
     const [rows] = await connection.query(selectPostListQuery, getPostParams);
 
     return rows;
@@ -24,4 +33,13 @@ export const countPostsByCategory = async(connection, categoryParams) => {
     const [rows] = await connection.query(countPostsQuery, categoryParams);
 
     return rows[0].post_num;
+}
+
+/** 게시글 제목 검색 */
+export const findTitle = async(connection, keywordParam) => {
+    const searchQuery = 
+    `SELECT * FROM post WHERE title LIKE ?;`
+    const [rows] = await connection.query(searchQuery, keywordParam);
+
+    return rows;
 }
