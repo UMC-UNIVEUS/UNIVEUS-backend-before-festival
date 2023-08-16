@@ -49,7 +49,7 @@ export const calculateTime = (currentTime, endTime) => {
     return { message : "마감"};
 }
 
-/** isMyPost 내가 작성한 post인지 확인*/
+/** isMyPost 내가 작성한 post인지*/
 export const isMyPost = (postPage, currentUserId) => {
     postPage.forEach(element => {
         if (element.user_id == currentUserId) {
