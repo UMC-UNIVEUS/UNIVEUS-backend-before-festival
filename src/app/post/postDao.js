@@ -166,3 +166,19 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
 
     return addParticipantAlarmRow;
 };
+
+export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 API
+    const postUniveusQuery = `
+        INSERT INTO participant_users(post_id, user_id, status) 
+        VALUES (?,?, "참여 완료");
+    `;
+
+    const applyParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
+        VALUES (?,?,?,"참여 알람");
+    `;
+
+    const postUniveusRow = await connection.query(postUniveusQuery, insertParticipantParams);
+    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
+    return postUniveusRow;
+};
