@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm } from "./postService";
+import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm, applyUniveus } from "./postService";
 import {getUserIdByEmail} from "../user/userProvider";
 
 /**
@@ -286,6 +286,29 @@ export const postOneDayAlarm = async(req, res) => {
     if(Post){ 
         const postOneDayAlarmResult = await addOneDayAlarm(post_id, user_id);
         return res.status(200).json(response(baseResponse.SUCCESS, postOneDayAlarmResult));
+    } 
+    else{ 
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+    }
+};
+
+
+/**
+ * API name : 유니버스 참여 >> 축제용 API
+ * POST: /post/{post_id}/participant
+ */
+export const participateUniveus = async(req, res) => {
+    
+    const {post_id} = req.params;
+    const {user_id} = req.body;// 작성자 ID
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
+    
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면 
+        const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, user_id);
+        return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
     } 
     else{ 
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))

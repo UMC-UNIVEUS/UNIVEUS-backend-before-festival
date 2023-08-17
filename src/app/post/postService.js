@@ -3,7 +3,7 @@
 
 import pool from "../../../config/database"
 import { baseResponse, response } from "../../../config/response";
-import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant, updateParticipant,deleteParticipant } from "./postDao";
+import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant, updateParticipant,deleteParticipant, insertUniveus } from "./postDao";
 
 export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, title, content) =>{
@@ -93,6 +93,17 @@ export const refuseParticipant = async(post_id, participant_id) =>{// 게시글 
 
     const connection = await pool.getConnection(async conn => conn);
     const refuseParticipantResult = await deleteParticipant(connection,deleteParticipantParams);
+    connection.release();
+
+    return response(baseResponse.SUCCESS);
+};
+
+export const applyUniveus = async(post_id, userIdFromJWT, user_id) =>{// 유니버스 참여 (축제용)
+
+    const applyUniveusParams =[post_id, userIdFromJWT, user_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const applyUniveusResult = await insertUniveus(connection,applyUniveusParams);
     connection.release();
 
     return response(baseResponse.SUCCESS);
