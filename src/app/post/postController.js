@@ -2,8 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike, applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm, applyUniveus } from "./postService";
-import {getUserIdByEmail} from "../user/userProvider";
+import { createPost, createImg, editPost, removePost, addScrap, addLike, 
+    applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm, applyUniveus, inviteOneParticipant, inviteTwoParticipant } from "./postService";
+import {getUserIdByEmail, getUserById} from "../user/userProvider";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -288,7 +289,7 @@ export const postOneDayAlarm = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, postOneDayAlarmResult));
     } 
     else{ 
-        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
     }
 };
 
@@ -311,6 +312,66 @@ export const participateUniveus = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
     } 
     else{ 
-        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
+    }
+};
+
+/**
+ * API name : 유니버스 참여자 초대 >> 축제용 API >> 개복잡함 + 더러움
+ * POST: /post/{post_id}/participant/invite
+ */
+export const inviteParticipant= async(req, res) => {
+    
+    const {post_id} = req.params;
+    const {user_id,participant_userIDs} = req.body;// 작성자 ID, 참여자 ID들(배열로 여러 개 받아옴)
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
+
+    if(user_id == userIdFromJWT){
+        const Post = await retrievePost(post_id); 
+
+        if(Post){ // Post가 존재한다면  
+            if(participant_userIDs.length == undefined || participant_userIDs.length == null){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때
+                return res.status(400).json(errResponse(baseResponse.POST_INVITE_EMPTY)); 
+            }
+            else if(participant_userIDs.length == 1){ // 초대 받은 유저가 1명일 때
+                const User = await getUserById(participant_userIDs[0]); 
+
+                if(User){// 초대 받은 유저가 존재할 때
+                    const inviteOneParticipantResult = await inviteOneParticipant(post_id, participant_userIDs[0], user_id);
+                    const Result = "한 명을 초대하였습니다.";
+                    return res.status(200).json(response(baseResponse.SUCCESS, Result));
+                }
+                else{
+                    return res.status(400).json(errResponse(baseResponse.USER_USERID_NOT_EXIST));            
+                }
+            }
+            else if(participant_userIDs.length == 2){ // 초대 받은 유저가 2명일 때
+                const User1 = await getUserById(participant_userIDs[0]); 
+
+                if(User1){
+                    const User2 = await getUserById(participant_userIDs[1]); 
+
+                    if(User2){
+                        const inviteOneParticipantResult = await inviteOneParticipant(post_id, participant_userIDs[0], user_id);
+                        const inviteTwoParticipantResult = await inviteOneParticipant(post_id, participant_userIDs[1], user_id);
+                        const Result = "두 명을 초대하였습니다.";
+                        return res.status(200).json(response(baseResponse.SUCCESS, Result));
+                    }
+                    else{
+                        return res.status(400).json(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
+                    }
+                }
+                else{
+                    return res.status(400).json(errResponse(baseResponse.USER_FIRST_NOT_EXIST));            
+                }
+            }
+        } 
+        else{ 
+            return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
+        }
+    }
+    else{
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     }
 };
