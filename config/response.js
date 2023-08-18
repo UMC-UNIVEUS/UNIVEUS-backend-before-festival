@@ -4,6 +4,8 @@ export const baseResponse = {
     SUCCESS : { "isSuccess": true, "code": 1000, "message":"성공" },
 
     //유저 관련 response msg
+    USER_FIRST_NOT_EXIST : { "isSuccess": false, "code": 2000, "message": "첫 번째 유저가 존재하지 않습니다." },
+    USER_SECOND_NOT_EXIST : { "isSuccess": false, "code": 2001, "message": "두 번째 유저가 존재하지 않습니다." },
     USER_USERID_NOT_EXIST : { "isSuccess": false, "code": 2002, "message": "해당 유저가 존재하지 않습니다." },
     SIGNUP_EMAIL_DUPLICATE : {"isSuccess" : false, "code" : 2003, "message" : "이미 존재하는 이메일입니다."},
     SIGNUP_EMAIL_KYONGGI : {"isSuccess" : false, "code" : 2004, "message" : "경기대학교 이메일만 사용 가능합니다."},
@@ -30,6 +32,8 @@ export const baseResponse = {
     POST_CATEGORY_LIMIT : { "isSuccess": false, "code": 3004, "message": "축제 기간에는 '축제' 카테고리만 가능합니다." },
     POST_INFORMATION_EMPTY : { "isSuccess": false, "code": 3005, "message": "미입력된 항목이 있습니다." },
     POST_CONTENT_LENGTH : { "isSuccess": false, "code": 3006, "message": "소개글은 최대 500자리를 입력해주세요." },
+    POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "아무도 초대하지 않았습니다." },
+
 
 
 
@@ -38,6 +42,7 @@ export const baseResponse = {
     COMMENT_COMMENT_LENGTH : { "isSuccess": false, "code": 3101, "message": "댓글은 최대 50자리를 입력해주세요." },
     COMMENT_COMMENT_EMPTY : { "isSuccess": false, "code": 3102, "message": "댓글을 입력해주세요." },
     
+
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
     SERVER_ERROR : { "isSuccess": false, "code": 4001, "message": "서버 에러"},

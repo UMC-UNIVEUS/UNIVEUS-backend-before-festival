@@ -56,6 +56,16 @@ export const selectUserIdByEmail = async(connection,email_id) => {// 이메일�
     return selectUserIdRow[0];
 };
 
+export const selectUserById = async(connection,user_id) => {// 이메일로 유저 id 조회
+    const selectUserByIdQuery = `
+        SELECT *
+        FROM user
+        WHERE user_id = ?;
+    `;
+    const [selectUserByIdRow] = await connection.query(selectUserByIdQuery,user_id);
+    return selectUserByIdRow;
+};
+
 export const selectUserIdByPostId = async(connection,post_id) => {// 이메일로 유저 id 조회
     const selectUserIdByPostIdQuery = `
         SELECT user_id

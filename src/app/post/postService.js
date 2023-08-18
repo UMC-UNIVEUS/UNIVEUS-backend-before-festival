@@ -2,8 +2,8 @@
 (CRUD에 해당하는 서버 로직 처리) */
 
 import pool from "../../../config/database"
-import { baseResponse, response } from "../../../config/response";
-import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike, insertParticipant, updateParticipant,deleteParticipant, insertUniveus } from "./postDao";
+import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike,
+     insertParticipant, updateParticipant,deleteParticipant, insertUniveus, addParticipant } from "./postDao";
 
 export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, title, content) =>{
@@ -14,8 +14,6 @@ export const createPost = async(userIdFromJWT, category, limit_gender, limit_peo
     const connection = await pool.getConnection(async conn => conn);
     const createpostResult = await insertPost(connection,insertPostParams);
     connection.release();
-    
-    return response(baseResponse.SUCCESS);
 };
 
 export const editPost = async(category, limit_gender,limit_people, location, meeting_date, openchat, // 게시글 수정
@@ -27,9 +25,6 @@ export const editPost = async(category, limit_gender,limit_people, location, mee
     const connection = await pool.getConnection(async conn => conn);
     const editPostResult = await updatePost(connection,updatePostParams); 
     connection.release();
-    
-    return response(baseResponse.SUCCESS);
-
 };
 
 export const removePost = async(post_id)=>{// 게시글 삭제
@@ -37,8 +32,6 @@ export const removePost = async(post_id)=>{// 게시글 삭제
     const connection = await pool.getConnection(async conn => conn);
     const removePostResult = await erasePost(connection,post_id); 
     connection.release();
-    
-    return response(baseResponse.SUCCESS);    
 };
 
 export const addScrap = async(post_id,userIdFromJWT)=>{// 게시글 스크랩
@@ -48,9 +41,6 @@ export const addScrap = async(post_id,userIdFromJWT)=>{// 게시글 스크랩
     const connection = await pool.getConnection(async conn => conn);
     const insertScrapResult = await insertScrap(connection, addScarpParams); 
     connection.release();
-    
-    return response(baseResponse.SUCCESS);
-
 };
 
 
@@ -59,9 +49,6 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
     const connection = await pool.getConnection(async conn => conn);
     const insertLikeResult = await insertLike(connection,post_id); 
     connection.release();
-    
-    return response(baseResponse.SUCCESS);
-
 };
 
 export const applyParticipant = async(post_id, userIdFromJWT, user_id) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
@@ -71,8 +58,6 @@ export const applyParticipant = async(post_id, userIdFromJWT, user_id) =>{// 게
     const connection = await pool.getConnection(async conn => conn);
     const applyParticipantResult = await insertParticipant(connection,insertParticipantParams);
     connection.release();
-
-    return response(baseResponse.SUCCESS);
 };
 
 
@@ -83,8 +68,6 @@ export const registerParticipant = async(post_id, participant_id) =>{// 게시�
     const connection = await pool.getConnection(async conn => conn);
     const registerParticipantResult = await updateParticipant(connection,updateParticipantParams);
     connection.release();
-
-    return response(baseResponse.SUCCESS);
 };
 
 export const refuseParticipant = async(post_id, participant_id) =>{// 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
@@ -94,8 +77,6 @@ export const refuseParticipant = async(post_id, participant_id) =>{// 게시글 
     const connection = await pool.getConnection(async conn => conn);
     const refuseParticipantResult = await deleteParticipant(connection,deleteParticipantParams);
     connection.release();
-
-    return response(baseResponse.SUCCESS);
 };
 
 export const applyUniveus = async(post_id, userIdFromJWT, user_id) =>{// 유니버스 참여 (축제용)
@@ -105,6 +86,13 @@ export const applyUniveus = async(post_id, userIdFromJWT, user_id) =>{// 유니�
     const connection = await pool.getConnection(async conn => conn);
     const applyUniveusResult = await insertUniveus(connection,applyUniveusParams);
     connection.release();
-
-    return response(baseResponse.SUCCESS);
 };
+
+export const inviteOneParticipant = async(post_id, participant_userIDs, user_id) =>{// 유니버스 초대 (축제용)
+
+    const askParticipantParams =[post_id,participant_userIDs, user_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const askParticipantResult = await addParticipant(connection,askParticipantParams);
+    connection.release();
+}; 
