@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
+import { retrievePost, retrieveParticipant, retrieveParticipantList, retrieveParticipantNum} from "./postProvider";
 import { createPost, createImg, editPost, removePost, addScrap, addLike, 
-    applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm, applyUniveus, inviteOneParticipant, inviteTwoParticipant } from "./postService";
+    applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant } from "./postService";
 import {getUserIdByEmail, getUserById} from "../user/userProvider";
 
 /**
@@ -295,21 +295,35 @@ export const postOneDayAlarm = async(req, res) => {
 
 
 /**
- * API name : 유니버스 참여 >> 축제용 API
+ * API name : 유니버스 참여 + 참여 인원 == 제한 인원 일 때 자동 마감,알림 >> 축제용 API
  * POST: /post/{post_id}/participant
  */
 export const participateUniveus = async(req, res) => {
     
     const {post_id} = req.params;
-    const {user_id} = req.body;// 작성자 ID
+    const {user_id,limit_people, post_status} = req.body;// 작성자 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
     
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면 
-        const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, user_id);
-        return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
+        if(post_status == "모집 마감"){ 
+            return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
+        }
+        else{
+            const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, user_id);
+            const ParticipantNum = await retrieveParticipantNum(post_id); // 게시글의 참여자 수 조회
+    
+            if(ParticipantNum == limit_people){ //현재 참여한 인원 수가 제한 인원 수와 같다면
+                const closeUniveusResult = await closeUniveus(post_id,user_id); // 게시글의 상태를 모집 마감으로 업데이트
+                const result = "현재 참여한 인원 덕분에 모집 마감되었습니다!"
+                return res.status(200).json(response(baseResponse.SUCCESS, result));
+            }
+            else{
+                return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
+            }
+        }
     } 
     else{ 
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
