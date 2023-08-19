@@ -166,7 +166,7 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
     return addParticipantAlarmRow;
 };
 
-export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용)
+export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1 도 해줘야 함
     const postUniveusQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
         VALUES (?,?, "참여 완료");
@@ -196,4 +196,32 @@ export const addParticipant = async(connection, askParticipantParams)=>{// 유�
     const postParticipantRow = await connection.query(postParticipantQuery, askParticipantParams);
     const inviteParticipantAlarmRow = await connection.query(inviteParticipantAlarmQuery, askParticipantParams);
     return postParticipantRow;
+};
+
+export const selectParticipantNum = async(connection, post_id)=>{ // 참여자 수 조회 (축제용)
+    const selectParticipantNumQuery = `
+        SELECT COUNT(*) AS participantNum, post_id
+        FROM participant_users
+        WHERE post_id = ?;
+    `;
+    const [participantNumRow] = await connection.query(selectParticipantNumQuery, post_id);
+
+    return participantNumRow[0].participantNum;
+};
+
+export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 마감
+    const blockUniveusQuery = `
+        UPDATE post 
+        SET post_status = "모집 마감"
+        WHERE post_id = ?;
+    `;
+
+    const closeUniveusAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,?,"참여 마감 알람");
+    `;
+
+    const blockUniveusRow = await connection.query(blockUniveusQuery, closeUniveusParams[0]);
+    const closeUniveusAlarmRow = await connection.query(closeUniveusAlarmQuery, closeUniveusParams);
+    return blockUniveusRow;
 };

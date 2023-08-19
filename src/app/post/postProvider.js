@@ -1,5 +1,5 @@
 import pool from "../../../config/database"
-import { selectPost, selectParticipant, selectParticipantList } from "./postDao";
+import { selectPost, selectParticipant, selectParticipantList, selectParticipantNum } from "./postDao";
 
 export const retrievePost = async(post_id) =>{
     
@@ -27,5 +27,13 @@ export const retrieveParticipantList = async(post_id)=>{ //게시글 참여자 �
     connection.release();
 
     return participantResult;
+};
+
+export const retrieveParticipantNum = async(post_id)=>{ // 참여자 수 조회 (축제용)
+  
+    const connection = await pool.getConnection(async conn => conn);
+    const participantNumResult = await selectParticipantNum(connection,post_id);
+    connection.release();
+    return participantNumResult;
 };
 
