@@ -166,10 +166,16 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
     return addParticipantAlarmRow;
 };
 
-export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1 도 해줘야 함
+export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1
     const postUniveusQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
         VALUES (?,?, "참여 완료");
+    `;
+
+    const addCurrentPeopleQuery = `
+        UPDATE post 
+        SET current_people = current_people + 1
+        WHERE post_id = ?;
     `;
 
     const applyParticipantAlarmQuery = `
@@ -178,7 +184,9 @@ export const insertUniveus = async(connection, insertParticipantParams)=>{// 유
     `;
 
     const postUniveusRow = await connection.query(postUniveusQuery, insertParticipantParams);
+    const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
     const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
+
     return postUniveusRow;
 };
 
@@ -188,12 +196,19 @@ export const addParticipant = async(connection, askParticipantParams)=>{// 유�
         VALUES (?,?, "참여 완료(초대)");
     `;
 
+    const addCurrentPeopleQuery = `
+        UPDATE post 
+        SET current_people = current_people + 1
+        WHERE post_id = ?;
+    `;
+
     const inviteParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
         VALUES (?,?,?,"초대 알람");
     `;
 
     const postParticipantRow = await connection.query(postParticipantQuery, askParticipantParams);
+    const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, askParticipantParams[0]);
     const inviteParticipantAlarmRow = await connection.query(inviteParticipantAlarmQuery, askParticipantParams);
     return postParticipantRow;
 };

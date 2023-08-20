@@ -97,7 +97,7 @@ export const inviteOneParticipant = async(post_id, participant_userIDs, user_id)
     connection.release();
 }; 
 
-export const closeUniveus = async(post_id,user_id) =>{// 유니버스 초대 (축제용) 
+export const closeUniveus = async(post_id,user_id) =>{// 게시글 모집 마감 (축제용)
 
     const closeUniveusParams =[post_id, user_id]; 
 
