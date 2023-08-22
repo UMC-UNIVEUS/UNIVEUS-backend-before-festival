@@ -37,10 +37,6 @@ export const baseResponse = {
     COMMENT_COMMENTID_NOT_EXIST : { "isSuccess": false, "code": 3100, "message": "댓글이 존재하지 않습니다." },
     COMMENT_COMMENT_LENGTH : { "isSuccess": false, "code": 3101, "message": "댓글은 최대 50자리를 입력해주세요." },
     COMMENT_COMMENT_EMPTY : { "isSuccess": false, "code": 3102, "message": "댓글을 입력해주세요." },
-    
-    //Connection, Transaction 등의 서버 오류
-    DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
-    SERVER_ERROR : { "isSuccess": false, "code": 4001, "message": "서버 에러"},
 
     // 토큰 오류
     TOKEN_EMPTY : { "isSuccess": false, "code": 5000, "message":"JWT 토큰을 입력해주세요." },

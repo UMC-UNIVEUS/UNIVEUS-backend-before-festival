@@ -11,9 +11,10 @@ import {
 import {
     ModifyIntroProfile
 } from "./profileService";
+import {getUserIdByEmail} from "../user/userProvider";
 
 
-export const getUserProfile = async (req, res) => {
+/* export const getUserProfile = async (req, res) => {
     const {user_id} = req.params;
     // 빈 아이디 체크
     if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
@@ -28,14 +29,15 @@ export const getUserProfile = async (req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, getAllResponse));
     }
 };
+*/
 
-
-export const putUserProfile = async (req, res) => {
+/* export const putUserProfile = async (req, res) => {
     //아직은 user_id를 확인할 방법이 없어 파라미터로 받음.
     //나중엔 헤더에 토큰 정보를 담아서 전달하면 굳이 파라미터로 받을 필요 없음.
-    const {user_id} = req.params;
+    const userEmail = req.verifiedToken.userEmail;
     // 빈 아이디 체크
-    if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    if (!userEmail) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    const user_id = await getUserIdByEmail(userEmail);
     const defaultInfo = {
         nickname: req.body.nickname,
         gender: req.body.gender,
@@ -52,21 +54,23 @@ export const putUserProfile = async (req, res) => {
     };
     const putUserProfileResponse = await ModifyIntroProfile(defaultInfo, detailInfo, user_id);
     return res.send(putUserProfileResponse);
-};
+};*/
 
 export const getUserMyUnive = async (req, res) => {
-    const {user_id} = req.params;
+    const userEmail = req.verifiedToken.userEmail;
     // 빈 아이디 체크
-    if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    if (!userEmail) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    const user_id = await getUserIdByEmail(userEmail);
     const getUserMyUniveResponse = await showUserMyUnive(user_id);
     return res.status(200).json(response(baseResponse.SUCCESS, getUserMyUniveResponse));
 };
 
 
 export const getUserParticipate = async (req, res) => {
-    const {user_id} = req.params;
+    const userEmail = req.verifiedToken.userEmail;
     // 빈 아이디 체크
-    if (!user_id) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    if (!userEmail) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    const user_id = await getUserIdByEmail(userEmail);
     const getUserParticipateResponse = await showUserParticipate(user_id);
     return res.status(200).json(response(baseResponse.SUCCESS, getUserParticipateResponse));
 }
