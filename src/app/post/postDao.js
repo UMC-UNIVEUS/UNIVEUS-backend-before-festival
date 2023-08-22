@@ -1,5 +1,4 @@
 /*posting 관련 데이터베이스, Query가 작성되어 있는 곳*/
-
 export const selectPost = async(connection, post_id)=>{ // 게시글 조회
     const selectPostQuery = `
         SELECT *
@@ -16,7 +15,7 @@ export const selectParticipant = async(connection, post_id)=>{ // 참여자 목�
         FROM participant_users
         INNER JOIN user
         ON participant_users.user_id = user.user_id
-        WHERE post_id = ? AND status = "Approved";
+        WHERE post_id = ? AND status = "승인";
     `;
     const [ParticipantRow] = await connection.query(selectParticipantQuery, post_id);
     return ParticipantRow;
@@ -33,7 +32,7 @@ export const insertPost = async(connection, insertPostParams)=>{// 게시글 생
 
     const postParticipantTableQuery = `
         INSERT INTO participant_users(user_id, post_id, status) 
-        VALUES (?,?,"Writer");
+        VALUES (?,?,"작성자");
     `;
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
     const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]); 
@@ -121,7 +120,7 @@ export const selectParticipantList = async(connection, post_id)=>{ //참여자 �
         FROM participant_users
         INNER JOIN user
         ON participant_users.user_id = user.user_id
-        WHERE post_id = ? AND status= "Waiting";
+        WHERE post_id = ? AND status= "승인 대기";
     `;
     const [selectParticipantListRow] = await connection.query(selectParticipantListQuery, post_id);
     return selectParticipantListRow;
@@ -130,7 +129,7 @@ export const selectParticipantList = async(connection, post_id)=>{ //참여자 �
 export const updateParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 승인 + 참여 승인 알람(to 참여자)
     const approveParticipantQuery = `
         UPDATE participant_users
-        SET status = "Approved"
+        SET status = "승인"
         WHERE participant_id= ?;
     `;
     
@@ -167,10 +166,16 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
     return addParticipantAlarmRow;
 };
 
-export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 API
+export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1
     const postUniveusQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
         VALUES (?,?, "참여 완료");
+    `;
+
+    const addCurrentPeopleQuery = `
+        UPDATE post 
+        SET current_people = current_people + 1
+        WHERE post_id = ?;
     `;
 
     const applyParticipantAlarmQuery = `
@@ -179,6 +184,59 @@ export const insertUniveus = async(connection, insertParticipantParams)=>{// 유
     `;
 
     const postUniveusRow = await connection.query(postUniveusQuery, insertParticipantParams);
+    const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
     const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
+
     return postUniveusRow;
+};
+
+export const addParticipant = async(connection, askParticipantParams)=>{// 유니버스 초대 (축제용)
+    const postParticipantQuery = `
+        INSERT INTO participant_users(post_id, user_id, status) 
+        VALUES (?,?, "참여 완료(초대)");
+    `;
+
+    const addCurrentPeopleQuery = `
+        UPDATE post 
+        SET current_people = current_people + 1
+        WHERE post_id = ?;
+    `;
+
+    const inviteParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
+        VALUES (?,?,?,"초대 알람");
+    `;
+
+    const postParticipantRow = await connection.query(postParticipantQuery, askParticipantParams);
+    const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, askParticipantParams[0]);
+    const inviteParticipantAlarmRow = await connection.query(inviteParticipantAlarmQuery, askParticipantParams);
+    return postParticipantRow;
+};
+
+export const selectParticipantNum = async(connection, post_id)=>{ // 참여자 수 조회 (축제용)
+    const selectParticipantNumQuery = `
+        SELECT COUNT(*) AS participantNum, post_id
+        FROM participant_users
+        WHERE post_id = ?;
+    `;
+    const [participantNumRow] = await connection.query(selectParticipantNumQuery, post_id);
+
+    return participantNumRow[0].participantNum;
+};
+
+export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 마감
+    const blockUniveusQuery = `
+        UPDATE post 
+        SET post_status = "모집 마감"
+        WHERE post_id = ?;
+    `;
+
+    const closeUniveusAlarmQuery = `
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?,?,"참여 마감 알람");
+    `;
+
+    const blockUniveusRow = await connection.query(blockUniveusQuery, closeUniveusParams[0]);
+    const closeUniveusAlarmRow = await connection.query(closeUniveusAlarmQuery, closeUniveusParams);
+    return blockUniveusRow;
 };

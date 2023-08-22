@@ -1,5 +1,7 @@
 import express from "express"
-import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, getParticipant, patchParticipant, deleteParticipant, postOneDayAlarm, participateUniveus} from "./postController";
+import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, 
+    getParticipant, patchParticipant, deleteParticipant, postOneDayAlarm, participateUniveus,
+    inviteParticipant} from "./postController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 
 const postRouter = express.Router();
@@ -17,6 +19,8 @@ postRouter.delete('/:post_id/participant/refuse', jwtMiddleware, deleteParticipa
 //postRouter.patch('/:post_id/status', jwtMiddleware, patchStatus); // 모집 상태 변경 API >> 일단 보류
 postRouter.post('/:post_id/participant/onedayalarm', postOneDayAlarm); // 게시글 모임 1일 전 알림 API
 postRouter.post('/:post_id/participant', jwtMiddleware, participateUniveus); // 유니버스 참여 API (축제용)
+postRouter.post('/:post_id/participant/invite', jwtMiddleware, inviteParticipant); // 유니버스 참여자 초대 API (축제용)
+
 
 
 
