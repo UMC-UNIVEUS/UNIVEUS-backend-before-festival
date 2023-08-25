@@ -34,7 +34,6 @@ export const baseResponse = {
     POST_CONTENT_LENGTH : { "isSuccess": false, "code": 3006, "message": "소개글은 최대 500자리를 입력해주세요." },
     POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "아무도 초대하지 않았습니다." },
     POST_PARTICIPATION_CLOSE : { "isSuccess": false, "code": 3008, "message": "모집이 마감되었습니다." },
-    POST_STATUS_EMPTY : { "isSuccess": false, "code": 3009, "message": "모집 상태를 보내주세요." },
 
 
 
