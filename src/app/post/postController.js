@@ -301,28 +301,27 @@ export const postOneDayAlarm = async(req, res) => {
 export const participateUniveus = async(req, res) => {
     
     const {post_id} = req.params;
-    const {user_id,limit_people, post_status} = req.body;// 작성자 ID
+    const {user_id,limit_people} = req.body;// 작성자 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
     
     const Post = await retrievePost(post_id); 
     
     if(Post){ // Post가 존재한다면 
-        if(post_status == "모집 마감"){ 
+        const ParticipantNum = await retrieveParticipantNum(post_id); // 게시글의 참여자 수 조회
+
+        if(limit_people <= ParticipantNum){ // 현재 참여 인원 수와 제한 인원 수가 같다면 모집 마감 응답
             return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
         }
-        else{
-            const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, user_id);
-            const ParticipantNum = await retrieveParticipantNum(post_id); // 게시글의 참여자 수 조회
-    
-            if(ParticipantNum == limit_people){ //현재 참여한 인원 수가 제한 인원 수와 같다면
-                const closeUniveusResult = await closeUniveus(post_id,user_id); // 게시글의 상태를 모집 마감으로 업데이트
-                const result = "현재 참여한 인원 덕분에 모집 마감되었습니다!"
-                return res.status(200).json(response(baseResponse.SUCCESS, result));
-            }
-            else{
-                return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
-            }
+        else if(limit_people == ParticipantNum + 1){ // 현재 참여할 인원 수와 제한 인원 수가 같다면
+            const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, user_id);// 게시글 참여
+            const closeUniveusResult = await closeUniveus(post_id,user_id); // 게시글의 상태를 모집 마감으로 업데이트
+            const result = "현재 참여한 인원 덕분에 모집 마감되었습니다!";
+            return res.status(200).json(response(baseResponse.SUCCESS, result));
+        }
+        else{// 정상적인 참여
+            const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, user_id);// 게시글 참여
+            return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
         }
     } 
     else{ 

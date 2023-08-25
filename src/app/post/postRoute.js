@@ -18,7 +18,7 @@ postRouter.patch('/:post_id/participant/register', jwtMiddleware, patchParticipa
 postRouter.delete('/:post_id/participant/refuse', jwtMiddleware, deleteParticipant); // 게시글 참여자 거절 API + 참여 거절 알람(to 참여자) API 
 //postRouter.patch('/:post_id/status', jwtMiddleware, patchStatus); // 모집 상태 변경 API >> 일단 보류
 postRouter.post('/:post_id/participant/onedayalarm', postOneDayAlarm); // 게시글 모임 1일 전 알림 API
-postRouter.post('/:post_id/participant', jwtMiddleware, participateUniveus); // 유니버스 참여 API (축제용)
+postRouter.post('/:post_id/participant', jwtMiddleware, participateUniveus); // 유니버스 참여 + 자동 모집 마감 API (축제용)
 postRouter.post('/:post_id/participant/invite', jwtMiddleware, inviteParticipant); // 유니버스 참여자 초대 API (축제용)
 
 

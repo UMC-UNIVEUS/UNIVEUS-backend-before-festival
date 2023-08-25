@@ -214,14 +214,13 @@ export const addParticipant = async(connection, askParticipantParams)=>{// 유�
 };
 
 export const selectParticipantNum = async(connection, post_id)=>{ // 참여자 수 조회 (축제용)
-    const selectParticipantNumQuery = `
-        SELECT COUNT(*) AS participantNum, post_id
-        FROM participant_users
+    const selectCurrentPeopleQuery = `
+        SELECT current_people
+        FROM post
         WHERE post_id = ?;
     `;
-    const [participantNumRow] = await connection.query(selectParticipantNumQuery, post_id);
-
-    return participantNumRow[0].participantNum;
+    const [selectCurrentPeopleRow] = await connection.query(selectCurrentPeopleQuery, post_id);
+    return selectCurrentPeopleRow[0].current_people;
 };
 
 export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 마감
