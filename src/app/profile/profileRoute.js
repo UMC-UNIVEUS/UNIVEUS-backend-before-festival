@@ -2,16 +2,16 @@
 
 import express from 'express';
 import {
-    getUserProfile,
-    putUserProfile,
+    //getUserProfile,
+    //putUserProfile,
     getUserMyUnive,
     getUserParticipate
 } from "./profileController";
-
+import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 const profileRouter = express.Router();
 
-profileRouter.get('/profile/:user_id', getUserProfile);
-profileRouter.put('/profile/:user_id', putUserProfile);
-profileRouter.get('profile/myunive/:user_id', getUserMyUnive);
-profileRouter.get('profile/participate/:user_id', getUserParticipate);
+//profileRouter.get('/profile/:user_id', getUserProfile);
+//profileRouter.put('/profile/:user_id', putUserProfile);
+profileRouter.get('/myunive', jwtMiddleware, getUserMyUnive);
+profileRouter.get('/participate', jwtMiddleware, getUserParticipate);
 export default profileRouter;
