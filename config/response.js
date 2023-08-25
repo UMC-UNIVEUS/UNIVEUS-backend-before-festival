@@ -39,6 +39,7 @@ export const baseResponse = {
 
 
 
+
     //댓글 관련
     COMMENT_COMMENTID_NOT_EXIST : { "isSuccess": false, "code": 3100, "message": "댓글이 존재하지 않습니다." },
     COMMENT_COMMENT_LENGTH : { "isSuccess": false, "code": 3101, "message": "댓글은 최대 50자리를 입력해주세요." },
