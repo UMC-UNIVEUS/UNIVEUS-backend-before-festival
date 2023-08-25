@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
-    "server": "babel-node index.js"
+    "start": "pm2 start --interpreter babel-node index.js"
   },
   "author": "Muok",
   "license": "ISC",
