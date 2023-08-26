@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrieveParticipantList, retrieveParticipantNum} from "./postProvider";
+import { retrievePost, retrieveParticipant, retrieveParticipantList, retrieveParticipantNum, retrievePostStatus} from "./postProvider";
 import { createPost, createImg, editPost, removePost, addScrap, addLike, 
-    applyParticipant, registerParticipant, refuseParticipant,addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant } from "./postService";
+    applyParticipant, registerParticipant, refuseParticipant,
+    addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
+    ,changePostStatus, removeParticipant } from "./postService";
 import {getUserIdByEmail, getUserById} from "../user/userProvider";
 
 /**
@@ -295,7 +297,7 @@ export const postOneDayAlarm = async(req, res) => {
 
 
 /**
- * API name : 유니버스 참여 + 참여 인원 == 제한 인원 일 때 자동 마감,알림 >> 축제용 API
+ * API name : 유니버스 참여 + 모집 자동 마감 + 각각 알림 >> 축제용 API
  * POST: /post/{post_id}/participant
  */
 export const participateUniveus = async(req, res) => {
@@ -386,5 +388,32 @@ export const inviteParticipant= async(req, res) => {
     }
     else{
         return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }
+};
+
+/**
+ * API name : 유니버스 참여 취소 (축제용)
+ * DELETE: /post/{post_id}/participant/cancel
+ */
+export const cancelParticipant = async(req, res) => {
+    
+    const {post_id} = req.params;
+    const {user_id} = req.body;// 작성자 ID
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
+    
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면 
+        const postStatus = await retrievePostStatus(post_id); // 게시글 모집 상태 조회
+
+        if(postStatus =="모집 마감"){// 모집 마감이라면
+            await changePostStatus(post_id);// 모집 중으로 변경
+        }
+        const removeParticipantResult = await removeParticipant(post_id, userIdFromJWT, user_id);// 유니버스 참여 취소 
+        return res.status(200).json(response(baseResponse.SUCCESS, removeParticipantResult));
+    } 
+    else{ 
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
     }
 };

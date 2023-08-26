@@ -232,10 +232,50 @@ export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 �
 
     const closeUniveusAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,?,"참여 마감 알람");
+        VALUES (?,?,"참여 마감 알림");
     `;
 
     const blockUniveusRow = await connection.query(blockUniveusQuery, closeUniveusParams[0]);
     const closeUniveusAlarmRow = await connection.query(closeUniveusAlarmQuery, closeUniveusParams);
     return blockUniveusRow;
+};
+
+export const selectPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 조회
+    const selectPostStatusQuery = `
+        SELECT post_status
+        FROM post
+        WHERE post_id = ?;
+    `;
+    const [PostRow] = await connection.query(selectPostStatusQuery, post_id);
+    return PostRow[0].post_status;
+};
+
+export const switchPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 변경
+    const switchPostStatusQuery = `
+        UPDATE post 
+        SET post_status = "모집 중"
+        WHERE post_id = ?;
+    `;
+    const [switchPostStatusRow] = await connection.query(switchPostStatusQuery, post_id);
+};
+
+export const eraseParticipant = async(connection, removeParticipantParams)=>{ // 게시글 참여 취소 (축제용)
+    const deleteParticipantQuery = `
+        DELETE FROM participant_users
+        WHERE post_id= ? AND user_id =?;
+    `;
+
+    const deleteCurrentPeopleQuery = `
+        UPDATE post 
+        SET current_people = current_people - 1
+        WHERE post_id = ?;
+    `;
+
+    const deleteParticipantAlarmQuery = `
+        INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
+        VALUES (?,?,?,"참여 취소 알림");
+    `;
+    const [switchPostStatusRow] = await connection.query(deleteParticipantQuery, [removeParticipantParams[0],removeParticipantParams[1]]);
+    const [deleteParticipantAlarmRow] = await connection.query(deleteParticipantAlarmQuery, removeParticipantParams);
+    const [deleteCurrentPeopleRow] = await connection.query(deleteCurrentPeopleQuery, removeParticipantParams[0]);
 };
