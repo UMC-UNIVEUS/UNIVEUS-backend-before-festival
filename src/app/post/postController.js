@@ -417,3 +417,13 @@ export const cancelParticipant = async(req, res) => {
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
     }
 };
+
+export const postImage = async(req, res) => {
+    if (!req.files) return res.send(errResponse(baseResponse.S3_ERROR));
+    const fileResponse = new Array();
+    for(let i = 0; i < req.files.length; i++) {
+        fileResponse.push({pic_url : req.files[i].location});
+    }
+    if (!fileResponse) return res.send(errResponse(baseResponse.S3_ERROR));
+    return res.send(response(baseResponse.SUCCESS, fileResponse));
+};
