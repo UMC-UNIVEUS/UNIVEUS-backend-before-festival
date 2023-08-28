@@ -15,7 +15,7 @@ export const selectParticipant = async(connection, post_id)=>{ // 참여자 목�
         FROM participant_users
         INNER JOIN user
         ON participant_users.user_id = user.user_id
-        WHERE post_id = ? AND status = "승인";
+        WHERE post_id = ? AND status = "approval";
     `;
     const [ParticipantRow] = await connection.query(selectParticipantQuery, post_id);
     return ParticipantRow;
@@ -27,12 +27,12 @@ export const insertPost = async(connection, insertPostParams)=>{// 게시글 생
         INSERT INTO post(user_id, category, limit_gender, current_people, limit_people, location, 
         meeting_date, openchat, end_date, title, 
         content, created_at, post_status) 
-        VALUES (?,?,?,1,?,?, ?,?,?,?, ?,now(), "모집 중");
+        VALUES (?,?,?,1,?,?, ?,?,?,?, ?,now(), "recruiting");
     `;
 
     const postParticipantTableQuery = `
         INSERT INTO participant_users(user_id, post_id, status) 
-        VALUES (?,?,"작성자");
+        VALUES (?,?,"writer");
     `;
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
     const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]); 
@@ -105,7 +105,7 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
 
     const applyParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
-        VALUES (?,?,?,"참여 신청 알람");
+        VALUES (?,?,?,"application_alarm");
     `;
 
     const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
@@ -120,7 +120,7 @@ export const selectParticipantList = async(connection, post_id)=>{ //참여자 �
         FROM participant_users
         INNER JOIN user
         ON participant_users.user_id = user.user_id
-        WHERE post_id = ? AND status= "승인 대기";
+        WHERE post_id = ? AND status= "waiting";
     `;
     const [selectParticipantListRow] = await connection.query(selectParticipantListQuery, post_id);
     return selectParticipantListRow;
@@ -129,7 +129,7 @@ export const selectParticipantList = async(connection, post_id)=>{ //참여자 �
 export const updateParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여자 승인 + 참여 승인 알람(to 참여자)
     const approveParticipantQuery = `
         UPDATE participant_users
-        SET status = "승인"
+        SET status = "approval"
         WHERE participant_id= ?;
     `;
     
@@ -141,7 +141,7 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
 
     const addParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 승인 알람");
+        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"approval_alarm");
     `;
     const approveParticipantRow = await connection.query(approveParticipantQuery, insertParticipantParams[1]);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
@@ -158,7 +158,7 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
 
     const addParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"참여 거부 알람");
+        VALUES (?,(SELECT user_id FROM participant_users WHERE participant_id = ?),"reject_alram");
     `;
     const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, deleteParticipantParams);
     const approveParticipantRow = await connection.query(deleteParticipantQuery, deleteParticipantParams[1]);
@@ -169,7 +169,7 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
 export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1
     const postUniveusQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
-        VALUES (?,?, "참여 완료");
+        VALUES (?,?, "complete");
     `;
 
     const addCurrentPeopleQuery = `
@@ -180,7 +180,7 @@ export const insertUniveus = async(connection, insertParticipantParams)=>{// 유
 
     const applyParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
-        VALUES (?,?,?,"참여 알람");
+        VALUES (?,?,?,"complete_alarm");
     `;
 
     const postUniveusRow = await connection.query(postUniveusQuery, insertParticipantParams);
@@ -193,7 +193,7 @@ export const insertUniveus = async(connection, insertParticipantParams)=>{// 유
 export const addParticipant = async(connection, askParticipantParams)=>{// 유니버스 초대 (축제용)
     const postParticipantQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
-        VALUES (?,?, "참여 완료(초대)");
+        VALUES (?,?, "complete(invite)");
     `;
 
     const addCurrentPeopleQuery = `
@@ -204,7 +204,7 @@ export const addParticipant = async(connection, askParticipantParams)=>{// 유�
 
     const inviteParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
-        VALUES (?,?,?,"초대 알람");
+        VALUES (?,?,?,"invite_alarm");
     `;
 
     const postParticipantRow = await connection.query(postParticipantQuery, askParticipantParams);
@@ -226,13 +226,13 @@ export const selectParticipantNum = async(connection, post_id)=>{ // 참여자 �
 export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 마감
     const blockUniveusQuery = `
         UPDATE post 
-        SET post_status = "모집 마감"
+        SET post_status = "end"
         WHERE post_id = ?;
     `;
 
     const closeUniveusAlarmQuery = `
         INSERT INTO alarm(post_id, user_id, alarm_type) 
-        VALUES (?,?,"참여 마감 알림");
+        VALUES (?,?,"end_alarm");
     `;
 
     const blockUniveusRow = await connection.query(blockUniveusQuery, closeUniveusParams[0]);
@@ -250,10 +250,10 @@ export const selectPostStatus = async(connection, post_id)=>{ // 게시글 모�
     return PostRow[0].post_status;
 };
 
-export const switchPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 변경
+export const switchPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 변경 (모집 중으로 변경)
     const switchPostStatusQuery = `
         UPDATE post 
-        SET post_status = "모집 중"
+        SET post_status = "recruiting"
         WHERE post_id = ?;
     `;
     const [switchPostStatusRow] = await connection.query(switchPostStatusQuery, post_id);
@@ -273,7 +273,7 @@ export const eraseParticipant = async(connection, removeParticipantParams)=>{ //
 
     const deleteParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
-        VALUES (?,?,?,"참여 취소 알림");
+        VALUES (?,?,?,"cancel_alarm");
     `;
     const [switchPostStatusRow] = await connection.query(deleteParticipantQuery, [removeParticipantParams[0],removeParticipantParams[1]]);
     const [deleteParticipantAlarmRow] = await connection.query(deleteParticipantAlarmQuery, removeParticipantParams);

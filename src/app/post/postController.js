@@ -40,7 +40,7 @@ export const postPost = async(req, res) => {
     if(category == null || meeting_date == null || end_date == null || location == null || openchat == null){// 축제용 조건문
         return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
     }
-    if(category != "축제"){ // 축제용 조건문
+    if(category != 4){ // 축제용 조건문
         return res.status(400).json(errResponse(baseResponse.POST_CATEGORY_LIMIT));
     }    
     if(limit_people != 4 && limit_people != 6){ // 축제용 조건문
@@ -79,7 +79,7 @@ export const patchPost =  async(req, res) => {
             if(category == null || meeting_date == null || end_date == null || location == null || openchat == null){// 축제용 조건문
                 return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
             }
-            if(category != "축제"){ // 축제용 조건문
+            if(category != 4){ // 축제용 조건문
                 return res.status(400).json(errResponse(baseResponse.POST_CATEGORY_LIMIT));
             }    
             if(limit_people != 4 && limit_people != 6){ // 축제용 조건문
