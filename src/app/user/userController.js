@@ -1,7 +1,7 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { createUser, insertRefreshToken, validEmailCheck, createAuthNum, authUser, checkAlarms } from "../user/userService";
-import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail } from "./userProvider";
+import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, getPhonNumById } from "./userProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
@@ -158,6 +158,44 @@ export const verifyNumber = (req, res) => {
     }
 
 }
+
+/** 유니버스 참여 알림 (to 작성자)*/
+export const sendParticipateAlarm = async(user_id) =>{ // 작성자 ID를 받아옴
+
+    const writerPhoneNum = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
+    console.log("writerPhoneNum = "+ writerPhoneNum);
+    const content = `[UNIVEUS] 새로운 유저가 유니버스에 참여했습니다!`;
+    const { success } = await sendSMS(naverCloudSensSecret, { writerPhoneNum, content });
+   // console.log("success =" + success);
+    if (!success) {
+        return false;
+    } else {
+        return true;
+    };
+
+};
+
+/** 유니버스 마감 알림 (to 작성자)*/
+export const sendEndAlarm = async(user_id, res) =>{ // 작성자 ID를 받아옴
+
+    const {writerPhoneNum} = await getPhonNumById(user_id, res); // user_id로 전화번호 가져오기
+    const content = `[UNIVEUS] 유니버스가 마감되었습니다!`;
+    const { success } = await sendSMS(naverCloudSensSecret, { writerPhoneNum, content });
+    console.log("success =" + success);
+    if (!success) {
+        return false;
+    } else {
+        return true;
+    };
+
+
+};
+
+/** 유니버스 초대 알림 (to 초대 받은 사람)*/
+
+
+/** 유니버스 참여 취소 알림 (to 작성자)*/
+
 
 /**닉네임 중복 체크 API */
 export const checkNickNameDuplicate = async (req, res) => {
