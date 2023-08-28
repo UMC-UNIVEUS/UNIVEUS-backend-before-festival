@@ -1,13 +1,19 @@
 import express from "express"
+import { uploadImage } from '../../../config/imageUploader';
 import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, 
     getParticipant, patchParticipant, deleteParticipant, postOneDayAlarm, participateUniveus,
-    inviteParticipant, cancelParticipant} from "./postController";
+    inviteParticipant, cancelParticipant, postImage} from "./postController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 
 const postRouter = express.Router();
 
 postRouter.get('/:post_id', getPost); // 게시글(+참여자 목록) 조회 API
 postRouter.post('/', jwtMiddleware,postPost); // 게시글 작성 API
+postRouter.post('/image/upload',
+    jwtMiddleware,
+    uploadImage.array('image', 4),
+    postImage
+);
 postRouter.patch('/:post_id', jwtMiddleware,patchPost); // 게시글 수정 API
 postRouter.delete('/:post_id', jwtMiddleware,deletePost); // 게시글 삭제 API
 postRouter.patch('/:post_id/scrap', jwtMiddleware, patchScrap); // 게시글 스크랩 API
