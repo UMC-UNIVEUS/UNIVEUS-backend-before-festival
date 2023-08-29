@@ -66,6 +66,16 @@ export const selectUserById = async(connection,user_id) => {// user_id로 유저
     return selectUserByIdRow;
 };
 
+export const selectUserNickNameById = async(connection,user_id) => {// user_id로 유저 닉네임 조회
+    const selectUserNickNameByIdQuery = `
+        SELECT nickname
+        FROM user
+        WHERE user_id = ?;
+    `;
+    const [UserNickNameByIdRow] = await connection.query(selectUserNickNameByIdQuery,user_id);
+    return UserNickNameByIdRow[0];
+};
+
 export const selectUserIdByPostId = async(connection,post_id) => {// post_id로 유저 id 조회
     const selectUserIdByPostIdQuery = `
         SELECT user_id

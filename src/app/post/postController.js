@@ -7,7 +7,7 @@ import { createPost, createImg, editPost, removePost, addScrap, addLike,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant } from "./postService";
 import {getUserIdByEmail, getUserById} from "../user/userProvider";
-import {sendInviteMessageAlarm, sendMessageAlarm} from "../user/userController"
+import {sendMessageAlarm, sendInviteMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -347,7 +347,7 @@ export const participateUniveus = async(req, res) => {
 export const inviteParticipant= async(req, res) => {
     
     const {post_id} = req.params;
-    const {user_id,participant_userIDs} = req.body;// 작성자 ID, 참여자 ID들(배열로 여러 개 받아옴)
+    const {user_id,participant_userIDs} = req.body;// 작성자 ID, 참여자 ID들(배열로 여러 개 받아옴) >> 참여자 ID가 아닌 닉네임이 올 예정이니 수정해야 함.
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
 
@@ -379,7 +379,8 @@ export const inviteParticipant= async(req, res) => {
                     if(User2){
                         await inviteOneParticipant(post_id, participant_userIDs[0], user_id);
                         await inviteOneParticipant(post_id, participant_userIDs[1], user_id);
-
+                        await sendInviteMessageAlarm(participant_userIDs[0],post_id); // 첫 번째 유저에게 초대 알림 
+                        await sendInviteMessageAlarm(participant_userIDs[1],post_id); // 두 번째 유저에게 초대 알림 
                         return res.status(200).json(response(baseResponse.POST_PARTICIPATE_TWO)); // 성공
                     }
                     else{
@@ -424,6 +425,7 @@ export const cancelParticipant = async(req, res) => {
                 await changePostStatus(post_id);// 모집 중으로 변경
             }
             const removeParticipantResult = await removeParticipant(post_id, userIdFromJWT, user_id);// 유니버스 참여 취소 
+            await sendCancelMessageAlarm(user_id, userIdFromJWT); // 참여 취소 알림 (to 작성자)
             return res.status(200).json(response(baseResponse.SUCCESS, removeParticipantResult));
         }
         else{ // 참여를 하지 않았던 유저라면 

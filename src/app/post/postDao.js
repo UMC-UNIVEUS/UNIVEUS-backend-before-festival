@@ -235,6 +235,16 @@ export const selectPostStatus = async(connection, post_id)=>{ // 게시글 모�
     return PostRow[0].post_status;
 };
 
+export const selectUniveUsNameById = async(connection, post_id)=>{ // post_id로 유니버스 제목 가져오기
+    const selectUniveUsNameByIdQuery = `
+        SELECT title
+        FROM post
+        WHERE post_id = ?;
+    `;
+    const [PostRow] = await connection.query(selectUniveUsNameByIdQuery, post_id);
+    return PostRow[0].title;
+};
+
 export const switchPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 변경 (모집 마감 >> 모집 중으로 변경) (축제용)
     const switchPostStatusQuery = `
         UPDATE post 
@@ -264,3 +274,4 @@ export const eraseParticipant = async(connection, removeParticipantParams)=>{ //
     const [deleteParticipantAlarmRow] = await connection.query(deleteParticipantAlarmQuery, removeParticipantParams);
     const [deleteCurrentPeopleRow] = await connection.query(deleteCurrentPeopleQuery, removeParticipantParams[0]);
 };
+
