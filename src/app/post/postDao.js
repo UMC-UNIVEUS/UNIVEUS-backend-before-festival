@@ -37,7 +37,6 @@ export const insertPost = async(connection, insertPostParams)=>{// 게시글 생
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
     const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]); 
     //insertPostRow.insertId는 생성된 post의 post_id, insertPostParams[0]는 user_id
-    return insertPostRow;
 };
 
 export const updatePost = async(connection, updatePostParams)=>{// 게시글 수정
@@ -57,7 +56,6 @@ export const updatePost = async(connection, updatePostParams)=>{// 게시글 수
         WHERE post_id =?;
     `;
     const updatePostRow = await connection.query(patchPostQuery, updatePostParams);
-    return updatePostRow;
 };
 
 export const erasePost = async(connection, post_id)=>{// 게시글 삭제
@@ -67,7 +65,6 @@ export const erasePost = async(connection, post_id)=>{// 게시글 삭제
         WHERE post_id = ?;
     `;
     const deletePostRow = await connection.query(deletePostQuery, post_id);
-    return deletePostRow;
 };
  
 export const insertScrap = async(connection, addScarpParams)=>{// 게시글 스크랩 수 증가 + post_scrapes 테이블 생성
@@ -83,8 +80,6 @@ export const insertScrap = async(connection, addScarpParams)=>{// 게시글 스�
     `;
     const updateScrapRow = await connection.query(addScrapQuery, addScarpParams[0]);
     const insertScrapTableRow = await connection.query(postScrapTableQuery, addScarpParams); // 여기 (postScrapTableQuery, post_id, user_id)처럼 인수를 3개 넘겨주면 에러남 
-
-    return updateScrapRow;
 };
 
 export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
@@ -94,7 +89,6 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
         WHERE post_id = ?;
     `;
     const insertLikeRow = await connection.query(addLikeQuery, post_id);
-    return insertLikeRow;
 };
 
 export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
@@ -110,7 +104,6 @@ export const insertParticipant = async(connection, insertParticipantParams)=>{//
 
     const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
     const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
-    return postParticipantRow;
 };
 
 export const selectParticipantList = async(connection, post_id)=>{ //참여자 신청 내역 조회
@@ -146,8 +139,6 @@ export const updateParticipant = async(connection, insertParticipantParams)=>{//
     const approveParticipantRow = await connection.query(approveParticipantQuery, insertParticipantParams[1]);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
     const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, insertParticipantParams);
-
-    return addParticipantAlarmRow;
 };
 
 export const deleteParticipant = async(connection, deleteParticipantParams)=>{// 게시글 참여자 거절 + 참여 거절 알람(to 참여자)
@@ -162,8 +153,6 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
     `;
     const addParticipantAlarmRow = await connection.query(addParticipantAlarmQuery, deleteParticipantParams);
     const approveParticipantRow = await connection.query(deleteParticipantQuery, deleteParticipantParams[1]);
-
-    return addParticipantAlarmRow;
 };
 
 export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1
@@ -186,8 +175,6 @@ export const insertUniveus = async(connection, insertParticipantParams)=>{// 유
     const postUniveusRow = await connection.query(postUniveusQuery, insertParticipantParams);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, insertParticipantParams[0]);
     const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
-
-    return postUniveusRow;
 };
 
 export const addParticipant = async(connection, askParticipantParams)=>{// 유니버스 초대 (축제용)
@@ -210,7 +197,6 @@ export const addParticipant = async(connection, askParticipantParams)=>{// 유�
     const postParticipantRow = await connection.query(postParticipantQuery, askParticipantParams);
     const addCurrentPeopleRow = await connection.query(addCurrentPeopleQuery, askParticipantParams[0]);
     const inviteParticipantAlarmRow = await connection.query(inviteParticipantAlarmQuery, askParticipantParams);
-    return postParticipantRow;
 };
 
 export const selectParticipantNum = async(connection, post_id)=>{ // 참여자 수 조회 (축제용)
@@ -237,7 +223,6 @@ export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 �
 
     const blockUniveusRow = await connection.query(blockUniveusQuery, closeUniveusParams[0]);
     const closeUniveusAlarmRow = await connection.query(closeUniveusAlarmQuery, closeUniveusParams);
-    return blockUniveusRow;
 };
 
 export const selectPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 조회
@@ -250,7 +235,7 @@ export const selectPostStatus = async(connection, post_id)=>{ // 게시글 모�
     return PostRow[0].post_status;
 };
 
-export const switchPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 변경 (모집 중으로 변경)
+export const switchPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 변경 (모집 마감 >> 모집 중으로 변경) (축제용)
     const switchPostStatusQuery = `
         UPDATE post 
         SET post_status = "recruiting"

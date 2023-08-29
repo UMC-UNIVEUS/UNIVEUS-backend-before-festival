@@ -106,7 +106,7 @@ export const closeUniveus = async(post_id,user_id) =>{// 게시글 모집 마감
     connection.release();
 }; 
 
-export const changePostStatus = async(post_id) =>{// 게시글 모집 마감 (축제용) 
+export const changePostStatus = async(post_id) =>{// 게시글 모집 상태 변경 (모집 마감 >> 모집 중) (축제용) 
 
     const connection = await pool.getConnection(async conn => conn);
     const changePostStatusResult = await switchPostStatus(connection,post_id);

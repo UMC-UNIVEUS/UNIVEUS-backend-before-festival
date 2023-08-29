@@ -83,8 +83,8 @@ export const selectPhonNumById = async(connection,user_id) => {// id로 전화�
         WHERE user_id = ?;
     `;
     const PhonNumByIdRow = await connection.query(selectPhonNumByIdQuery,user_id);
-    console.log("PhonNumByIdRow = "+ PhonNumByIdRow);
-    return PhonNumByIdRow;
+
+    return PhonNumByIdRow[0][0];
 };
 
 export const selectAlarms = async(connection, userIdFromJWT) => {// 알림 내역 조회
