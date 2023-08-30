@@ -182,10 +182,9 @@ export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼
 export const sendInviteMessageAlarm = async(user_id,post_id) =>{ // 알림을 보낼 유저
 
     const to = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
-    const univeUsName = await getUniveUsNameById(post_id); // post_id로 유니버스 제목 가져오기 >> 함수 만들어야 함
-    console.log(univeUsName);
+    const univeUsName = await getUniveUsNameById(post_id); // post_id로 유니버스 제목 가져오기
     const content = `[UNIVEUS] 유니버스 '${univeUsName}'에 초대받으셨습니다! 들어가서 확인해 보세요!`;
-
+    
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     if (!success) { return false} 
     else { return true}
