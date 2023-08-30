@@ -355,7 +355,7 @@ export const inviteParticipant= async(req, res) => {
         const Post = await retrievePost(post_id); 
 
         if(Post){ // Post가 존재한다면  
-            if(participant_userNickNames.length == undefined || participant_userNickNames.length == null){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때
+            if(participant_userNickNames.length == 0 || participant_userNickNames == null){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
                 return res.status(400).json(errResponse(baseResponse.POST_INVITE_EMPTY)); 
             }
             else if(participant_userNickNames.length == 1){ // 초대 받은 유저가 1명일 때
@@ -364,7 +364,7 @@ export const inviteParticipant= async(req, res) => {
 
                 if(User){// 초대 받은 유저가 존재할 때
                     await inviteOneParticipant(post_id, userIdByNickName, user_id);
-                    await sendInviteMessageAlarm(userIdByNickName,post_id); // 초대 알림 (to 초대 받은 사람)
+                    //await sendInviteMessageAlarm(userIdByNickName,post_id); // 초대 알림 (to 초대 받은 사람)
                     return res.status(200).json(response(baseResponse.POST_PARTICIPATE_ONE)); // 성공
                 }
                 else{
