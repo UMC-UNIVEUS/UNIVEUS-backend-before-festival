@@ -1,4 +1,6 @@
-import { selectUser, selectUserByNickname, selectUserIdByEmail, selectUserIdByPostId, selectAlarms, selectUserById, selectPhonNumById, selectUserNickNameById } from "./userDao"
+import { selectUser, selectUserByNickname, selectUserIdByEmail, selectUserIdByPostId, 
+    selectAlarms, selectUserById, selectPhonNumById, selectUserNickNameById,
+    selectUserIdByNickName } from "./userDao"
 import pool from "../../../config/database"
 
 export const isUser = async(email_id) => {
@@ -30,6 +32,14 @@ export const getUserNickNameById = async(user_id) => {// id로 유저 닉네임 
     const UserNickName = await selectUserNickNameById(connection, user_id);
     connection.release();
     return UserNickName.nickname;
+};
+
+export const getUserIdByNickName = async(nickname) => {// 닉네임으로 유저 id 조회
+
+    const connection = await pool.getConnection(async (conn) => conn);
+    const UserId = await selectUserIdByNickName(connection, nickname);
+    connection.release();
+    return UserId.user_id;
 };
 
 export const getUserIdByEmail = async(email_id) => {// 이메일로 유저 id 조회
