@@ -1,14 +1,14 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { validEmailCheck, createAuthNum, createAuthUser, checkAlarms } from "../user/userService";
-import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail } from "./userProvider";
+import { createAuthUser, validEmailCheck, createAuthNum, authUser, checkAlarms } from "../user/userService";
+import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, getPhonNumById, getUserNickNameById } from "./userProvider";
+import { getUniveUsNameById } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
 import NodeCache from "node-cache";
 
 const cache = new NodeCache();
-
 
 /**구글 로그인 후 회원이면 토큰 발급, 회원이 아니면 err 발송 */
 export const login = async(req, res) => {
@@ -53,7 +53,6 @@ export const login = async(req, res) => {
 //     const GOOGLE_SIGNUP_REDIRECT_URI = 'http://localhost:3000/user/signup/redirect';
 //     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 //     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
-
 
 //     const { code } = req.body;
 
@@ -114,6 +113,72 @@ export const verifyNumber = (req, res) => {
     }
 
 }
+
+/** 유니버스 관련 문자 알림
+ * 1. 참여 알림 (to 작성자)
+ * 2. 마감 알림 (to 작성자)*/
+export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼 유저, 알림 type
+
+    const to = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
+    if(alarmType == 1){
+        var content = `[UNIVEUS] 새로운 유저가 유니버스에 참여했습니다!`;
+    }
+    else if(alarmType == 2){
+        var content = `[UNIVEUS] 유니버스가 마감됐습니다!`;
+    }
+
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
+};
+
+/**초대 알림 (to 초대 받은 사람)*/
+export const sendInviteMessageAlarm = async(user_id,post_id) =>{ // 알림을 보낼 유저
+
+    const to = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
+    const univeUsName = await getUniveUsNameById(post_id); // post_id로 유니버스 제목 가져오기
+    const content = `[UNIVEUS] 유니버스 '${univeUsName}'에 초대받으셨습니다! 들어가서 확인해 보세요!`;
+    
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
+};
+
+/** 참여 취소 알림 (to 작성자)*/
+export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림을 보낼 유저
+
+    const to = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
+    const userNickName = await getUserNickNameById(userIdFromJWT); // user_id로 닉네임 가져오기
+    const content = `[UNIVEUS] 유니버스에 참여했던 '${userNickName}'님이/가 참여 취소하였습니다.`;
+
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
+};
+
+/** 유저 신고 관련 알림 (to 관리자) */
+export const sendUserReportAlarm = async(reportedBy,reportedUser) =>{ 
+
+    const to = "01092185178"; // 일단 내번호로....
+    const content = `[UNIVEUS 유저 신고] user_id = '${reportedBy}' >> user_id = '${reportedUser}'을 신고했습니다.`;
+
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
+};
+
+/** 게시글 신고 관련 알림 (to 관리자) */
+export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{ 
+
+    const to = "01092185178"; // 일단 내번호로....
+    const content = `[UNIVEUS 게시글 신고] user_id = '${reportedBy}' >> post_id = '${reportedPost}'을 신고했습니다.`;
+
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
+};
+
+
 
 /**닉네임 중복 체크 API */
 export const checkNickNameDuplicate = async (req, res) => {

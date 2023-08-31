@@ -35,11 +35,12 @@ export const baseResponse = {
     POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "아무도 초대하지 않았습니다." },
     POST_PARTICIPATION_CLOSE : { "isSuccess": false, "code": 3008, "message": "모집이 마감되었습니다." },
     POST_PARTICIPATION_OVERLAP : { "isSuccess": false, "code": 3009, "message": "이미 참여한 유저입니다." },
-    POST_PARTICIPATION_LIMIT : { "isSuccess": false, "code": 3010, "message": "초대 가능한 인원 수는 2명이 최대입니다." },
     POST_PARTICIPATION_NOT_MATCH : { "isSuccess": false, "code": 3011, "message": "참여를 하지 않았으므로 참여 취소를 할 수 없습니다." },
-
-
-
+    POST_PARTICIPATION_CLOSE_NOW : { "isSuccess": true, "code": 3012, "message": "현재 참여한 인원 덕분에 모집 마감되었습니다!" },
+    POST_PARTICIPATE_ONE : { "isSuccess": true, "code": 3013, "message": "한 명을 초대하였습니다." },
+    POST_PARTICIPATE_TWO : { "isSuccess": true, "code": 3014, "message": "두 명을 초대하였습니다." },
+    POST_PARTICIPATE_ONLY_ONE : { "isSuccess": false, "code": 3015, "message": "제한 인원이 4명일 때는 1명만 초대할 수 있습니다." },
+    POST_PARTICIPATE_ONLY_TWO : { "isSuccess": false, "code": 3016, "message": "제한 인원이 6명일 때는 2명만 초대할 수 있습니다." },
 
 
 

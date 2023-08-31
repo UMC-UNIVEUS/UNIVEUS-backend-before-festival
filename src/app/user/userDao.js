@@ -56,7 +56,7 @@ export const selectUserIdByEmail = async(connection,email_id) => {// 이메일�
     return selectUserIdRow[0];
 };
 
-export const selectUserById = async(connection,user_id) => {// 이메일로 유저 id 조회
+export const selectUserById = async(connection,user_id) => {// user_id로 유저 조회
     const selectUserByIdQuery = `
         SELECT *
         FROM user
@@ -66,7 +66,27 @@ export const selectUserById = async(connection,user_id) => {// 이메일로 유�
     return selectUserByIdRow;
 };
 
-export const selectUserIdByPostId = async(connection,post_id) => {// 이메일로 유저 id 조회
+export const selectUserNickNameById = async(connection,user_id) => {// user_id로 유저 닉네임 조회
+    const selectUserNickNameByIdQuery = `
+        SELECT nickname
+        FROM user
+        WHERE user_id = ?;
+    `;
+    const [UserNickNameByIdRow] = await connection.query(selectUserNickNameByIdQuery,user_id);
+    return UserNickNameByIdRow[0];
+};
+
+export const selectUserIdByNickName = async(connection,nickname) => {// 닉네임으로 유저 id 조회
+    const selectUserIdByNickNameQuery = `
+        SELECT user_id
+        FROM user
+        WHERE nickname = ?;
+    `;
+    const [UserIdByNickNameRow] = await connection.query(selectUserIdByNickNameQuery,nickname);
+    return UserIdByNickNameRow[0];
+};
+
+export const selectUserIdByPostId = async(connection,post_id) => {// post_id로 유저 id 조회
     const selectUserIdByPostIdQuery = `
         SELECT user_id
         FROM post
@@ -74,6 +94,17 @@ export const selectUserIdByPostId = async(connection,post_id) => {// 이메일�
     `;
     const selectUserIdByPostIdRow = await connection.query(selectUserIdByPostIdQuery,post_id);
     return selectUserIdByPostIdRow[0];
+};
+
+export const selectPhonNumById = async(connection,user_id) => {// id로 전화번호 조회
+    const selectPhonNumByIdQuery = `
+        SELECT phone
+        FROM user
+        WHERE user_id = ?;
+    `;
+    const PhonNumByIdRow = await connection.query(selectPhonNumByIdQuery,user_id);
+
+    return PhonNumByIdRow[0][0];
 };
 
 export const selectAlarms = async(connection, userIdFromJWT) => {// 알림 내역 조회
@@ -95,3 +126,4 @@ export const updateAlarms = async(connection, alarm_id) => {// 알림 확인
     const updateAlarmsRow = await connection.query(updateAlarmsQuery,alarm_id);
     return updateAlarmsRow;
 };
+

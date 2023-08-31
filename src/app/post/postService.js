@@ -2,7 +2,7 @@
 (CRUD에 해당하는 서버 로직 처리) */
 
 import pool from "../../../config/database"
-import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike,
+import { insertPost,updatePost, erasePost, insertScrap, insertLike,
      insertParticipant, updateParticipant,deleteParticipant, insertUniveus, addParticipant,blockUniveus, switchPostStatus, eraseParticipant } from "./postDao";
 
 export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
@@ -106,7 +106,7 @@ export const closeUniveus = async(post_id,user_id) =>{// 게시글 모집 마감
     connection.release();
 }; 
 
-export const changePostStatus = async(post_id) =>{// 게시글 모집 마감 (축제용) 
+export const changePostStatus = async(post_id) =>{// 게시글 모집 상태 변경 (모집 마감 >> 모집 중) (축제용) 
 
     const connection = await pool.getConnection(async conn => conn);
     const changePostStatusResult = await switchPostStatus(connection,post_id);

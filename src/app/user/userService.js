@@ -53,6 +53,4 @@ export const checkAlarms = async(alarm_id) =>{// 알림 확인
     const connection = await pool.getConnection(async conn => conn);
     const checkAlarmsResult = await updateAlarms(connection,alarm_id);
     connection.release();
-
-    return response(baseResponse.SUCCESS);
 };
