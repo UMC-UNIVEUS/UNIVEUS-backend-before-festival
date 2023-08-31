@@ -14,7 +14,7 @@ const cache = new NodeCache();
 
 /**로그인 버튼 클릭 시 발생, 구글 인증페이지로 이동*/
 export const login = async(req, res) => {
-    const GOOGLE_LOGIN_REDIRECT_URI = 'http://univeus.site/user/login/redirect';
+    const GOOGLE_LOGIN_REDIRECT_URI = 'https://univeus.site/user/login/redirect';
 
     // try {
         let url = 'https://accounts.google.com/o/oauth2/v2/auth';
