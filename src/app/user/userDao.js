@@ -1,9 +1,9 @@
-export const insertUser = async(connection,email_id) => {
+// export const insertUser = async(connection,email_id) => {
 
-    const insertUserQuery = `INSERT INTO user (email_id) VALUES ('${email_id}');`;
-    const insertUserRow = await connection.query(insertUserQuery);
-    return insertUserRow
-}
+//     const insertUserQuery = `INSERT INTO user (email_id) VALUES ('${email_id}');`;
+//     const insertUserRow = await connection.query(insertUserQuery);
+//     return insertUserRow
+// }
 
 export const selectUser = async(connection, email_id) => {
 
@@ -26,12 +26,12 @@ export const selectUserByNickname = async(connection, nickname) => {
     return selectUserRow[0];
 }
 
-/** 본인인증 후 userInfo 삽입 DB에 PHONE 컬럼 추가*/
+/** 본인인증 후 userInfo insert*/
 export const insertAuthUser = async(connection, insertUserParams) => {
     const userInfo = insertUserParams.userInfo;
     const userEmail = insertUserParams.userEmail;
 
-    const updateUserQuery = `UPDATE user SET phone = ?, nickname = ?, gender = ?, major = ?, class_of = ? WHERE email_id = ?`;
+    const insertUserQuery = `INSERT INTO user (phone, nickname, gender, major, class_of, email_id) VALUES (?, ?, ?, ?, ?, ?);`;
 
     const values = [
       userInfo.phone,      
@@ -42,7 +42,7 @@ export const insertAuthUser = async(connection, insertUserParams) => {
       userEmail
     ];
   
-    const updateUserRow = await connection.query(updateUserQuery, values);
+    const updateUserRow = await connection.query(insertUserQuery, values);
     return updateUserRow;
   };
 
