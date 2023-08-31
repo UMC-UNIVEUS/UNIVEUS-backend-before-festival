@@ -1,6 +1,6 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createAuthUser, validEmailCheck, createAuthNum, authUser, checkAlarms } from "../user/userService";
+import { createAuthUser, validEmailCheck, createAuthNum, checkAlarms } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, getPhonNumById, getUserNickNameById } from "./userProvider";
 import { getUniveUsNameById } from "../post/postProvider";
 import jwt from "jsonwebtoken";
