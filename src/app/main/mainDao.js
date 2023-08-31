@@ -46,5 +46,7 @@ export const findTitle = async(connection, keywordParam) => {
     `SELECT * FROM post WHERE title LIKE ?;`
     const [rows] = await connection.query(searchQuery, keywordParam);
 
+    console.log(rows)
+
     return rows;
 }
