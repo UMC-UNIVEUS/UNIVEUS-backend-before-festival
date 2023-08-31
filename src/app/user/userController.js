@@ -1,6 +1,6 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createAuthUser, validEmailCheck, createAuthNum, authUser, checkAlarms } from "../user/userService";
+import { createAuthUser, isKyonggiEmail, createAuthNum, checkAlarms } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, getPhonNumById, getUserNickNameById } from "./userProvider";
 import { getUniveUsNameById } from "../post/postProvider";
 import jwt from "jsonwebtoken";
@@ -10,39 +10,33 @@ import NodeCache from "node-cache";
 
 const cache = new NodeCache();
 
+
 /**구글 로그인 후 회원이면 토큰 발급, 회원이 아니면 err 발송 */
 export const login = async(req, res) => {
-    const GOOGLE_LOGIN_REDIRECT_URI = 'http://localhost:3000';
-    const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
+    const googleAccessToken = req.body.accessToken;
 
-    const { code } = req.body;
-
-    const resAuthCode = await axios.post(GOOGLE_TOKEN_URL, {
-        code,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: GOOGLE_LOGIN_REDIRECT_URI,
-        grant_type: 'authorization_code',
-    });
+    console.log("googleAccessToken : " + googleAccessToken);
 
     const resUserInfo = await axios.get(GOOGLE_USERINFO_URL, {
       headers: {
-          Authorization: `Bearer ${resAuthCode.data.access_token}`,
+          Authorization: `Bearer ${googleAccessToken}`,
       },
     });
 
     const userEmail = resUserInfo.data.email;  
 
-    if (validEmailCheck(userEmail) == false) {
+    if (isKyonggiEmail(userEmail) == false) {
         return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
     }
     if (!await isUser(userEmail)) {
         return res.send(response(baseResponse.LOGIN_NOT_USER, { userEmail : userEmail }));
     }
     
-    const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '24days', issuer : 'univeus' })    
+    const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' })    
+
     if (accessToken) {
+        console.log("univeus-access-token : " + accessToken);
         return res.send(response(baseResponse.SUCCESS,{ accessToken }));
     }
 }
@@ -211,18 +205,20 @@ export const startUniveUs = async (req, res) => {
         /** 헤더에서 userEmail 추출 */
         const userEmail = req.headers.useremail;
         const user = { userInfo : req.body, userEmail : userEmail};
+
+
+        if (isKyonggiEmail(userEmail) == false)  return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
+
+        if (await isUser(userEmail)) return res.send(errResponse(baseResponse.SIGNUP_EMAIL_DUPLICATE));
         
-        // try {
-            createAuthUser(user);
+        createAuthUser(user);
 
-            return res.send(response(baseResponse.SUCCESS));
-        // } catch(err) {
-            // return res.send(errResponse(baseResponse.SERVER_ERROR));
-        // }
-
-    // }catch(err) {
-    //     return res.send(errResponse(baseResponse.SERVER_ERROR));
-    // }
+        const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' });
+           
+        if (accessToken) {
+            console.log("univeus-access-token : " + accessToken);
+            return res.send(response(baseResponse.SUCCESS,{ accessToken }));
+        }
 };
 
 /**

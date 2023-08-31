@@ -3,6 +3,7 @@ import { selectUser, selectUserByNickname, selectUserIdByEmail, selectUserIdByPo
     selectUserIdByNickName } from "./userDao"
 import pool from "../../../config/database"
 
+/** 회원인지 확인 */
 export const isUser = async(email_id) => {
 
     const connection = await pool.getConnection(async (conn) => conn);
