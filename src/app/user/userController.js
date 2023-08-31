@@ -12,27 +12,32 @@ const cache = new NodeCache();
 
 /**구글 로그인 후 회원이면 토큰 발급, 회원이 아니면 err 발송 */
 export const login = async(req, res) => {
-    const GOOGLE_LOGIN_REDIRECT_URI = 'http://localhost:3000';
-    const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+    // const GOOGLE_LOGIN_REDIRECT_URI = 'http://localhost:3000';
+    // const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
-    const { code } = req.body;
+    // const { code } = req.body;
 
-    const resAuthCode = await axios.post(GOOGLE_TOKEN_URL, {
-        code,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: GOOGLE_LOGIN_REDIRECT_URI,
-        grant_type: 'authorization_code',
-    });
+    // const resAuthCode = await axios.post(GOOGLE_TOKEN_URL, {
+    //     code,
+    //     client_id: process.env.GOOGLE_CLIENT_ID,
+    //     client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    //     redirect_uri: GOOGLE_LOGIN_REDIRECT_URI,
+    //     grant_type: 'authorization_code',
+    // });
+
+    const token = req.body.accessToken;
+    console.log(token)
 
     const resUserInfo = await axios.get(GOOGLE_USERINFO_URL, {
       headers: {
-          Authorization: `Bearer ${resAuthCode.data.access_token}`,
+          Authorization: `Bearer ${token}`,
       },
     });
 
     const userEmail = resUserInfo.data.email;  
+
+    console.log(userEmail)
 
     if (validEmailCheck(userEmail) == false) {
         return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
