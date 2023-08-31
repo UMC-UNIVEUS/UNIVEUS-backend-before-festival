@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrieveParticipantList, retrieveParticipantNum, retrievePostStatus} from "./postProvider";
-import { createPost, createImg, editPost, removePost, addScrap, addLike, 
+import { createPost, editPost, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant } from "./postService";
@@ -347,7 +347,7 @@ export const participateUniveus = async(req, res) => {
 export const inviteParticipant= async(req, res) => {
     
     const {post_id} = req.params;
-    const {user_id,participant_userNickNames} = req.body;// 작성자 ID, 참여자 닉네임들(배열로 여러 개 받아옴) 
+    const {user_id,participant_userNickNames,limit_people} = req.body;// 작성자 ID, 참여자 닉네임들(배열로 여러 개 받아옴), 제한 인원
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
 
@@ -358,44 +358,51 @@ export const inviteParticipant= async(req, res) => {
             if(participant_userNickNames.length == 0 || participant_userNickNames == null){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
                 return res.status(400).json(errResponse(baseResponse.POST_INVITE_EMPTY)); 
             }
-            else if(participant_userNickNames.length == 1){ // 초대 받은 유저가 1명일 때
-                const userIdByNickName = await getUserIdByNickName(participant_userNickNames[0]); // 닉네임으로 유저 id 얻기
-                const User = await getUserById(userIdByNickName); 
-
-                if(User){// 초대 받은 유저가 존재할 때
-                    await inviteOneParticipant(post_id, userIdByNickName, user_id);
-                    //await sendInviteMessageAlarm(userIdByNickName,post_id); // 초대 알림 (to 초대 받은 사람)
-                    return res.status(200).json(response(baseResponse.POST_PARTICIPATE_ONE)); // 성공
-                }
-                else{
-                    return res.status(400).json(errResponse(baseResponse.USER_USERID_NOT_EXIST));            
-                }
-            }
-            else if(participant_userNickNames.length == 2){ // 초대 받은 유저가 2명일 때
-                const userIdByNickName1 = await getUserIdByNickName(participant_userNickNames[0]); // 닉네임으로 유저 id 얻기
-                const User1 = await getUserById(userIdByNickName1); 
-
-                if(User1){
-                    const userIdByNickName2 = await getUserIdByNickName(participant_userNickNames[1]); // 닉네임으로 유저 id 얻기
-                    const User2 = await getUserById(userIdByNickName2); 
-
-                    if(User2){
-                        await inviteOneParticipant(post_id, userIdByNickName1, user_id);
-                        await inviteOneParticipant(post_id, userIdByNickName2, user_id);
-                        await sendInviteMessageAlarm(userIdByNickName1,post_id); // 첫 번째 유저에게 초대 알림 
-                        await sendInviteMessageAlarm(userIdByNickName2,post_id); // 두 번째 유저에게 초대 알림 
-                        return res.status(200).json(response(baseResponse.POST_PARTICIPATE_TWO)); // 성공
+            else if(limit_people == 4){ 
+                if(participant_userNickNames.length == 1){ // 초대 가능 인원 수는 1명
+                    const userIdByNickName = await getUserIdByNickName(participant_userNickNames[0]); // 닉네임으로 유저 id 얻기
+                    const User = await getUserById(userIdByNickName); 
+    
+                    if(User){// 초대 받은 유저가 존재할 때
+                        await inviteOneParticipant(post_id, userIdByNickName, user_id);
+                        await sendInviteMessageAlarm(userIdByNickName,post_id); // 초대 알림 (to 초대 받은 사람)
+                        return res.status(200).json(response(baseResponse.POST_PARTICIPATE_ONE)); // 성공
                     }
                     else{
-                        return res.status(400).json(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
+                        return res.status(400).json(errResponse(baseResponse.USER_USERID_NOT_EXIST));            
                     }
                 }
                 else{
-                    return res.status(400).json(errResponse(baseResponse.USER_FIRST_NOT_EXIST));            
+                    return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATE_ONLY_ONE));            
                 }
             }
-            else if(participant_userNickNames.length >= 3){
-                return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_LIMIT));            
+            else if(limit_people == 6){
+                if(participant_userNickNames.length == 2){ // 초대 가능인원 수는 2명
+                    const userIdByNickName1 = await getUserIdByNickName(participant_userNickNames[0]); // 닉네임으로 유저 id 얻기
+                    const User1 = await getUserById(userIdByNickName1); 
+    
+                    if(User1){
+                        const userIdByNickName2 = await getUserIdByNickName(participant_userNickNames[1]); // 닉네임으로 유저 id 얻기
+                        const User2 = await getUserById(userIdByNickName2); 
+    
+                        if(User2){
+                            await inviteOneParticipant(post_id, userIdByNickName1, user_id);
+                            await inviteOneParticipant(post_id, userIdByNickName2, user_id);
+                            await sendInviteMessageAlarm(userIdByNickName1,post_id); // 첫 번째 유저에게 초대 알림 
+                            await sendInviteMessageAlarm(userIdByNickName2,post_id); // 두 번째 유저에게 초대 알림 
+                            return res.status(200).json(response(baseResponse.POST_PARTICIPATE_TWO)); // 성공
+                        }
+                        else{
+                            return res.status(400).json(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
+                        }
+                    }
+                    else{
+                        return res.status(400).json(errResponse(baseResponse.USER_FIRST_NOT_EXIST));            
+                    }
+                }
+                else{
+                    return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATE_ONLY_TWO));            
+                }
             }
         } 
         else{ 

@@ -1,6 +1,7 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import { getUserIdByEmail } from "../user/userProvider";
 import { createUserReport, createUserReportReason, createPostReport, createPostReportReason } from "./reportService"
+import {sendUserReportAlarm, sendPostReportAlarm} from "../user/userController"
 
 
 /** 유저 신고하기 API */
@@ -12,6 +13,7 @@ export const reportUser = async(req, res) => {
 
     const reportUserResult = await createUserReport(reportReasonText, reportedBy, reportedUser);
     const reportReasonResult = await createUserReportReason(reportUserResult, reportReason);
+    await sendUserReportAlarm(reportedBy,reportedUser); // 유저 신고 알림 (to 관리자)
     res.send(response(baseResponse.REPORT_SUCCESS));
 };
 
@@ -24,5 +26,6 @@ export const reportPost = async(req, res) => {
 
     const reportPostResult = await createPostReport(reportReasonText, reportedBy, reportedPost);
     const reportReasonResult = await createPostReportReason(reportPostResult, reportReason);
+    await sendPostReportAlarm(reportedBy, reportedPost); // 게시글 신고 알림 (to 관리자)
     res.send(response(baseResponse.REPORT_SUCCESS));
 }
