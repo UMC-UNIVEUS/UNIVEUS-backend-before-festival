@@ -2,7 +2,7 @@
 (CRUD에 해당하는 서버 로직 처리) */
 
 import pool from "../../../config/database"
-import { insertPost, insertImg, updatePost, erasePost, insertScrap, insertLike,
+import { insertPost,updatePost, erasePost, insertScrap, insertLike,
      insertParticipant, updateParticipant,deleteParticipant, insertUniveus, addParticipant,blockUniveus, switchPostStatus, eraseParticipant } from "./postDao";
 
 export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
