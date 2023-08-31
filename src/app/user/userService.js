@@ -26,7 +26,7 @@ export const insertRefreshToken = async(refreshToken, email) => {
 }
 
 /** 경기대 이메일인지 확인 */
-export const validEmailCheck = (email) => {
+export const isKyonggiEmail = (email) => {
     const pattern = /^[a-zA-Z0-9_.+-]+@kyonggi\.ac\.kr$/i;
     return pattern.test(email);
 }
