@@ -65,6 +65,10 @@ export const baseResponse = {
     REPORT_SUCCESS : {"isSuccess" : true, "code" : 6000, "message" : "신고가 접수되었습니다."},
     REPORT_FAIL : {"isSuccess" : false, "code" : 6001, "message" : "신고접수를 실패하였습니다."},
 
+    /** 검색 관련 응답 */
+    SEARCH_KEYWORD_NULL : {"isSuccess" : false, "code" : 7000, "message" : "검색 키워드를 입력하지 않았습니다."},
+    SEARCH_RESULT_NULL : {"isSuccess" : false, "code" : 7001, "message" : "찾으시는 검색 결과가 없습니다."},
+
 
     //Connection, Transaction 등의 서버 오류
     DB_ERROR : { "isSuccess": false, "code": 4000, "message": "데이터 베이스 에러"},
