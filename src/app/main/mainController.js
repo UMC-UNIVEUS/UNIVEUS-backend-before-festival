@@ -31,8 +31,18 @@ export const getPostListPage = async (req, res) => {
 
 /** 메인페이지 게시글 제목 검색 */
 export const searchTitle = async (req, res) => {
-    const keywordParam = "%" + req.query.keyword + "%";
-    const searchResult = await searchPosts(keywordParam);
+    const keyword = req.query.keyword;
+
+    if (keyword == "") {
+        return res.status(200).json(errResponse(baseResponse.SEARCH_KEYWORD_NULL));
+    }
+
+    const searchParam = "%" + keyword + "%";
+    const searchResult = await searchPosts(searchParam);
+
+    if (searchResult.length === 0) {
+        return res.status(200).json(errResponse(baseResponse.SEARCH_RESULT_NULL));
+    }
 
     return res.status(200).json(response(baseResponse.SUCCESS, searchResult))
 }
