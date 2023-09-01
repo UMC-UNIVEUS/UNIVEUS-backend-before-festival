@@ -17,10 +17,10 @@ export const createPost = async(userIdFromJWT, category, limit_gender, limit_peo
 };
 
 export const editPost = async(category, limit_gender,limit_people, location, meeting_date, openchat, // 게시글 수정
-    end_date, post_status, title,content, post_id)=>{
+    end_date, title,content, post_id)=>{
   
     const updatePostParams =[category, limit_gender,limit_people, location, meeting_date, openchat, 
-        end_date, post_status, title,content,post_id]; 
+        end_date, title,content,post_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const editPostResult = await updatePost(connection,updatePostParams); 

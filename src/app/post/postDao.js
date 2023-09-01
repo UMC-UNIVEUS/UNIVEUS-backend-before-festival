@@ -49,7 +49,6 @@ export const updatePost = async(connection, updatePostParams)=>{// 게시글 수
         meeting_date =?, 
         openchat =?, 
         end_date =?, 
-        post_status =?, 
         title =?,
         content =?,
         updated_at = now()

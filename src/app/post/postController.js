@@ -35,10 +35,11 @@ export const postPost = async(req, res) => {
     
     const {category, limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content } = req.body; // 축제용 >> limit_gender
+    const notNull = [category, meeting_date, end_date, location, openchat] // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
-    
-    if(category == null || meeting_date == null || end_date == null || location == null || openchat == null){// 축제용 조건문
+
+    if(!notNull){// 축제용 조건문
         return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
     }
     if(category != 4){ // 축제용 조건문
@@ -70,14 +71,15 @@ export const patchPost =  async(req, res) => {
 
     const {post_id} = req.params;
     const {user_id, category, limit_gender,limit_people, location, meeting_date, openchat, 
-        end_date, post_status, title,content} = req.body;
+        end_date, title,content} = req.body;
+    const notNull = [category, meeting_date, end_date, location, openchat] // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
     
     if(user_id == userIdFromJWT){  //접속한 유저가 작성자라면
         const Post = await retrievePost(post_id); 
         if(Post){
-            if(category == null || meeting_date == null || end_date == null || location == null || openchat == null){// 축제용 조건문
+            if(!notNull){// 축제용 조건문
                 return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
             }
             if(category != 4){ // 축제용 조건문
@@ -96,7 +98,7 @@ export const patchPost =  async(req, res) => {
                 return res.status(400).json(errResponse(baseResponse.POST_CONTENT_LENGTH));
             }
             const patchPostResult = await editPost(category, limit_gender,limit_people, location, meeting_date, openchat, 
-                end_date, post_status, title,content, post_id);   
+                end_date, title,content, post_id);   
             return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
         } 
         else{ 
@@ -314,7 +316,6 @@ export const participateUniveus = async(req, res) => {
         if(participant_userIDsFromDB.includes(userIdFromJWT)){ // 이미 참여한 유저라면
             return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
         }
-
         else{ // 처음 참여하는 유저라면
             const ParticipantNum = await retrieveParticipantNum(post_id); // 게시글의 참여자 수 조회
     
@@ -377,12 +378,12 @@ export const inviteParticipant= async(req, res) => {
                 }
             }
             else if(limit_people == 6){
-                if(participant_userNickNames.length == 2){ // 초대 가능인원 수는 2명
-                    const userIdByNickName1 = await getUserIdByNickName(participant_userNickNames[0]); // 닉네임으로 유저 id 얻기
+                if(participant_userNickNames.length == 2){ // 초대 가능 인원 수는 2명
+                    const userIdByNickName1 = await getUserIdByNickName(participant_userNickNames[0]); 
                     const User1 = await getUserById(userIdByNickName1); 
     
                     if(User1){
-                        const userIdByNickName2 = await getUserIdByNickName(participant_userNickNames[1]); // 닉네임으로 유저 id 얻기
+                        const userIdByNickName2 = await getUserIdByNickName(participant_userNickNames[1]); 
                         const User2 = await getUserById(userIdByNickName2); 
     
                         if(User2){
