@@ -1,7 +1,9 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
-import { createAuthUser, isKyonggiEmail, createAuthNum, checkAlarms } from "../user/userService";
-import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, getPhonNumById, getUserNickNameById } from "./userProvider";
+import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
+    createUser, addUserPhoneNumber } from "../user/userService";
+import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
+    getPhonNumById, getUserNickNameById, isAuthNumber, isProfileExist } from "./userProvider";
 import { getUniveUsNameById } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
@@ -11,7 +13,7 @@ import NodeCache from "node-cache";
 const cache = new NodeCache();
 
 
-/**구글 로그인 후 회원이면 토큰 발급, 회원이 아니면 err 발송 */
+/** 구글 로그인 APT */
 export const login = async(req, res) => {
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
     const googleAccessToken = req.body.accessToken;
@@ -29,14 +31,26 @@ export const login = async(req, res) => {
     if (isKyonggiEmail(userEmail) == false) {
         return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
     }
-    if (!await isUser(userEmail)) {
-        return res.send(response(baseResponse.LOGIN_NOT_USER, { userEmail : userEmail }));
-    }
-    
+
     const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' })    
 
-    if (accessToken) {
+    if (!await isUser(userEmail) && accessToken) {
+        createUser(userEmail);
         console.log("univeus-access-token : " + accessToken);
+        return res.send(response(baseResponse.LOGIN_NOT_USER, { accessToken }));
+    }
+
+    if (!await isAuthNumber(userEmail)) {
+        console.log("univeus-access-token : " + accessToken);
+        return res.send(response(baseResponse.LOGIN_NOT_AUTH_NUMBER, { accessToken }));
+    }
+
+    if (await isProfileExist(userEmail)) {
+        console.log("univeus-access-token : " + accessToken);
+        return res.send(response(baseResponse.PROFILE_DEFAULT_INFO_NOT_EXIST, { accessToken }));
+    }
+
+    if (accessToken) {
         return res.send(response(baseResponse.SUCCESS,{ accessToken }));
     }
 }
@@ -85,27 +99,35 @@ export const sendAuthNumber = async(req, res) => {
     const sendAuth = createAuthNum();
     const content = `[UNIVEUS] 인증번호 [${sendAuth}]`;
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    // 서버 캐시에 인증번호 임시 저장, 5분동안 유효
-    cache.set("authNumber", sendAuth, 300);
+
+    // 서버 캐시에 인증번호 및 유저 전화번호 임시 저장, 3분동안 유효
+    cache.set("authNumber", sendAuth, 180);
+    cache.set("userPhone", to, 180); 
+
     if (!success) {
-        res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
-    } else {
-        res.send(response(baseResponse.SEND_AUTH_NUMBER_MSG))
-    };
+        return res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
+    } 
+
+    return res.send(response(baseResponse.SEND_AUTH_NUMBER_MSG))
 }
 
 /** 인증번호 검증 API */
-export const verifyNumber = (req, res) => {
-    const number = req.body.number;
+export const verifyNumber = async(req, res) => {
+    const userAuthNumber = req.body.number;
     const authNumber = cache.get("authNumber");
-    if (authNumber == number) {
-        cache.del("authNumber");
-        res.send(response(baseResponse.VERIFY_NUMBER_SUCCESS));
-    }
-    else {
-        res.send(errResponse(baseResponse.VERIFY_NUMBER_FAIL));
-    }
+    const userPhone = cache.get("userPhone");
 
+    if (authNumber == userAuthNumber) {
+        const userId = await getUserIdByEmail(req.verifiedToken.userEmail);
+        addUserPhoneNumber(userPhone, userId);
+
+        cache.del("authNumber");
+        cache.del("userPhone");
+        
+        return res.send(response(baseResponse.VERIFY_NUMBER_SUCCESS));
+    }
+    
+    return res.send(errResponse(baseResponse.VERIFY_NUMBER_FAIL));
 }
 
 /** 유니버스 관련 문자 알림
@@ -174,7 +196,7 @@ export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{
 
 
 
-/**닉네임 중복 체크 API */
+/** 닉네임 중복 체크 API */
 export const checkNickNameDuplicate = async (req, res) => {
     const nickname = req.body.nickname;
     // try {
@@ -191,8 +213,6 @@ export const checkNickNameDuplicate = async (req, res) => {
 
 /**유니버스 시작하기 API */
 export const startUniveUs = async (req, res) => {
-    // try {
-        if (typeof req.body.phone == "undefined") return res.send(errResponse(baseResponse.SIGNUP_PHONE_NUMBER_EMPTY));
 
         if (typeof req.body.nickname == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
 
@@ -202,23 +222,16 @@ export const startUniveUs = async (req, res) => {
 
         if (typeof req.body.studentId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));   
             
-        /** 헤더에서 userEmail 추출 */
-        const userEmail = req.headers.useremail;
-        const user = { userInfo : req.body, userEmail : userEmail};
+
+        const userEmail = req.verifiedToken.userEmail;
+        const userInfo = { userInfo : req.body, userEmail : userEmail };
 
 
         if (isKyonggiEmail(userEmail) == false)  return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
-
-        if (await isUser(userEmail)) return res.send(errResponse(baseResponse.SIGNUP_EMAIL_DUPLICATE));
         
-        createAuthUser(user);
+        addUserProfileInfo(userInfo);
 
-        const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' });
-           
-        if (accessToken) {
-            console.log("univeus-access-token : " + accessToken);
-            return res.send(response(baseResponse.SUCCESS,{ accessToken }));
-        }
+        return res.send(response(baseResponse.SUCCESS));
 };
 
 /**

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { baseResponse, errResponse } from "./response"
 
 
-
+/** jwt 미들웨어 */
 export const jwtMiddleware = (req, res, next) =>{
     /** 헤더에서 토큰 추출 */
     const token = req.headers['x-access-token']
