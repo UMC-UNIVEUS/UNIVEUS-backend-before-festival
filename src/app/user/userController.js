@@ -118,7 +118,7 @@ export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼
         var content = `[UNIVEUS] 새로운 유저가 유니버스에 참여했습니다!`;
     }
     else if(alarmType == 2){
-        var content = `[UNIVEUS] 유니버스가 마감됐습니다!`;
+        var content = `[UNIVEUS] 유니버스가 모집 마감됐습니다!`;
     }
 
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
