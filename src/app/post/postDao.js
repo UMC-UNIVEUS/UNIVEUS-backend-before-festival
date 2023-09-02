@@ -154,6 +154,15 @@ export const deleteParticipant = async(connection, deleteParticipantParams)=>{//
     const approveParticipantRow = await connection.query(deleteParticipantQuery, deleteParticipantParams[1]);
 };
 
+export const updateStatus = async(connection, post_id)=>{// 게시글 모집 마감으로 벼경
+    const updateStatusQuery = `
+        UPDATE post 
+        SET post_status = 'end'
+        WHERE post_id = ?;
+    `;
+    const updateStatusRow = await connection.query(updateStatusQuery, post_id);
+};
+
 export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1
     const postUniveusQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 

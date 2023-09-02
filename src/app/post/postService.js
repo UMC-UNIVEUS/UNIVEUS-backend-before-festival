@@ -3,7 +3,9 @@
 
 import pool from "../../../config/database"
 import { insertPost,updatePost, erasePost, insertScrap, insertLike,
-     insertParticipant, updateParticipant,deleteParticipant, insertUniveus, addParticipant,blockUniveus, switchPostStatus, eraseParticipant } from "./postDao";
+     insertParticipant, updateParticipant,deleteParticipant, insertUniveus, 
+     addParticipant,blockUniveus, switchPostStatus, eraseParticipant,
+     updateStatus } from "./postDao";
 
 export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, title, content) =>{
@@ -76,6 +78,13 @@ export const refuseParticipant = async(post_id, participant_id) =>{// 게시글 
 
     const connection = await pool.getConnection(async conn => conn);
     const refuseParticipantResult = await deleteParticipant(connection,deleteParticipantParams);
+    connection.release();
+};
+
+export const changeStatus = async(post_id)=>{// 게시글 모집 마감으로 변경
+
+    const connection = await pool.getConnection(async conn => conn);
+    const updateStatusResult = await updateStatus(connection,post_id); 
     connection.release();
 };
 

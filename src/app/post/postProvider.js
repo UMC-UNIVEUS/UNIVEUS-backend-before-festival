@@ -5,6 +5,7 @@ export const retrievePost = async(post_id) =>{
     
     const connection = await pool.getConnection(async conn => conn);
     const postResult = await selectPost(connection,post_id);
+    //console.log(postResult[0].post_status); // 이러면 post_status가 출력됨
     connection.release();
 
     return postResult[0];
