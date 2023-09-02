@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrieveParticipantList, retrieveParticipantNum, retrievePostStatus} from "./postProvider";
+import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
 import { createPost, editPost, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
-    ,changePostStatus, removeParticipant } from "./postService";
-import {getUserIdByEmail, getUserById, getUserIdByNickName} from "../user/userProvider";
+    ,changePostStatus, removeParticipant,changeStatus } from "./postService";
+import {getUserIdByEmail, getUserByNickName} from "../user/userProvider";
 import {sendMessageAlarm, sendInviteMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 
 /**
@@ -279,6 +279,37 @@ export const deleteParticipant = async(req, res) => {
 };
 
 /**
+ * API name : 모집 마감으로 상태 변경
+ * POST: post/{post_id}/status
+ */
+export const patchStatus = async(req, res) => {
+
+    const {post_id} = req.params;
+    const {user_id} = req.body; // 작성자 ID
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
+    const Post = await retrievePost(post_id); 
+   
+    if(user_id == userIdFromJWT){
+        if(Post){ // Post가 존재한다면
+            if(Post.post_status == 'end'){
+                return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATE_ALREADY_CLOSE))
+            }
+            else{
+                const changeStatusResult = await changeStatus(post_id);   
+                return res.status(200).json(response(baseResponse.SUCCESS, changeStatusResult));
+            }
+        } 
+        else{ 
+            return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+        } 
+    }
+    else{
+        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }
+};
+
+/**
  * API name : 게시글 모임 1일 전 알림 
  * POST: post/{post_id}/participant/onedayalarm
  */
@@ -317,12 +348,10 @@ export const participateUniveus = async(req, res) => {
             return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
         }
         else{ // 처음 참여하는 유저라면
-            const ParticipantNum = await retrieveParticipantNum(post_id); // 게시글의 참여자 수 조회
-    
-            if(limit_people <= ParticipantNum){ // 현재 참여 인원 수와 제한 인원 수가 같다면 모집 마감되었다고 응답
+            if(limit_people <= Post.current_people){ // 현재 참여 인원 수와 제한 인원 수가 같다면 모집 마감되었다고 응답
                 return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
             }
-            else if(limit_people == ParticipantNum + 1){ // 현재 참여할 인원 수와 제한 인원 수가 같다면
+            else if(limit_people == Post.current_people + 1){ // 현재 참여할 인원 수와 제한 인원 수가 같다면
                 await applyUniveus(post_id, userIdFromJWT, user_id);// 게시글 참여
                 await closeUniveus(post_id,user_id); // 게시글의 상태를 모집 마감으로 업데이트
                 await sendMessageAlarm(user_id,2); // 2. 유니버스 마감 알림 (to 작성자)
@@ -361,12 +390,11 @@ export const inviteParticipant= async(req, res) => {
             }
             else if(limit_people == 4){ 
                 if(participant_userNickNames.length == 1){ // 초대 가능 인원 수는 1명
-                    const userIdByNickName = await getUserIdByNickName(participant_userNickNames[0]); // 닉네임으로 유저 id 얻기
-                    const User = await getUserById(userIdByNickName); 
-    
-                    if(User){// 초대 받은 유저가 존재할 때
-                        await inviteOneParticipant(post_id, userIdByNickName, user_id);
-                        await sendInviteMessageAlarm(userIdByNickName,post_id); // 초대 알림 (to 초대 받은 사람)
+                    const userByNickName = await getUserByNickName(participant_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
+             
+                    if(userByNickName){// 초대 받은 유저가 존재할 때
+                        await inviteOneParticipant(post_id, userByNickName.user_id, user_id);
+                        await sendInviteMessageAlarm(userByNickName.user_id,post_id); // 초대 알림 (to 초대 받은 사람)
                         return res.status(200).json(response(baseResponse.POST_PARTICIPATE_ONE)); // 성공
                     }
                     else{
@@ -379,18 +407,16 @@ export const inviteParticipant= async(req, res) => {
             }
             else if(limit_people == 6){
                 if(participant_userNickNames.length == 2){ // 초대 가능 인원 수는 2명
-                    const userIdByNickName1 = await getUserIdByNickName(participant_userNickNames[0]); 
-                    const User1 = await getUserById(userIdByNickName1); 
+                    const userByNickName1 = await getUserByNickName(participant_userNickNames[0]); 
     
-                    if(User1){
-                        const userIdByNickName2 = await getUserIdByNickName(participant_userNickNames[1]); 
-                        const User2 = await getUserById(userIdByNickName2); 
+                    if(userByNickName1){
+                        const userByNickName2 = await getUserByNickName(participant_userNickNames[1]); 
     
-                        if(User2){
-                            await inviteOneParticipant(post_id, userIdByNickName1, user_id);
-                            await inviteOneParticipant(post_id, userIdByNickName2, user_id);
-                            await sendInviteMessageAlarm(userIdByNickName1,post_id); // 첫 번째 유저에게 초대 알림 
-                            await sendInviteMessageAlarm(userIdByNickName2,post_id); // 두 번째 유저에게 초대 알림 
+                        if(userByNickName2){
+                            await inviteOneParticipant(post_id, userByNickName1.user_id, user_id);
+                            await inviteOneParticipant(post_id, userByNickName2.user_id, user_id);
+                            await sendInviteMessageAlarm(userByNickName1.user_id,post_id); // 첫 번째 유저에게 초대 알림 
+                            await sendInviteMessageAlarm(userByNickName2.user_id,post_id); // 두 번째 유저에게 초대 알림 
                             return res.status(200).json(response(baseResponse.POST_PARTICIPATE_TWO)); // 성공
                         }
                         else{
@@ -430,9 +456,8 @@ export const cancelParticipant = async(req, res) => {
     
     if(Post){ // Post가 존재한다면 
         if(participant_userIDsFromDB.includes(userIdFromJWT)){ // 참여를 했던 유저라면
-            const postStatus = await retrievePostStatus(post_id); // 게시글 모집 상태 조회
-    
-            if(postStatus =="end"){// 모집 마감이라면
+
+            if(Post.post_status =="end"){// 모집 마감이라면
                 await changePostStatus(post_id);// 모집 중으로 변경
             }
             const removeParticipantResult = await removeParticipant(post_id, userIdFromJWT, user_id);// 유니버스 참여 취소 

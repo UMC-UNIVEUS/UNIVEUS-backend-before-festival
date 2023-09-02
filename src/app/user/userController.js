@@ -1,8 +1,8 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { createAuthUser, isKyonggiEmail, createAuthNum, checkAlarms } from "../user/userService";
-import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, getPhonNumById, getUserNickNameById } from "./userProvider";
-import { getUniveUsNameById } from "../post/postProvider";
+import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, getUserNickNameById, getUserById } from "./userProvider";
+import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
@@ -113,7 +113,9 @@ export const verifyNumber = (req, res) => {
  * 2. 마감 알림 (to 작성자)*/
 export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼 유저, 알림 type
 
-    const to = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
+    const User = await getUserById(user_id); 
+    const to = User.phone;
+
     if(alarmType == 1){
         var content = `[UNIVEUS] 새로운 유저가 유니버스에 참여했습니다!`;
     }
@@ -129,9 +131,11 @@ export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼
 /**초대 알림 (to 초대 받은 사람)*/
 export const sendInviteMessageAlarm = async(user_id,post_id) =>{ // 알림을 보낼 유저
 
-    const to = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
-    const univeUsName = await getUniveUsNameById(post_id); // post_id로 유니버스 제목 가져오기
-    const content = `[UNIVEUS] 유니버스 '${univeUsName}'에 초대받으셨습니다! 들어가서 확인해 보세요!`;
+    const User = await getUserById(user_id); 
+    const to = User.phone;
+    
+    const Post = await retrievePost(post_id); 
+    const content = `[UNIVEUS] 유니버스 '${Post.title}'에 초대받으셨습니다! 들어가서 확인해 보세요!`;
     
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     if (!success) { return false} 
@@ -141,7 +145,9 @@ export const sendInviteMessageAlarm = async(user_id,post_id) =>{ // 알림을 �
 /** 참여 취소 알림 (to 작성자)*/
 export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림을 보낼 유저
 
-    const to = await getPhonNumById(user_id); // user_id로 전화번호 가져오기
+    const User = await getUserById(user_id); 
+    const to = User.phone;
+
     const userNickName = await getUserNickNameById(userIdFromJWT); // user_id로 닉네임 가져오기
     const content = `[UNIVEUS] 유니버스에 참여했던 '${userNickName}'님이/가 참여 취소하였습니다.`;
 

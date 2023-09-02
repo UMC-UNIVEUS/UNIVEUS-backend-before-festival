@@ -1,5 +1,4 @@
 import { insertToken, insertAuthUser, updateAlarms } from "./userDao"
-import { baseResponse, response } from "../../../config/response";
 import pool from "../../../config/database"
 
 // export const createUser = async(userEmail) => {
