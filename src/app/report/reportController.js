@@ -1,4 +1,4 @@
-import { baseResponse, errResponse, response } from "../../../config/response";
+import { baseResponse, response } from "../../../config/response";
 import { getUserIdByEmail } from "../user/userProvider";
 import { createUserReport, createUserReportReason, createPostReport, createPostReportReason } from "./reportService"
 import {sendUserReportAlarm, sendPostReportAlarm} from "../user/userController"

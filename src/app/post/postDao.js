@@ -207,16 +207,6 @@ export const addParticipant = async(connection, askParticipantParams)=>{// 유�
     const inviteParticipantAlarmRow = await connection.query(inviteParticipantAlarmQuery, askParticipantParams);
 };
 
-export const selectParticipantNum = async(connection, post_id)=>{ // 참여자 수 조회 (축제용)
-    const selectCurrentPeopleQuery = `
-        SELECT current_people
-        FROM post
-        WHERE post_id = ?;
-    `;
-    const [selectCurrentPeopleRow] = await connection.query(selectCurrentPeopleQuery, post_id);
-    return selectCurrentPeopleRow[0].current_people;
-};
-
 export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 마감
     const blockUniveusQuery = `
         UPDATE post 
@@ -231,16 +221,6 @@ export const blockUniveus = async(connection, closeUniveusParams)=>{ // 모집 �
 
     const blockUniveusRow = await connection.query(blockUniveusQuery, closeUniveusParams[0]);
     const closeUniveusAlarmRow = await connection.query(closeUniveusAlarmQuery, closeUniveusParams);
-};
-
-export const selectPostStatus = async(connection, post_id)=>{ // 게시글 모집 상태 조회
-    const selectPostStatusQuery = `
-        SELECT post_status
-        FROM post
-        WHERE post_id = ?;
-    `;
-    const [PostRow] = await connection.query(selectPostStatusQuery, post_id);
-    return PostRow[0].post_status;
 };
 
 export const selectUniveUsNameById = async(connection, post_id)=>{ // post_id로 유니버스 제목 가져오기

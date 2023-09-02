@@ -97,9 +97,9 @@ export const applyUniveus = async(post_id, userIdFromJWT, user_id) =>{// 유니�
     connection.release();
 };
 
-export const inviteOneParticipant = async(post_id, participant_userIDs, user_id) =>{// 유니버스 초대 (축제용)
+export const inviteOneParticipant = async(post_id, participant_userID, user_id) =>{// 유니버스 초대 (축제용)
 
-    const askParticipantParams =[post_id,participant_userIDs, user_id]; 
+    const askParticipantParams =[post_id,participant_userID, user_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const askParticipantResult = await addParticipant(connection,askParticipantParams);
