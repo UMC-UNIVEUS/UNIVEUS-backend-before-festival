@@ -3,7 +3,9 @@
 
 import pool from "../../../config/database"
 import { insertPost,updatePost, erasePost, insertScrap, insertLike,
-     insertParticipant, updateParticipant,deleteParticipant, insertUniveus, addParticipant,blockUniveus, switchPostStatus, eraseParticipant } from "./postDao";
+     insertParticipant, updateParticipant,deleteParticipant, insertUniveus, 
+     addParticipant,blockUniveus, switchPostStatus, eraseParticipant,
+     updateStatus } from "./postDao";
 
 export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
     end_date, title, content) =>{
@@ -79,6 +81,13 @@ export const refuseParticipant = async(post_id, participant_id) =>{// 게시글 
     connection.release();
 };
 
+export const changeStatus = async(post_id)=>{// 게시글 모집 마감으로 변경
+
+    const connection = await pool.getConnection(async conn => conn);
+    const updateStatusResult = await updateStatus(connection,post_id); 
+    connection.release();
+};
+
 export const applyUniveus = async(post_id, userIdFromJWT, user_id) =>{// 유니버스 참여 (축제용)
 
     const applyUniveusParams =[post_id, userIdFromJWT, user_id]; 
@@ -88,9 +97,9 @@ export const applyUniveus = async(post_id, userIdFromJWT, user_id) =>{// 유니�
     connection.release();
 };
 
-export const inviteOneParticipant = async(post_id, participant_userIDs, user_id) =>{// 유니버스 초대 (축제용)
+export const inviteOneParticipant = async(post_id, participant_userID, user_id) =>{// 유니버스 초대 (축제용)
 
-    const askParticipantParams =[post_id,participant_userIDs, user_id]; 
+    const askParticipantParams =[post_id,participant_userID, user_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const askParticipantResult = await addParticipant(connection,askParticipantParams);

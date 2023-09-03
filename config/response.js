@@ -43,6 +43,7 @@ export const baseResponse = {
     POST_PARTICIPATE_TWO : { "isSuccess": true, "code": 3014, "message": "두 명을 초대하였습니다." },
     POST_PARTICIPATE_ONLY_ONE : { "isSuccess": false, "code": 3015, "message": "제한 인원이 4명일 때는 1명만 초대할 수 있습니다." },
     POST_PARTICIPATE_ONLY_TWO : { "isSuccess": false, "code": 3016, "message": "제한 인원이 6명일 때는 2명만 초대할 수 있습니다." },
+    POST_PARTICIPATE_ALREADY_CLOSE : { "isSuccess": false, "code": 3017, "message": "이미 모집 마감됐습니다." },
 
 
 
@@ -67,6 +68,10 @@ export const baseResponse = {
     /** 신고 관련 MSG */
     REPORT_SUCCESS : {"isSuccess" : true, "code" : 6000, "message" : "신고가 접수되었습니다."},
     REPORT_FAIL : {"isSuccess" : false, "code" : 6001, "message" : "신고접수를 실패하였습니다."},
+
+    /** 검색 관련 응답 */
+    SEARCH_KEYWORD_NULL : {"isSuccess" : false, "code" : 7000, "message" : "검색 키워드를 입력하지 않았습니다."},
+    SEARCH_RESULT_NULL : {"isSuccess" : false, "code" : 7001, "message" : "찾으시는 검색 결과가 없습니다."},
 
 
     //Connection, Transaction 등의 서버 오류
