@@ -82,6 +82,7 @@ export const isAuthNumber = async(userEmail) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const authNumberResult = await selectPhoneByEmail(connection, userEmail);
     connection.release();
+    
     if (authNumberResult[0][0].phone == null) return false;
     return true;
 }
@@ -90,8 +91,7 @@ export const isAuthNumber = async(userEmail) => {
 export const isAuthUser = async(userEmail) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const isAuthUserResult = await selectAuthStatusByEmail(connection, userEmail);
-
-    console.log(isAuthUserResult)
+    connection.release();
 
     if(isAuthUserResult[0][0].auth_status == null) return false;
     return true;

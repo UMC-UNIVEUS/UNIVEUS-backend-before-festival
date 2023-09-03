@@ -31,7 +31,8 @@ export const updateUserProfileInfo = async(connection, updateUserParams) => {
         nickname =?,
         gender = ?,
         major = ?,
-        class_of = ?
+        class_of = ?,
+        auth_status = 1
         WHERE email_id = ?;
     `;
 
