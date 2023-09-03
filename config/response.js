@@ -24,7 +24,10 @@ export const baseResponse = {
     USER_USERID_EMPTY : { "isSuccess": false, "code": 2017, "message": "user_Id를 입력해주세요." },
     USER_USER_NICKNAME_LENGTH : { "isSuccess": false, "code": 2018, "message": "닉네임 길이 제한을 초과하였습니다." },
     LOGIN_NOT_AUTH_NUMBER : {"isSuccess" : false, "code" : 2019, "message" : "번호인증이 필요합니다. 번호인증 페이지로 리다이렉트 됩니다." },
-    LOGIN_NOT_AUTH_COMPLETE_USER : {"isSuccess" : false, "code" : 2020, "message" : "본인인증을 완료한 유저가 아닙니다. 해당 페이지로 리다이렉트 됩니다." },
+    LOGIN_NOT_AUTH_COMPLETE_USER : {"isSuccess" : false, "code" : 2500, "message" : "권한이 없습니다." },
+
+    // 관리자
+    NOT_ADMIN : {"isSuccess" : false, "code" : 2020, "message" : "본인인증을 완료한 유저가 아닙니다. 해당 페이지로 리다이렉트 됩니다." },
     
     //게시글 관련
     POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3000, "message": "해당 게시글이 존재하지 않습니다." },
