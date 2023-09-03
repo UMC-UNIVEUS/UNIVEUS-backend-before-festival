@@ -1,7 +1,7 @@
-import { selectUser, selectUserByNickname, selectUserIdByEmail, selectUserIdByPostId, 
-    selectAlarms, selectUserById, selectPhonNumById, selectUserNickNameById,
-    selectUserIdByNickName,
-    selectPhoneByEmail } from "./userDao"
+import { selectUser, selectUserByNickname, selectUserIdByEmail, 
+    selectUserIdByPostId, selectAlarms, selectUserById, 
+    selectPhonNumById, selectUserNickNameById, selectUserIdByNickName, 
+    selectPhoneByEmail, selectAuthStatusByEmail } from "./userDao"
 import pool from "../../../config/database"
 
 /** 회원인지 확인 */
@@ -86,9 +86,15 @@ export const isAuthNumber = async(userEmail) => {
     return true;
 }
 
-/** 프로필 등록을 마친 user인지 */
-export const isProfileExist = async(userEmail) => {
+/** 본인인증을 마친 user인지 */
+export const isAuthUser = async(userEmail) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const isAuthUserResult = await selectAuthStatusByEmail(connection, userEmail);
 
+    console.log(isAuthUserResult)
+
+    if(isAuthUserResult[0][0].auth_status == null) return false;
+    return true;
 }
 
 

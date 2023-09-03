@@ -141,3 +141,10 @@ export const selectPhoneByEmail = async(connection, userEmail) => {
     const selectPhoneByEmailRow = await connection.query(selectPhoneByEmailQuery);
     return selectPhoneByEmailRow;
 }
+
+/**user의 auth_status를 검색 */
+export const selectAuthStatusByEmail = async(connection, userEmail) => {
+    const selectAuthStatusByEmailQuery = `SELECT auth_status FROM user WHERE email_id = '${userEmail}';`;
+    const selectAuthStatusByEmailRow = await connection.query(selectAuthStatusByEmailQuery);
+    return selectAuthStatusByEmailRow;
+}

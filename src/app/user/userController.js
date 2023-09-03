@@ -3,7 +3,7 @@ import axios from "axios";
 import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
     createUser, addUserPhoneNumber } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
-    getPhonNumById, getUserNickNameById, isAuthNumber, isProfileExist } from "./userProvider";
+    getPhonNumById, getUserNickNameById, isAuthNumber, isAuthUser } from "./userProvider";
 import { getUniveUsNameById } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
@@ -34,7 +34,9 @@ export const login = async(req, res) => {
 
     const accessToken = await jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' })    
 
-    if (!await isUser(userEmail) && accessToken) {
+    if(!accessToken) return res.send(errResponse(baseResponse.VERIFIED_ACCESS_TOKEN_EMPTY));
+    
+    if (!await isUser(userEmail)) {
         createUser(userEmail);
         console.log("univeus-access-token : " + accessToken);
         return res.send(response(baseResponse.LOGIN_NOT_USER, { accessToken }));
@@ -45,14 +47,13 @@ export const login = async(req, res) => {
         return res.send(response(baseResponse.LOGIN_NOT_AUTH_NUMBER, { accessToken }));
     }
 
-    if (await isProfileExist(userEmail)) {
+    if (!await isAuthUser(userEmail)) {
         console.log("univeus-access-token : " + accessToken);
-        return res.send(response(baseResponse.PROFILE_DEFAULT_INFO_NOT_EXIST, { accessToken }));
+        return res.send(response(baseResponse.LOGIN_NOT_AUTH_COMPLETE_USER, { accessToken }));
     }
 
-    if (accessToken) {
-        return res.send(response(baseResponse.SUCCESS,{ accessToken }));
-    }
+    console.log("univeus-access-token : " + accessToken);
+    return res.send(response(baseResponse.SUCCESS,{ accessToken }));
 }
 
 
