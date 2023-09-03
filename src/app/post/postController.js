@@ -35,11 +35,12 @@ export const postPost = async(req, res) => {
     
     const {category, limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content, participant_userNickNames } = req.body; // 축제용 >> limit_gender, participant_userNickNames
-    const notNull = [category, meeting_date, end_date, location,openchat, title, content,participant_userNickNames] // 빠지면 안될 정보들
+    const notUndefined = [category, limit_gender, limit_people, location, meeting_date, openchat, 
+        end_date, title, content, participant_userNickNames]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
 
-    if(!notNull){// 축제용 조건문 >> 이거 잘 안됨 수정해야 함.
+    if(notUndefined.includes(undefined)){// 축제용 조건문 
         return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
     }
     if(category != 4){ // 축제용 조건문
@@ -57,7 +58,7 @@ export const postPost = async(req, res) => {
     if(content.length > 500){ // 축제용 조건문
         return res.status(400).json(errResponse(baseResponse.POST_CONTENT_LENGTH));
     }
-    if(participant_userNickNames.length == 0 || participant_userNickNames == null){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
+    if( participant_userNickNames.length == 0){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
         return res.status(400).json(errResponse(baseResponse.POST_INVITE_EMPTY)); 
     }
     if(limit_people == 4){ // 축제용 조건문
@@ -118,14 +119,15 @@ export const patchPost =  async(req, res) => {
     const {post_id} = req.params;
     const {user_id, category, limit_gender,limit_people, location, meeting_date, openchat, 
         end_date, title,content} = req.body;
-    const notNull = [category, meeting_date, end_date, location, openchat] // 빠지면 안될 정보들
+    const notUndefined = [category, limit_gender, limit_people, location, meeting_date, openchat, 
+        end_date, title, content]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
     
     if(user_id == userIdFromJWT){  //접속한 유저가 작성자라면
         const Post = await retrievePost(post_id); 
         if(Post){
-            if(!notNull){// 축제용 조건문
+            if(notUndefined.includes(undefined)){// 축제용 조건문 
                 return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
             }
             if(category != 4){ // 축제용 조건문
