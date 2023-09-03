@@ -1,6 +1,7 @@
-import { selectUser, selectUserByNickname, selectUserIdByEmail, 
-    selectAlarms, selectUserById, selectUserNickNameById,
+import { selectUser, selectUserByNickname, selectUserIdByEmail, selectAlarms, 
+    selectUserById, selectUserNickNameById, selectPhoneByEmail, selectAuthStatusByEmail, 
     selectUserByNickName } from "./userDao"
+
 import pool from "../../../config/database"
 
 /** 회원인지 확인 */
@@ -58,5 +59,25 @@ export const retrieveAlarms = async(userIdFromJWT) => {// 알림 내역 조회
     connection.release();
     return alarmsResult;
 };
+
+/** 번호인증을 마친 user인지 */
+export const isAuthNumber = async(userEmail) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const authNumberResult = await selectPhoneByEmail(connection, userEmail);
+    connection.release();
+
+    if (authNumberResult[0][0].phone == null) return false;
+    return true;
+}
+
+/** 본인인증을 마친 user인지 */
+export const isAuthUser = async(userEmail) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const isAuthUserResult = await selectAuthStatusByEmail(connection, userEmail);
+    connection.release();
+
+    if(isAuthUserResult[0][0].auth_status == null) return false;
+    return true;
+}
 
 
