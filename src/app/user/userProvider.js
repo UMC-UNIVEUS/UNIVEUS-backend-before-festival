@@ -1,7 +1,6 @@
 import { selectUser, selectUserByNickname, selectUserIdByEmail, selectAlarms, 
     selectUserById, selectUserNickNameById, selectPhoneByEmail, selectAuthStatusByEmail, 
     selectUserByNickName } from "./userDao"
-
 import pool from "../../../config/database"
 
 /** 회원인지 확인 */
