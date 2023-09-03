@@ -5,7 +5,6 @@ import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms,
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
     getUserNickNameById, isAuthNumber, isAuthUser, getUserById } from "./userProvider";
 import { retrievePost } from "../post/postProvider";
-import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/NaverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
@@ -14,7 +13,7 @@ import NodeCache from "node-cache";
 const cache = new NodeCache();
 
 
-/** 구글 로그인 APT */
+/** 구글 로그인 API */
 export const login = async(req, res) => {
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
     const googleAccessToken = req.body.accessToken;
