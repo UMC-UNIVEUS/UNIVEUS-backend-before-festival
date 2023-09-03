@@ -16,6 +16,7 @@ export const createPost = async(userIdFromJWT, category, limit_gender, limit_peo
     const connection = await pool.getConnection(async conn => conn);
     const createpostResult = await insertPost(connection,insertPostParams);
     connection.release();
+    return createpostResult;
 };
 
 export const editPost = async(category, limit_gender,limit_people, location, meeting_date, openchat, // 게시글 수정

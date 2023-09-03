@@ -37,6 +37,7 @@ export const insertPost = async(connection, insertPostParams)=>{// 게시글 생
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
     const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]); 
     //insertPostRow.insertId는 생성된 post의 post_id, insertPostParams[0]는 user_id
+    return insertPostRow[0];
 };
 
 export const updatePost = async(connection, updatePostParams)=>{// 게시글 수정

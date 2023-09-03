@@ -34,12 +34,12 @@ export const getPost = async(req, res) => {
 export const postPost = async(req, res) => {
     
     const {category, limit_gender, limit_people, location, meeting_date, openchat, 
-        end_date, title, content } = req.body; // 축제용 >> limit_gender
-    const notNull = [category, meeting_date, end_date, location, openchat] // 빠지면 안될 정보들
+        end_date, title, content, participant_userNickNames } = req.body; // 축제용 >> limit_gender, participant_userNickNames
+    const notNull = [category, meeting_date, end_date, location,openchat, title, content,participant_userNickNames] // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
-    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
 
-    if(!notNull){// 축제용 조건문
+    if(!notNull){// 축제용 조건문 >> 이거 잘 안됨 수정해야 함.
         return res.status(400).json(errResponse(baseResponse.POST_INFORMATION_EMPTY));
     }
     if(category != 4){ // 축제용 조건문
@@ -57,10 +57,56 @@ export const postPost = async(req, res) => {
     if(content.length > 500){ // 축제용 조건문
         return res.status(400).json(errResponse(baseResponse.POST_CONTENT_LENGTH));
     }
-    const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
-        end_date, title, content);
-    
-    return res.status(200).json(response(baseResponse.SUCCESS, postPostResult));
+    if(participant_userNickNames.length == 0 || participant_userNickNames == null){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
+        return res.status(400).json(errResponse(baseResponse.POST_INVITE_EMPTY)); 
+    }
+    if(limit_people == 4){ // 축제용 조건문
+        if(participant_userNickNames.length == 1){ // 초대 가능 인원 수는 1명
+            const userByNickName = await getUserByNickName(participant_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
+     
+            if(userByNickName){// 초대 받은 유저가 존재할 때
+                const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+                    end_date, title, content);
+                await inviteOneParticipant(postPostResult.insertId, userByNickName.user_id, userIdFromJWT);
+                //await sendInviteMessageAlarm(userByNickName.user_id,post_id); // 초대 알림 (to 초대 받은 사람)
+                return res.status(200).json(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
+            }
+            else{
+                return res.status(400).json(errResponse(baseResponse.USER_USERID_NOT_EXIST));            
+            }
+        }
+        else{
+            return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATE_ONLY_ONE));            
+        }
+    }
+    else if(limit_people == 6){
+        if(participant_userNickNames.length == 2){ // 초대 가능 인원 수는 2명
+            const userByNickName1 = await getUserByNickName(participant_userNickNames[0]); 
+
+            if(userByNickName1){
+                const userByNickName2 = await getUserByNickName(participant_userNickNames[1]); 
+
+                if(userByNickName2){
+                    const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+                        end_date, title, content);
+                    await inviteOneParticipant(postPostResult.insertId, userByNickName1.user_id, userIdFromJWT);
+                    await inviteOneParticipant(postPostResult.insertId, userByNickName2.user_id, userIdFromJWT);
+                    //await sendInviteMessageAlarm(userByNickName1.user_id, postPostResult.insertId); // 첫 번째 유저에게 초대 알림 
+                    //await sendInviteMessageAlarm(userByNickName2.user_id, postPostResult.insertId); // 두 번째 유저에게 초대 알림 
+                    return res.status(200).json(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
+                }
+                else{
+                    return res.status(400).json(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
+                }
+            }
+            else{
+                return res.status(400).json(errResponse(baseResponse.USER_FIRST_NOT_EXIST));            
+            }
+        }
+        else{
+            return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATE_ONLY_TWO));            
+        }
+    }
 };
 
 /**
@@ -367,77 +413,6 @@ export const participateUniveus = async(req, res) => {
     } 
     else{ 
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
-    }
-};
-
-/**
- * API name : 유니버스 참여자 초대 >> 축제용 API 
- * POST: /post/{post_id}/participant/invite
- */
-export const inviteParticipant= async(req, res) => {
-    
-    const {post_id} = req.params;
-    const {user_id,participant_userNickNames,limit_people} = req.body;// 작성자 ID, 참여자 닉네임들(배열로 여러 개 받아옴), 제한 인원
-    const userEmail = req.verifiedToken.userEmail;
-    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
-
-    if(user_id == userIdFromJWT){
-        const Post = await retrievePost(post_id); 
-
-        if(Post){ // Post가 존재한다면  
-            if(participant_userNickNames.length == 0 || participant_userNickNames == null){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
-                return res.status(400).json(errResponse(baseResponse.POST_INVITE_EMPTY)); 
-            }
-            else if(limit_people == 4){ 
-                if(participant_userNickNames.length == 1){ // 초대 가능 인원 수는 1명
-                    const userByNickName = await getUserByNickName(participant_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
-             
-                    if(userByNickName){// 초대 받은 유저가 존재할 때
-                        await inviteOneParticipant(post_id, userByNickName.user_id, user_id);
-                        await sendInviteMessageAlarm(userByNickName.user_id,post_id); // 초대 알림 (to 초대 받은 사람)
-                        return res.status(200).json(response(baseResponse.POST_PARTICIPATE_ONE)); // 성공
-                    }
-                    else{
-                        return res.status(400).json(errResponse(baseResponse.USER_USERID_NOT_EXIST));            
-                    }
-                }
-                else{
-                    return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATE_ONLY_ONE));            
-                }
-            }
-            else if(limit_people == 6){
-                if(participant_userNickNames.length == 2){ // 초대 가능 인원 수는 2명
-                    const userByNickName1 = await getUserByNickName(participant_userNickNames[0]); 
-    
-                    if(userByNickName1){
-                        const userByNickName2 = await getUserByNickName(participant_userNickNames[1]); 
-    
-                        if(userByNickName2){
-                            await inviteOneParticipant(post_id, userByNickName1.user_id, user_id);
-                            await inviteOneParticipant(post_id, userByNickName2.user_id, user_id);
-                            await sendInviteMessageAlarm(userByNickName1.user_id,post_id); // 첫 번째 유저에게 초대 알림 
-                            await sendInviteMessageAlarm(userByNickName2.user_id,post_id); // 두 번째 유저에게 초대 알림 
-                            return res.status(200).json(response(baseResponse.POST_PARTICIPATE_TWO)); // 성공
-                        }
-                        else{
-                            return res.status(400).json(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
-                        }
-                    }
-                    else{
-                        return res.status(400).json(errResponse(baseResponse.USER_FIRST_NOT_EXIST));            
-                    }
-                }
-                else{
-                    return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATE_ONLY_TWO));            
-                }
-            }
-        } 
-        else{ 
-            return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
-        }
-    }
-    else{
-        return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     }
 };
 
