@@ -10,6 +10,7 @@ import commentRouter from "../src/app/comment/commRoute";
 import mainRouter from "../src/app/main/mainRoute"
 import reportRouter from "../src/app/report/reportRoute";
 import profileRouter from "../src/app/profile/profileRoute";
+import adminRouter from "../src/app/admin/adminRoute";
 
 
 const app = express();  
@@ -21,11 +22,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(methodOverride());
 app.use(cors());
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
-  });
-
 
 app.use('/user', userRouter);
 app.use('/post',postRouter);
@@ -34,5 +30,6 @@ app.use('/report', reportRouter);
 app.use('/profile', profileRouter);
 app.use('/mypage', userRouter);
 app.use('/', mainRouter)
+app.use('/admin', adminRouter)
 
 export default app;
