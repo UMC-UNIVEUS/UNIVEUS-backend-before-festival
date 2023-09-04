@@ -328,7 +328,7 @@ export const deleteParticipant = async(req, res) => {
 
 /**
  * API name : 모집 마감으로 상태 변경
- * POST: post/{post_id}/status
+ * PATCH: post/{post_id}/status
  */
 export const patchStatus = async(req, res) => {
 
