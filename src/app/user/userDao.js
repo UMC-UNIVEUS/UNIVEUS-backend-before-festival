@@ -128,3 +128,11 @@ export const selectAuthStatusByEmail = async(connection, userEmail) => {
     const selectAuthStatusByEmailRow = await connection.query(selectAuthStatusByEmailQuery);
     return selectAuthStatusByEmailRow;
 }
+
+/** 임의 user를 insert */
+export const insertUser = async (connection, userInfoParams) => {
+    const insertUserQuery = `
+        INSERT INTO user(nickname, email_id, gender, major, class_of, auth_status, phone) VALUES (?, ?, ?, ?, ?, 1, ?);`;
+
+    const insertUserRow = await connection.query(insertUserQuery, userInfoParams);
+};

@@ -21,7 +21,7 @@ export const isKyonggiEmail = (email) => {
 
 /** 랜덤 인증번호 생성 */
 export const createAuthNum = () => {
-    return Math.floor(Math.random() * 9000) + 1000;
+    return Math.floor(Math.random() * 900000) + 100000;
 }
 
 /** 유저생성 - 본인인증 후 유저 생성*/

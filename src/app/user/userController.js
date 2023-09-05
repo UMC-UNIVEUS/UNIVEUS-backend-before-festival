@@ -56,54 +56,15 @@ export const login = async(req, res) => {
     return res.send(response(baseResponse.SUCCESS,{ accessToken }));
 }
 
-
-/**회원가입 */
-// export const signupRedirect = async(req, res) => {
-//     const GOOGLE_SIGNUP_REDIRECT_URI = 'http://localhost:3000/user/signup/redirect';
-//     const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
-//     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
-
-//     const { code } = req.body;
-
-//     const resAuthCode = await axios.post(GOOGLE_TOKEN_URL, {
-//         code,
-//         client_id: process.env.GOOGLE_CLIENT_ID,
-//         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-//         redirect_uri: GOOGLE_SIGNUP_REDIRECT_URI,
-//         grant_type: 'authorization_code',
-//     });
-
-//     const resUserInfo = await axios.get(GOOGLE_USERINFO_URL, {
-//         headers: {
-//             Authorization: `Bearer ${resAuthCode.data.access_token}`,
-//         },
-//     });
-
-//     const userEmail = resUserInfo.data.email;   
-
-//     if (validEmailCheck(userEmail) == false) {
-//         return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
-//     }
-//     if (await isUser(userEmail)) {
-//         return res.send(errResponse(baseResponse.SIGNUP_EMAIL_DUPLICATE));
-//     }
-//     await createUser(userEmail);
-//     res.send(response(baseResponse.SUCCESS));
-
-// }
-
-
-
 /** 인증번호 문자 전송 API */
 export const sendAuthNumber = async(req, res) => {
     const to = req.body.phoneNumber;
     const sendAuth = createAuthNum();
-    const content = `[UNIVEUS] 인증번호 [${sendAuth}]`;
+    const content = `[UNIVEUS] 인증번호는 "${sendAuth}"입니다.`;
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
 
     // 서버 캐시에 인증번호 및 유저 전화번호 임시 저장, 3분동안 유효
-    cache.set("authNumber", sendAuth, 180);
-    cache.set("userPhone", to, 180); 
+    cache.set(to, sendAuth, 180);
 
     if (!success) {
         return res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
@@ -114,16 +75,15 @@ export const sendAuthNumber = async(req, res) => {
 
 /** 인증번호 검증 API */
 export const verifyNumber = async(req, res) => {
+    const userPhone = req.body.phoneNumber;
     const userAuthNumber = req.body.number;
-    const authNumber = cache.get("authNumber");
-    const userPhone = cache.get("userPhone");
+    const authNumber = cache.get(userPhone);
 
     if (authNumber == userAuthNumber) {
         const userId = await getUserIdByEmail(req.verifiedToken.userEmail);
         addUserPhoneNumber(userPhone, userId);
 
-        cache.del("authNumber");
-        cache.del("userPhone");
+        cache.del(userPhone);
         
         return res.send(response(baseResponse.VERIFY_NUMBER_SUCCESS));
     }
@@ -146,7 +106,7 @@ export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼
         var content = `[UNIVEUS] 유니버스가 모집 마감됐습니다!`;
     }
 
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     if (!success) { return false} 
     else { return true}
 };
@@ -174,7 +134,7 @@ export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림
     const userNickName = await getUserNickNameById(userIdFromJWT); // user_id로 닉네임 가져오기
     const content = `[UNIVEUS] 유니버스에 참여했던 '${userNickName}'님이/가 참여 취소하였습니다.`;
 
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     if (!success) { return false} 
     else { return true}
 };

@@ -1,10 +1,10 @@
-import { isAdmin } from "./adminProvider";
 import { baseResponse, response, errResponse } from "../../../config/response";
-import { getAllUsersInfo } from "./adminProvider";
-import { changeStatusByAdmin, changeHiddenByAdmin } from "./adminService"
+import { isAdmin, getAllUsersInfo } from "./adminProvider"
+import { changeStatusByAdmin, changeHiddenByAdmin, signUpByAdmin } from "./adminService"
 import { retrievePost } from "../post/postProvider";
 import { createPost, editPost, removePost } from "../post/postService";
 
+/** 모든 유저 정보 가져오기 */
 export const getUsersInfo = async(req, res) => {
     const userEmail = req.verifiedToken.userEmail;
 
@@ -13,7 +13,48 @@ export const getUsersInfo = async(req, res) => {
     const getAllUsersInfoResult = await getAllUsersInfo();
 
     return res.send(response(baseResponse.SUCCESS, getAllUsersInfoResult));
-};
+}
+
+/** 임의 회원가입 */
+export const adminSignUp = async(req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+
+    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
+
+    const userInfo =  req.body;
+
+    const getAdminSignUpResult = await signUpByAdmin(userInfo);
+
+    return res.send(response(baseResponse.SUCCESS));
+}
+
+/** userReports 함수 */
+// TODO : DAO, servcie 구현
+export const userReports = async(req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+
+    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
+
+    const userInfo =  req.body;
+
+    const getAdminSignUpResult = await signUpByAdmin(userInfo);
+
+    return res.send(response(baseResponse.SUCCESS));
+}
+
+/** postReports 함수 */
+// TODO : DAO, servcie 구현
+export const postReports = async(req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+
+    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
+
+    const userInfo =  req.body;
+
+    const getAdminSignUpResult = await signUpByAdmin(userInfo);
+
+    return res.send(response(baseResponse.SUCCESS));
+}
 
 /**
  * API name : 게시글 작성 (관리자)

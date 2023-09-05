@@ -1,4 +1,5 @@
 import pool from "../../../config/database";
+import { insertUser } from "../user/userDao" 
 import {updateStatusByAdmin, updateHiddenByAdmin} from "./adminDao"
 
 
@@ -18,4 +19,19 @@ export const changeHiddenByAdmin = async(hidden, post_id)=>{// 게시글 상태 
     connection.release();
 };
 
+/** 임의 회원가입 */
+export const signUpByAdmin = async(userInfo) => {
+    const connection = await pool.getConnection(async (conn) => conn);
 
+    const userInfoParams = [ 
+        userInfo.nickname,  
+        userInfo.userEmail, 
+        userInfo.gender,      
+        userInfo.major,       
+        userInfo.studentId,    
+        userInfo.phoneNumber
+      ];
+
+    const insertUserResult = await insertUser(connection, userInfoParams)
+    connection.release();
+};
