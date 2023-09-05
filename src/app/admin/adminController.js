@@ -24,3 +24,27 @@ export const adminSignUp = async(req, res) => {
 
     return res.send(response(baseResponse.SUCCESS));
 }
+
+export const userReports = async(req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+
+    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
+
+    const userInfo =  req.body;
+
+    const getAdminSignUpResult = await signUpByAdmin(userInfo);
+
+    return res.send(response(baseResponse.SUCCESS));
+}
+
+export const postReports = async(req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+
+    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
+
+    const userInfo =  req.body;
+
+    const getAdminSignUpResult = await signUpByAdmin(userInfo);
+
+    return res.send(response(baseResponse.SUCCESS));
+}
