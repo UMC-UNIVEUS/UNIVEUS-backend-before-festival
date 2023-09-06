@@ -91,10 +91,65 @@ export const verifyNumber = async(req, res) => {
     return res.send(errResponse(baseResponse.VERIFY_NUMBER_FAIL));
 }
 
-/** 유니버스 관련 문자 알림
- * 1. 참여 알림 (to 작성자)
- * 2. 마감 알림 (to 작성자)*/
-export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼 유저, 알림 type
+/** 게시글 작성 시 문자 알림 (to 작성자, 초대받은 사람들)*/
+export const sendCreatePostMessageAlarm = async(user_id, post_id,participants,limit_people, location, meeting_date, openchat) =>{
+    
+    const Post = await retrievePost(post_id); 
+    const User = await getUserById(user_id); // 작성자 id
+    const writerPhone = User.phone; 
+
+    if(limit_people == 4){
+
+        const participantPhone = participants.phone
+        
+        const content = `
+[UNIVEUS] 
+'${User.nickname}'님의 [${Post.title}] 유니버스가 생성되었습니다 :)
+즐겁고 유익한 행성을 만들어 주세요!
+
+- 나의 유니버스 확인하기 : 
+- 같이 하는 친구 : "${User.nickname}","${participants.nickname}"
+- 최대 인원 : ${limit_people}
+- 모임 장소 : ${location}
+- 모임 시간 : ${meeting_date}
+- 나의 유니버스 오픈채팅방 : ${openchat}
+    
+*다른 행성에 참여하고 싶다면 매칭 전 이 행성을 삭제해 주세요!`; 
+   const { success1 } = await sendSMS(naverCloudSensSecret, { to: writerPhone, content });
+   const { success2 } = await sendSMS(naverCloudSensSecret, { to: participantPhone, content });
+
+    if (!success1 || !success2) {return false}
+    else {return true}
+    }
+    else if(limit_people== 6){
+
+        const participant1Phone = participants[0].phone
+        const participant2Phone = participants[1].phone
+
+        const content = `
+[UNIVEUS] 
+'${User.nickname}'님의 [${Post.title}] 유니버스가 생성되었습니다 :)
+즐겁고 유익한 행성을 만들어 주세요!
+
+- 나의 유니버스 확인하기 : 
+- 같이 하는 친구 : ${User.nickname},${participants[0].nickname},${participants[1].nickname}
+- 최대 인원 : ${limit_people}
+- 모임 장소 : ${location}
+- 모임 시간 : ${meeting_date}
+- 나의 유니버스 오픈채팅방 : ${openchat}
+    
+*다른 행성에 참여하고 싶다면 매칭 전 이 행성을 삭제해 주세요!`;
+    const { success1 } = await sendSMS(naverCloudSensSecret, { to: writerPhone, content });
+    const { success2 } = await sendSMS(naverCloudSensSecret, { to: participant1Phone, content });
+    const { success3 } = await sendSMS(naverCloudSensSecret, { to: participant2Phone, content });
+
+    if (!success1 || !success2 || !success3) {return false}
+    else {return true}
+    }
+};
+
+/** 게시글 참여 시 문자 알림 (to old 참여자, new 참여자)*/
+export const sendParticipantMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼 유저, 알림 type
 
     const User = await getUserById(user_id); 
     const to = User.phone;
@@ -106,24 +161,12 @@ export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼
         var content = `[UNIVEUS] 유니버스가 모집 마감됐습니다!`;
     }
 
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    if (!success) { return false} 
-    else { return true}
+    //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    //if (!success) { return false} 
+    //else { return true}
 };
 
-/**초대 알림 (to 초대 받은 사람)*/
-export const sendInviteMessageAlarm = async(user_id,post_id) =>{ // 알림을 보낼 유저
 
-    const User = await getUserById(user_id); 
-    const to = User.phone;
-    
-    const Post = await retrievePost(post_id); 
-    const content = `[UNIVEUS] 유니버스 '${Post.title}'에 초대받으셨습니다! 들어가서 확인해 보세요!`;
-    
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    if (!success) { return false} 
-    else { return true}
-};
 
 /** 참여 취소 알림 (to 작성자)*/
 export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림을 보낼 유저
@@ -134,9 +177,10 @@ export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림
     const userNickName = await getUserNickNameById(userIdFromJWT); // user_id로 닉네임 가져오기
     const content = `[UNIVEUS] 유니버스에 참여했던 '${userNickName}'님이/가 참여 취소하였습니다.`;
 
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    if (!success) { return false} 
-    else { return true}
+
+    // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    //if (!success) { return false} 
+    //else { return true}
 };
 
 /** 유저 신고 관련 알림 (to 관리자) */
@@ -145,9 +189,9 @@ export const sendUserReportAlarm = async(reportedBy,reportedUser) =>{
     const to = "01092185178"; // 일단 내번호로....
     const content = `[UNIVEUS 유저 신고] user_id = '${reportedBy}' >> user_id = '${reportedUser}'을 신고했습니다.`;
 
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    if (!success) { return false} 
-    else { return true}
+    //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    //if (!success) { return false} 
+    //else { return true}
 };
 
 /** 게시글 신고 관련 알림 (to 관리자) */
@@ -156,7 +200,7 @@ export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{
     const to = "01092185178"; // 일단 내번호로....
     const content = `[UNIVEUS 게시글 신고] user_id = '${reportedBy}' >> post_id = '${reportedPost}'을 신고했습니다.`;
 
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     if (!success) { return false} 
     else { return true}
 };

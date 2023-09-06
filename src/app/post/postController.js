@@ -7,7 +7,7 @@ import { createPost, editPost, removePost, addScrap, addLike,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
 import {getUserIdByEmail, getUserByNickName} from "../user/userProvider";
-import {sendMessageAlarm, sendInviteMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
+import {sendMessageAlarm, sendCreatePostMessageAlarm, sendInviteMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -34,9 +34,9 @@ export const getPost = async(req, res) => {
 export const postPost = async(req, res) => {
     
     const {category, limit_gender, limit_people, location, meeting_date, openchat, 
-        end_date, title, content, participant_userNickNames } = req.body; // 축제용 >> limit_gender, participant_userNickNames
+        end_date, title, content, invited_userNickNames } = req.body; // 축제용 >> limit_gender, invited_userNickNames
     const notUndefined = [category, limit_gender, limit_people, location, meeting_date, openchat, 
-        end_date, title, content, participant_userNickNames]; // 빠지면 안될 정보들
+        end_date, title, content, invited_userNickNames]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
 
@@ -58,18 +58,19 @@ export const postPost = async(req, res) => {
     if(content.length > 500){ // 축제용 조건문
         return res.status(400).json(errResponse(baseResponse.POST_CONTENT_LENGTH));
     }
-    if( participant_userNickNames.length == 0){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
+    if( invited_userNickNames.length == 0){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
         return res.status(400).json(errResponse(baseResponse.POST_INVITE_EMPTY)); 
     }
     if(limit_people == 4){ // 축제용 조건문
-        if(participant_userNickNames.length == 1){ // 초대 가능 인원 수는 1명
-            const userByNickName = await getUserByNickName(participant_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
-     
-            if(userByNickName){// 초대 받은 유저가 존재할 때
+        if(invited_userNickNames.length == 1){ // 초대 가능 인원 수는 1명
+            const participant = await getUserByNickName(invited_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
+
+            if(participant){// 초대 받은 유저가 존재할 때
                 const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
                     end_date, title, content);
-                await inviteOneParticipant(postPostResult.insertId, userByNickName.user_id, userIdFromJWT);
-                //await sendInviteMessageAlarm(userByNickName.user_id,post_id); // 초대 알림 (to 초대 받은 사람)
+                await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant, 
+                    limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
+                await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
                 return res.status(200).json(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
             }
             else{
@@ -81,19 +82,21 @@ export const postPost = async(req, res) => {
         }
     }
     else if(limit_people == 6){
-        if(participant_userNickNames.length == 2){ // 초대 가능 인원 수는 2명
-            const userByNickName1 = await getUserByNickName(participant_userNickNames[0]); 
+        if(invited_userNickNames.length == 2){ // 초대 가능 인원 수는 2명
+            const participant1 = await getUserByNickName(invited_userNickNames[0]); 
 
-            if(userByNickName1){
-                const userByNickName2 = await getUserByNickName(participant_userNickNames[1]); 
+            if(participant1){
+                const participant2 = await getUserByNickName(invited_userNickNames[1]); 
 
-                if(userByNickName2){
+                if(participant2){
+                    const participants = [participant1, participant2]
+                    console.log(participants);
                     const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
                         end_date, title, content);
-                    await inviteOneParticipant(postPostResult.insertId, userByNickName1.user_id, userIdFromJWT);
-                    await inviteOneParticipant(postPostResult.insertId, userByNickName2.user_id, userIdFromJWT);
-                    //await sendInviteMessageAlarm(userByNickName1.user_id, postPostResult.insertId); // 첫 번째 유저에게 초대 알림 
-                    //await sendInviteMessageAlarm(userByNickName2.user_id, postPostResult.insertId); // 두 번째 유저에게 초대 알림 
+                    await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants, 
+                        limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
+                    await inviteOneParticipant(postPostResult.insertId, participant1.user_id, userIdFromJWT);
+                    await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
                     return res.status(200).json(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
                 }
                 else{
@@ -156,7 +159,6 @@ export const patchPost =  async(req, res) => {
     else{
         return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     }
-    
 };
 
 /**
@@ -220,7 +222,7 @@ export const patchLike = async(req, res) => {
         return res.status(200).json(response(baseResponse.SUCCESS, addLikeResult));
     } 
     else{ 
-        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+        return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
     } 
 };
 
@@ -377,40 +379,42 @@ export const postOneDayAlarm = async(req, res) => {
     }
 };
 
-
 /**
- * API name : 유니버스 참여 + 모집 자동 마감 + 각각 알림 >> 축제용 API
+ * API name : 유니버스 참여 + 모집 자동 마감 + 알림 >> 축제용 API
  * POST: /post/{post_id}/participant
  */
 export const participateUniveus = async(req, res) => {
     
     const {post_id} = req.params;
-    const {user_id,limit_people,participant_userIDsFromDB} = req.body;// 작성자 ID
+    const writer_id = req.body.user_id; // 이 부분 수정해서 한 번 해보기!!, applyUniveus 함수 수정해야 함!!, 알림 코드 짜야함!!
+    const {limit_people,participant_userIDsFromDB, invited_userNickNamesFromAPI} = req.body;// 작성자 ID
     const userEmail = req.verifiedToken.userEmail;
-    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
+    const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID)
     
     const Post = await retrievePost(post_id); 
 
     if(Post){ // Post가 존재한다면 
-        if(participant_userIDsFromDB.includes(userIdFromJWT)){ // 이미 참여한 유저라면
-            return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
-        }
-        else{ // 처음 참여하는 유저라면
-            if(limit_people <= Post.current_people){ // 현재 참여 인원 수와 제한 인원 수가 같다면 모집 마감되었다고 응답
-                return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
-            }
-            else if(limit_people == Post.current_people + 1){ // 현재 참여할 인원 수와 제한 인원 수가 같다면
-                await applyUniveus(post_id, userIdFromJWT, user_id);// 게시글 참여
-                await closeUniveus(post_id,user_id); // 게시글의 상태를 모집 마감으로 업데이트
-                await sendMessageAlarm(user_id,2); // 2. 유니버스 마감 알림 (to 작성자)
+        if(limit_people == 4){
+            const guest = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
+            const isParticipate = (participant_userIDsFromDB.includes(userIdFromJWT) || participant_userIDsFromDB.includes(guest.user_id));
 
-                return res.status(200).json(response(baseResponse.POST_PARTICIPATION_CLOSE_NOW));
+            if(isParticipate){ // 이미 참여한 유저가 있다면
+                return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
             }
-            else{// 정상적인 참여
-                const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, user_id);// 게시글 참여
-                await sendMessageAlarm(user_id,1); // 1. 유니버스 참여 알림 (to 작성자)
-                return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
-            }  
+            else{ // 처음 참여하는 유저라면
+                if(limit_people <= Post.current_people){ // 모집 마감이라면
+                    return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
+                }
+                else{// 정상적인 참여
+                    const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, guest, writer_id);// 게시글 참여
+                    await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
+                    await sendParticipantMessageAlarm(writer_id,1); // 1. 유니버스 참여 알림 (to 작성자)
+                    return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
+                }  
+            }
+        }
+        else if(limit_people == 6){
+
         }
     } 
     else{ 

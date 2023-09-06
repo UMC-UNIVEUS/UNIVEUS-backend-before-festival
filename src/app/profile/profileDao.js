@@ -41,7 +41,7 @@ WHERE user_id = ? ;`;
 export const selectUserMyUnivebyId = async (connection, user_id)=> {
     const selectUserMyUniveQuery = `
     SELECT post_id, user.profile_img, user.nickname, user.gender, user.class_of,
-       title, category, limit_gender, scrapes, location,
+       main_img, title, category, limit_gender, scrapes, location,
        post_status, meeting_date
     FROM post
     INNER JOIN user
@@ -54,7 +54,7 @@ export const selectUserMyUnivebyId = async (connection, user_id)=> {
 export const selectUserParticipatebyId = async (connection, user_id) => {
     const selectUserParticipatebyIdQuery = `
     SELECT post_id, user.profile_img, user.nickname, user.gender, user.class_of,
-           title, category, limit_gender, scrapes, location,
+           main_img, title, category, limit_gender, scrapes, location,
            post_status, meeting_date
     FROM post
     INNER JOIN user
