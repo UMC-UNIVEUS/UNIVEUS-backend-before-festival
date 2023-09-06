@@ -89,9 +89,9 @@ export const changeStatus = async(post_id)=>{// 게시글 모집 마감으로 �
     connection.release();
 };
 
-export const applyUniveus = async(post_id, userIdFromJWT, user_id) =>{// 유니버스 참여 (축제용)
+export const applyUniveus = async(post_id, userIdFromJWT, guest, writer_id) =>{// 유니버스 참여 (축제용)
 
-    const applyUniveusParams =[post_id, userIdFromJWT, user_id]; 
+    const applyUniveusParams =[post_id, userIdFromJWT, guest, writer_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const applyUniveusResult = await insertUniveus(connection,applyUniveusParams);

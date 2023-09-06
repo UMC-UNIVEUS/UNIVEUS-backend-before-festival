@@ -38,7 +38,7 @@ export const baseResponse = {
     POST_CONTENT_LENGTH : { "isSuccess": false, "code": 3006, "message": "소개글은 최대 500자리를 입력해주세요." },
     POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "아무도 초대하지 않았습니다." },
     POST_PARTICIPATION_CLOSE : { "isSuccess": false, "code": 3008, "message": "모집이 마감되었습니다." },
-    POST_PARTICIPATION_OVERLAP : { "isSuccess": false, "code": 3009, "message": "이미 참여한 유저입니다." },
+    POST_PARTICIPATION_OVERLAP : { "isSuccess": false, "code": 3009, "message": "이미 참여한 유저가 존재합니다." },
     POST_PARTICIPATION_NOT_MATCH : { "isSuccess": false, "code": 3011, "message": "참여를 하지 않았으므로 참여 취소를 할 수 없습니다." },
     POST_PARTICIPATION_CLOSE_NOW : { "isSuccess": true, "code": 3012, "message": "현재 참여한 인원 덕분에 모집 마감되었습니다!" },
     POST_PARTICIPATE_ONLY_ONE : { "isSuccess": false, "code": 3015, "message": "제한 인원이 4명일 때는 1명만 초대할 수 있습니다." },
