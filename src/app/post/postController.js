@@ -7,7 +7,7 @@ import { createPost, editPost, removePost, addScrap, addLike,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
 import {getUserIdByEmail, getUserByNickName} from "../user/userProvider";
-import {sendMessageAlarm, sendInviteMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
+import {sendMessageAlarm, sendCreatePostMessageAlarm, sendInviteMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -68,6 +68,8 @@ export const postPost = async(req, res) => {
             if(userByNickName){// 초대 받은 유저가 존재할 때
                 const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
                     end_date, title, content);
+                await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant_userNickNames, 
+                    limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
                 await inviteOneParticipant(postPostResult.insertId, userByNickName.user_id, userIdFromJWT);
                 //await sendInviteMessageAlarm(userByNickName.user_id,post_id); // 초대 알림 (to 초대 받은 사람)
                 return res.status(200).json(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
@@ -90,6 +92,8 @@ export const postPost = async(req, res) => {
                 if(userByNickName2){
                     const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
                         end_date, title, content);
+                    await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant_userNickNames, 
+                        limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
                     await inviteOneParticipant(postPostResult.insertId, userByNickName1.user_id, userIdFromJWT);
                     await inviteOneParticipant(postPostResult.insertId, userByNickName2.user_id, userIdFromJWT);
                     //await sendInviteMessageAlarm(userByNickName1.user_id, postPostResult.insertId); // 첫 번째 유저에게 초대 알림 
@@ -156,7 +160,6 @@ export const patchPost =  async(req, res) => {
     else{
         return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     }
-    
 };
 
 /**

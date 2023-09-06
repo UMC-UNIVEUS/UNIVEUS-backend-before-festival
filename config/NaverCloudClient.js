@@ -43,7 +43,7 @@ const prepareSignature = (secretKey, method, serviceId, accessKey) => {
           "x-ncp-apigw-signature-v2": signature,
         },
         data: {
-          type: "SMS",
+          type: "LMS",
           contentType: "COMM",
           countryCode,
           from: phoneNumber,
