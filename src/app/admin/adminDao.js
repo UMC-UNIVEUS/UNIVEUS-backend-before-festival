@@ -30,3 +30,12 @@ export const updateHiddenByAdmin = async(connection, changeHiddenByAdminParms)=>
     `;
     const updateHiddenByAdminRow = await connection.query(updateHiddenByAdminQuery, changeHiddenByAdminParms);
 };
+
+/** report된 유저 확인 */
+
+export const selectUserReports = async(connection) => {
+    const selectUserReportsQuery = `SELECT is_admin FROM user WHERE email_id = '${userEmail}'`;
+    const [selectUserReportsRow] = await connection.query(selectIsAdminByUserEmailQuery, userEmail);
+
+    return selectUserReportsRow;
+};

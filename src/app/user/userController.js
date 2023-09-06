@@ -6,7 +6,7 @@ import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail,
     getUserNickNameById, isAuthNumber, isAuthUser, getUserById } from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
-import { sendSMS } from "../../../config/NaverCloudClient";
+import { sendSMS } from "../../../config/naverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
 import NodeCache from "node-cache";
 
@@ -106,7 +106,7 @@ export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼
         var content = `[UNIVEUS] 유니버스가 모집 마감됐습니다!`;
     }
 
-    // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     if (!success) { return false} 
     else { return true}
 };
@@ -134,7 +134,7 @@ export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림
     const userNickName = await getUserNickNameById(userIdFromJWT); // user_id로 닉네임 가져오기
     const content = `[UNIVEUS] 유니버스에 참여했던 '${userNickName}'님이/가 참여 취소하였습니다.`;
 
-    // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     if (!success) { return false} 
     else { return true}
 };
@@ -241,3 +241,18 @@ export const patchAlarms = async(req, res) => {
         return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     } 
 };
+
+/** 
+ * 약관 동의
+ */
+export const agreeTerms = async(req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+
+    if (typeof req.body.firstAgree == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
+
+    if (typeof req.body.secondAgree == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
+
+    if (typeof req.body.ThirdAgree == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
+
+
+}
