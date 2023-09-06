@@ -91,47 +91,65 @@ export const verifyNumber = async(req, res) => {
     return res.send(errResponse(baseResponse.VERIFY_NUMBER_FAIL));
 }
 
-/** 유니버스 작성 문자 알림*/
-export const sendCreatePostMessageAlarm = async(user_id, post_id, participant_userNickNames, limit_people, location, meeting_date, openchat) =>{
+/** 게시글 작성 시 문자 알림 (to 작성자, 초대받은 사람들)*/
+export const sendCreatePostMessageAlarm = async(user_id, post_id,participants,limit_people, location, meeting_date, openchat) =>{
     
+    const Post = await retrievePost(post_id); 
     const User = await getUserById(user_id); // 작성자 id
+    const writerPhone = User.phone; 
 
-    if(participant_userNickNames.length == 1){
-        //const to = User.phone; 
+    if(limit_people == 4){
+
+        const participantPhone = participants.phone
+        
         const content = `
-[UNIVEUS] 나의 유니버스 확인하기 : 
-- 같이 하는 친구 : ${User.nickname},${participant_userNickNames[0]}
+[UNIVEUS] 
+'${User.nickname}'님의 [${Post.title}] 유니버스가 생성되었습니다 :)
+즐겁고 유익한 행성을 만들어 주세요!
+
+- 나의 유니버스 확인하기 : 
+- 같이 하는 친구 : "${User.nickname}","${participants.nickname}"
 - 최대 인원 : ${limit_people}
 - 모임 장소 : ${location}
 - 모임 시간 : ${meeting_date}
 - 나의 유니버스 오픈채팅방 : ${openchat}
     
 *다른 행성에 참여하고 싶다면 매칭 전 이 행성을 삭제해 주세요!`; 
-    const { success } = await sendSMS(naverCloudSensSecret, { to, content }); // 이 부분 수정해야 함!!
+   const { success1 } = await sendSMS(naverCloudSensSecret, { to: writerPhone, content });
+   const { success2 } = await sendSMS(naverCloudSensSecret, { to: participantPhone, content });
 
-    if (!success) { return false} 
-    else { return true}
+    if (!success1 || !success2) {return false}
+    else {return true}
     }
-    else{
+    else if(limit_people== 6){
+
+        const participant1Phone = participants[0].phone
+        const participant2Phone = participants[1].phone
+
         const content = `
-[UNIVEUS] 나의 유니버스 확인하기 : 
-- 같이 하는 친구 : ${User.nickname},${participant_userNickNames[0]},${participant_userNickNames[1]}
+[UNIVEUS] 
+'${User.nickname}'님의 [${Post.title}] 유니버스가 생성되었습니다 :)
+즐겁고 유익한 행성을 만들어 주세요!
+
+- 나의 유니버스 확인하기 : 
+- 같이 하는 친구 : ${User.nickname},${participants[0].nickname},${participants[1].nickname}
 - 최대 인원 : ${limit_people}
 - 모임 장소 : ${location}
 - 모임 시간 : ${meeting_date}
 - 나의 유니버스 오픈채팅방 : ${openchat}
     
 *다른 행성에 참여하고 싶다면 매칭 전 이 행성을 삭제해 주세요!`;
-    //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    //if (!success) { return false} 
-    //else { return true}
+    const { success1 } = await sendSMS(naverCloudSensSecret, { to: writerPhone, content });
+    const { success2 } = await sendSMS(naverCloudSensSecret, { to: participant1Phone, content });
+    const { success3 } = await sendSMS(naverCloudSensSecret, { to: participant2Phone, content });
+
+    if (!success1 || !success2 || !success3) {return false}
+    else {return true}
     }
 };
 
-/** 유니버스 관련 문자 알림
- * 1. 참여 알림 (to 작성자)
- * 2. 마감 알림 (to 작성자)*/
-export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼 유저, 알림 type
+/** 게시글 참여 시 문자 알림 (to old 참여자, new 참여자)*/
+export const sendParticipantMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼 유저, 알림 type
 
     const User = await getUserById(user_id); 
     const to = User.phone;
@@ -148,19 +166,7 @@ export const sendMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼
     //else { return true}
 };
 
-/**초대 알림 (to 초대 받은 사람)*/
-export const sendInviteMessageAlarm = async(user_id,post_id) =>{ // 알림을 보낼 유저
 
-    const User = await getUserById(user_id); 
-    const to = User.phone;
-    
-    const Post = await retrievePost(post_id); 
-    const content = `[UNIVEUS] 유니버스 '${Post.title}'에 초대받으셨습니다! 들어가서 확인해 보세요!`;
-    
-    //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    //if (!success) { return false} 
-    //else { return true}
-};
 
 /** 참여 취소 알림 (to 작성자)*/
 export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림을 보낼 유저
