@@ -3,7 +3,7 @@ export const selectIsAdminByUserEmail = async(connection, userEmail) => {
     const selectIsAdminByUserEmailQuery = `SELECT is_admin FROM user WHERE email_id = '${userEmail}'`;
     const [selectIsAdminByUserEmailRow] = await connection.query(selectIsAdminByUserEmailQuery, userEmail);
 
-    return selectIsAdminByUserEmailRow[0];
+    return selectIsAdminByUserEmailRow[0].is_admin;
 };
 
 export const selectUserInfoFromUser = async(connection) => {
