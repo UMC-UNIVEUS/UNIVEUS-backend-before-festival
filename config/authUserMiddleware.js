@@ -8,15 +8,15 @@ export const authUserMiddleware = async (req, res, next) => {
 
     if (!await isUser(userEmail)) {
         createUser(userEmail);
-        return res.send(response(baseResponse.LOGIN_NOT_USER));
+        return res.send(errResponse(baseResponse.LOGIN_NOT_USER));
     }
 
     if (!await isAuthNumber(userEmail)) {
-        return res.send(response(baseResponse.LOGIN_NOT_AUTH_NUMBER));
+        return res.send(errResponse(baseResponse.LOGIN_NOT_AUTH_NUMBER));
     }
 
     if (!await isAuthUser(userEmail)) {
-        return res.send(response(baseResponse.LOGIN_NOT_AUTH_COMPLETE_USER));
+        return res.send(errResponse(baseResponse.LOGIN_NOT_AUTH_COMPLETE_USER));
     }
 
     next();

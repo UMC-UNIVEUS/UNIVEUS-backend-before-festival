@@ -6,9 +6,6 @@ import { createPost, editPost, removePost } from "../post/postService";
 
 /** 모든 유저 정보 가져오기 */
 export const getUsersInfo = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
-
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
 
     const getAllUsersInfoResult = await getAllUsersInfo();
 
@@ -17,9 +14,6 @@ export const getUsersInfo = async(req, res) => {
 
 /** 임의 회원가입 */
 export const adminSignUp = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
-
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
 
     const userInfo =  req.body;
 
@@ -31,9 +25,6 @@ export const adminSignUp = async(req, res) => {
 /** 신고 유저 확인 함수 */
 // TODO : DAO, servcie 구현
 export const userReports = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
-
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
 
     const userReports = await reportsUser();
 
@@ -43,9 +34,6 @@ export const userReports = async(req, res) => {
 /** postReports 함수 */
 // TODO : DAO, servcie 구현
 export const postReports = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
-
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
 
     const userInfo =  req.body;
 
