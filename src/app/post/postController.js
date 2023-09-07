@@ -386,7 +386,7 @@ export const postOneDayAlarm = async(req, res) => {
 export const participateUniveus = async(req, res) => {
     
     const {post_id} = req.params;
-    const writer_id = req.body.user_id; // 이 부분 수정해서 한 번 해보기!!, applyUniveus 함수 수정해야 함!!, 알림 코드 짜야함!!
+    const writer_id = req.body.user_id; 
     const {limit_people,participant_userIDsFromDB, invited_userNickNamesFromAPI} = req.body;// 작성자 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID)
@@ -406,9 +406,11 @@ export const participateUniveus = async(req, res) => {
                     return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
                 }
                 else{// 정상적인 참여
-                    const participateUniveusResult = await applyUniveus(post_id, userIdFromJWT, guest, writer_id);// 게시글 참여
+                    const participate1UniveusResult = await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
+                    const participate2UniveusResult = await applyUniveus(post_id, guest); // 초대받은 사람 참여
                     await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
-                    await sendParticipantMessageAlarm(writer_id,1); // 1. 유니버스 참여 알림 (to 작성자)
+                    const MessageAlarmList = [writer_id, participant_userIDsFromDB, userIdFromJWT, guest];
+                    await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
                     return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
                 }  
             }

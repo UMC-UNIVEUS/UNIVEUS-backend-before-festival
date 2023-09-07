@@ -164,10 +164,11 @@ export const updateStatus = async(connection, post_id)=>{// 게시글 모집 마
     const updateStatusRow = await connection.query(updateStatusQuery, post_id);
 };
 
-export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), 참여하면서 current_people + 1
+export const insertUniveus = async(connection, insertParticipantParams)=>{// 유니버스 참여 (축제용), post_id, participant_id
+     
     const postUniveusQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
-        VALUES (?,?, "complete");
+        VALUES (?,?, "participate_complete");
     `;
 
     const addCurrentPeopleQuery = `
@@ -177,8 +178,8 @@ export const insertUniveus = async(connection, insertParticipantParams)=>{// 유
     `;
 
     const applyParticipantAlarmQuery = `
-        INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
-        VALUES (?,?,?,"complete_alarm");
+        INSERT INTO alarm(post_id, user_id, alarm_type) 
+        VALUES (?, ?,"participate_complete_alarm");
     `;
 
     const postUniveusRow = await connection.query(postUniveusQuery, insertParticipantParams);
@@ -186,7 +187,7 @@ export const insertUniveus = async(connection, insertParticipantParams)=>{// 유
     const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
 };
 
-export const addParticipant = async(connection, askParticipantParams)=>{// 유니버스 초대 (축제용)
+export const addParticipant = async(connection, askParticipantParams)=>{// 유니버스 초대 (언젠간 쓰일 예정...)
     const postParticipantQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
         VALUES (?,?, "complete(invite)");
@@ -243,7 +244,7 @@ export const switchPostStatus = async(connection, post_id)=>{ // 게시글 모�
     const [switchPostStatusRow] = await connection.query(switchPostStatusQuery, post_id);
 };
 
-export const eraseParticipant = async(connection, removeParticipantParams)=>{ // 게시글 참여 취소 (축제용)
+export const eraseParticipant = async(connection, removeParticipantParams)=>{ // 게시글 참여 취소 (언젠간 쓰일 예정...)
     const deleteParticipantQuery = `
         DELETE FROM participant_users
         WHERE post_id= ? AND user_id =?;
