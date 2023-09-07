@@ -1,7 +1,7 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
-    createUser, addUserPhoneNumber } from "../user/userService";
+    createUser, addUserPhoneNumber, addAgreementTerms } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
     getUserNickNameById, isAuthNumber, isAuthUser, getUserById } from "./userProvider";
 import { retrievePost } from "../post/postProvider";
@@ -298,17 +298,20 @@ export const patchAlarms = async(req, res) => {
     } 
 };
 
-/** 
- * 약관 동의
- */
-export const agreeTerms = async(req, res) => {
+/** 약관 동의 API*/
+// TODO: DAO, SERVICE 구현
+export const agreementTerms = async(req, res) => {
     const userEmail = req.verifiedToken.userEmail;
+    const userId = await getUserIdByEmail(userEmail);
+    const userAgreed = req.body.userAgreement
 
-    if (typeof req.body.firstAgree == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
+    if (userAgreed[0] == 0) return res.send(errResponse(baseResponse.FIRST_AGREEMENT_EMPTY));
 
-    if (typeof req.body.secondAgree == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
+    if (userAgreed[1] == 0) return res.send(errResponse(baseResponse.SECOND_AGREEMENT_EMPTY));
 
-    if (typeof req.body.ThirdAgree == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
+    if (userAgreed[2] == 0) return res.send(errResponse(baseResponse.THIRD_AGREEMENT_EMPTY));
 
+    await addAgreementTerms(userId, userAgreed);
 
+    return res.send(response(baseResponse.SUCCESS));
 }

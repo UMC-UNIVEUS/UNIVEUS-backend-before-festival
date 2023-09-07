@@ -1,4 +1,5 @@
-import { updateUserProfileInfo, updateAlarms, insertUserEmailId, updateUserPhoneNumber } from "./userDao"
+import { updateUserProfileInfo, updateAlarms, insertUserEmailId, 
+    updateUserPhoneNumber, insertAgreementTerms } from "./userDao"
 import pool from "../../../config/database"
 
 /** 유저 생성 - 프로필 등록, 번호인증 전 user */
@@ -53,5 +54,16 @@ export const addUserPhoneNumber = async(userPhoneNumber, userId) => {
     } catch(err) {
         console.log(err);
     }
+};
+
+/** 약관동의 - 다음 클릭 시 수행 */
+export const addAgreementTerms = async(userId, agreementParams) => {
+    const connection = await pool.getConnection(async conn => conn);
+
+    for (let i = 1; i <= agreementParams.length; i++) {
+        insertAgreementTerms(connection, userId, i);
+    }
+
+    connection.release();
 };
 
