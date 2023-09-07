@@ -149,17 +149,29 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants,li
 };
 
 /** 게시글 참여 시 문자 알림 (to old 참여자, new 참여자)*/
-export const sendParticipantMessageAlarm = async(user_id,alarmType) =>{ // 알림을 보낼 유저, 알림 type
+export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ // 알림을 보낼 유저, 알림 type
+    // const MessageAlarmList = [writer_id, participant_userIDsFromDB, userIdFromJWT, guest];
+    const Writer = getUserById(MessageAlarmList[0]);
+    const already_participations = MessageAlarmList[1]; // 같이 하는 친구 리스트 만들다가 말음@@
+    const invitee = getUserById(MessageAlarmList[2]);
+    const guests = MessageAlarmList[3];
+    
+    const Post = await retrievePost(post_id); 
 
-    const User = await getUserById(user_id); 
-    const to = User.phone;
+    const content = `
+[UNIVEUS] 
+'${Writer.nickname}'님의 [${Post.title}] 유니버스에 참여 완료되었습니다 :)
+즐겁고 유익한 행성을 만들어 주세요!
 
-    if(alarmType == 1){
-        var content = `[UNIVEUS] 새로운 유저가 유니버스에 참여했습니다!`;
-    }
-    else if(alarmType == 2){
-        var content = `[UNIVEUS] 유니버스가 모집 마감됐습니다!`;
-    }
+- 나의 유니버스 확인하기 : 
+- 같이 하는 친구 : ""
+- 최대 인원 : ${limit_people}
+- 모임 장소 : ${location}
+- 모임 시간 : ${meeting_date}
+- 나의 유니버스 오픈채팅방 : ${openchat}
+    
+*다른 행성에 참여하고 싶다면 매칭 전 이 행성을 삭제해 주세요!`; 
+   
 
     //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     //if (!success) { return false} 
