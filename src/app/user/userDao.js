@@ -136,3 +136,9 @@ export const insertUser = async (connection, userInfoParams) => {
 
     const insertUserRow = await connection.query(insertUserQuery, userInfoParams);
 };
+
+/** 약관 동의 insert */
+export const insertAgreementTerms = async(connection, userId, agreementParam) => {
+    const insertAgreementTermsQuery = `INSERT INTO term_agreement(user_id, term_agreement_name_id, created_at) VALUES(${userId}, ${agreementParam}, now());`;
+    const insertAgreementTermsRow = await connection.query(insertAgreementTermsQuery);
+}
