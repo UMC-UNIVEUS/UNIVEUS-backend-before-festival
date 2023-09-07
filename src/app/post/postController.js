@@ -6,7 +6,7 @@ import { createPost, editPost, removePost, addScrap, addLike,
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
-import {getUserIdByEmail, getUserByNickName} from "../user/userProvider";
+import {getUserIdByEmail, getUserByNickName, getUserById} from "../user/userProvider";
 import {sendMessageAlarm, sendCreatePostMessageAlarm, sendInviteMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 
 /**
@@ -387,11 +387,13 @@ export const participateUniveus = async(req, res) => {
     
     const {post_id} = req.params;
     const writer_id = req.body.user_id; 
-    const {limit_people,participant_userIDsFromDB, invited_userNickNamesFromAPI} = req.body;// 작성자 ID
+    const {participant_userIDsFromDB, invited_userNickNamesFromAPI, limit_people, location, meeting_date, openchat} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID)
     
     const Post = await retrievePost(post_id); 
+    const Writer = await getUserById(writer_id); 
+    const Invitee = await getUserById(userIdFromJWT); 
 
     if(Post){ // Post가 존재한다면 
         if(limit_people == 4){
@@ -406,17 +408,42 @@ export const participateUniveus = async(req, res) => {
                     return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
                 }
                 else{// 정상적인 참여
-                    const participate1UniveusResult = await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
-                    const participate2UniveusResult = await applyUniveus(post_id, guest); // 초대받은 사람 참여
+                    const alreadyParticipant = await getUserById(participant_userIDsFromDB[1]); 
+                    const postInfo = {limit_people,location, meeting_date, openchat};
+                    await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
+                    await applyUniveus(post_id, guest.user_id); // 초대받은 사람 참여
                     await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
-                    const MessageAlarmList = [writer_id, participant_userIDsFromDB, userIdFromJWT, guest];
-                    await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
-                    return res.status(200).json(response(baseResponse.SUCCESS, participateUniveusResult));
+                    const MessageAlarmList = [Writer, [alreadyParticipant], Invitee, [guest]];
+                    await sendParticipantMessageAlarm(post_id, MessageAlarmList,postInfo); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
+                    return res.status(200).json(response(baseResponse.SUCCESS));
                 }  
             }
         }
         else if(limit_people == 6){
+            const guest1 = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
+            const guest2 = await getUserByNickName(invited_userNickNamesFromAPI[1]); 
+            const isParticipate = (participant_userIDsFromDB.includes(userIdFromJWT) || participant_userIDsFromDB.includes(guest1.user_id) || participant_userIDsFromDB.includes(guest2.user_id));
 
+            if(isParticipate){ // 이미 참여한 유저가 있다면
+                return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
+            }
+            else{ // 처음 참여하는 유저라면
+                if(limit_people <= Post.current_people){ // 모집 마감이라면
+                    return res.status(400).json(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
+                }
+                else{// 정상적인 참여
+                    const alreadyParticipant1 = await getUserById(participant_userIDsFromDB[1]); 
+                    const alreadyParticipant2 = await getUserById(participant_userIDsFromDB[2]); 
+                    const postInfo = {limit_people,location, meeting_date, openchat};
+                    await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
+                    await applyUniveus(post_id, guest1.user_id); // 초대받은 사람 참여
+                    await applyUniveus(post_id, guest2.user_id); // 초대받은 사람 참여
+                    await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
+                    const MessageAlarmList = [Writer, [alreadyParticipant1, alreadyParticipant2], Invitee, [guest1, guest2]];
+                    await sendParticipantMessageAlarm(post_id, MessageAlarmList,postInfo); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
+                    return res.status(200).json(response(baseResponse.SUCCESS));
+                }  
+            }
         }
     } 
     else{ 
