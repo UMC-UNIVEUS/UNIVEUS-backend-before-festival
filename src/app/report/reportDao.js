@@ -1,10 +1,9 @@
 /** 유저 신고 insert */
 export const insertUserReport = async(connection, insertUserReportParams) => {
-    const insertUserReportQuery =  `INSERT INTO user_reports (reported_by, report_reason_text, 
-        report_user_id, report_status) VALUES (?, ?, ?, 0);`;
+    const insertUserReportQuery =  `INSERT INTO user_reports (reported_by, reason_text, 
+        report_user_id, report_status, reported_at, reason_category1, reason_category2
+        , reason_category3, reason_category4, reason_category5) VALUES (?, ?, ?, 0, now(), ?, ?, ?, ?, ?);`;
     const [insertUserReportRow] = await connection.query(insertUserReportQuery, insertUserReportParams);
-    /** insert후 테이블 id 반환 */
-    return insertUserReportRow.insertId;
 }
 
 /** 유저 신고 사유 insert */

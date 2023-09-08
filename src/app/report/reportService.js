@@ -1,28 +1,18 @@
-import { insertUserReport, insertUserReportReason, insertPostReport, insertPostReportReason } from "./reportDao"
+import { insertUserReport, insertPostReport, insertPostReportReason } from "./reportDao"
 import pool from "../../../config/database"
 
 /** User Report 생성 */
-export const createUserReport = async(reportReasonText, reportedBy, reportedUser) => {
+export const createUserReport = async(reportReasonText, reportedBy, reportedUser, reportReason) => {
     const connection = await pool.getConnection(async conn => conn);
     const insertUserReportParams = [reportedBy, reportReasonText, reportedUser];
+
+    for (let i = 0; i < reportReason.length; i++) {
+        insertUserReportParams.push(reportReason[i]);
+    }
+
     const reportUserResult = await insertUserReport(connection, insertUserReportParams);
     connection.release();
-    return reportUserResult;
 }
-
-/** User Report Reason 생성 */
-export const createUserReportReason = async (reportUserResult, reportReasons) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const insertReportReasonParams = reportReasons.map(reason => ({
-        reportReason: reason,
-        userReportId: reportUserResult
-    }));
-    for (const params of insertReportReasonParams) {
-        await insertUserReportReason(connection, [params.reportReason, params.userReportId]);
-    }
-    connection.release();
-    return null;
-};
 
 /** Post Report 생성 */
 export const createPostReport = async(reportReasonText, reportedBy, reportedPost) => {
