@@ -1,38 +1,28 @@
-import { insertUserReport, insertPostReport, insertPostReportReason } from "./reportDao"
+import { insertUserReport, insertPostReport } from "./reportDao"
 import pool from "../../../config/database"
 
 /** User Report 생성 */
-export const createUserReport = async(reportReasonText, reportedBy, reportedUser, reportReason) => {
+export const createUserReport = async(reportReasonText, reportedBy, reportedUser, reportReasons) => {
     const connection = await pool.getConnection(async conn => conn);
-    const insertUserReportParams = [reportedBy, reportReasonText, reportedUser];
+    const insertUserReportParam = [reportedBy, reportReasonText, reportedUser];
 
-    for (let i = 0; i < reportReason.length; i++) {
-        insertUserReportParams.push(reportReason[i]);
+    for (let i = 0; i < reportReasons.length; i++) {
+        insertUserReportParam.push(reportReasons[i]);
     }
 
-    const reportUserResult = await insertUserReport(connection, insertUserReportParams);
+    const reportUserResult = await insertUserReport(connection, insertUserReportParam);
     connection.release();
-}
+};
 
 /** Post Report 생성 */
-export const createPostReport = async(reportReasonText, reportedBy, reportedPost) => {
+export const createPostReport = async(reportReasonText, reportedBy, reportedPost, reportReasons) => {
     const connection = await pool.getConnection(async conn => conn);
-    const insertPostReportParams = [reportReasonText, reportedBy, reportedPost];
-    const reportPostResult = await insertPostReport(connection, insertPostReportParams);
-    connection.release();
-    return reportPostResult;
-}
+    const insertPostReportParam = [reportedBy, reportReasonText, reportedPost];
 
-/** Post Report Reason 생성 */
-export const createPostReportReason = async (reportPostResult, reportReason) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const insertReportReasonParams = reportReason.map(reason => ({
-        reportReason : reason,
-        postReportId: reportPostResult
-    }));
-    for (const params of insertReportReasonParams) {
-        await insertPostReportReason(connection, [params.reportReason, params.postReportId]);
+    for (let i = 0; i < reportReasons.length; i++) {
+        insertPostReportParam.push(reportReasons[i]);
     }
+
+    const reportPostResult = await insertPostReport(connection, insertPostReportParam);
     connection.release();
-    return null;
-}
+};
