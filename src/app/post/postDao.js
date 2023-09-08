@@ -25,9 +25,9 @@ export const selectParticipant = async(connection, post_id)=>{ // 참여자 목�
 export const insertPost = async(connection, insertPostParams)=>{// 게시글 생성 + 게시글 참여자 테이블 생성
     const postPostQuery = `
         INSERT INTO post(user_id, category, limit_gender, current_people, limit_people, location, 
-        meeting_date, openchat, end_date, title, 
+        meeting_date, openchat, end_date, title, main_img,
         content, created_at, post_status) 
-        VALUES (?,?,?,1,?,?, ?,?,?,?, ?,now(), "recruiting");
+        VALUES (?,?,?,1,?,?, ?,?,?,?,?, ?,now(), "recruiting");
     `;
 
     const postParticipantTableQuery = `
@@ -35,9 +35,20 @@ export const insertPost = async(connection, insertPostParams)=>{// 게시글 생
         VALUES (?,?,"writer");
     `;
     const insertPostRow = await connection.query(postPostQuery, insertPostParams);
-    const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]); 
+    const postParticipantTableRow = await connection.query(postParticipantTableQuery, [insertPostParams[0],insertPostRow[0].insertId]);
     //insertPostRow.insertId는 생성된 post의 post_id, insertPostParams[0]는 user_id
     return insertPostRow[0];
+};
+
+export const insertPostImages = async(connection, insertPostImagesParams)=>{// 게시글 이미지 저장
+
+    const postPostImagesQuery = `
+            INSERT INTO post_img(img_url, post_id) 
+            VALUES (?,?);
+        `;
+    for(var i =0; i<insertPostImagesParams[0].length ;i++){
+        const insertPostImagesRow = await connection.query(postPostImagesQuery, [insertPostImagesParams[0][i],insertPostImagesParams[1]]);
+    }
 };
 
 export const updatePost = async(connection, updatePostParams)=>{// 게시글 수정
