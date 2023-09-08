@@ -108,7 +108,9 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants,li
 즐겁고 유익한 행성을 만들어 주세요!
 
 - 나의 유니버스 확인하기 : 
-- 같이 하는 친구 : "${User.nickname}","${participants.nickname}"
+- 같이 하는 친구 : 
+'${User.nickname}',
+'${participants.nickname}'
 - 최대 인원 : ${limit_people}
 - 모임 장소 : ${location}
 - 모임 시간 : ${meeting_date}
@@ -132,7 +134,10 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants,li
 즐겁고 유익한 행성을 만들어 주세요!
 
 - 나의 유니버스 확인하기 : 
-- 같이 하는 친구 : ${User.nickname},${participants[0].nickname},${participants[1].nickname}
+- 같이 하는 친구 : 
+'${User.nickname}',
+'${participants[0].nickname}',
+'${participants[1].nickname}'
 - 최대 인원 : ${limit_people}
 - 모임 장소 : ${location}
 - 모임 시간 : ${meeting_date}
@@ -161,7 +166,11 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList,postI
 즐겁고 유익한 행성을 만들어 주세요!
 
 - 나의 유니버스 확인하기 : 
-- 같이 하는 친구 : "${MessageAlarmList[0].nickname}", "${MessageAlarmList[1][0].nickname}", "${MessageAlarmList[2].nickname}", "${MessageAlarmList[3][0].nickname}"
+- 같이 하는 친구 : 
+'${MessageAlarmList[0].nickname}', 
+'${MessageAlarmList[1][0].nickname}', 
+'${MessageAlarmList[2].nickname}', 
+'${MessageAlarmList[3][0].nickname}'
 - 최대 인원 : ${postInfo.limit_people}
 - 모임 장소 : ${postInfo.location}
 - 모임 시간 : ${postInfo.meeting_date}
@@ -182,7 +191,13 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList,postI
 즐겁고 유익한 행성을 만들어 주세요!
 
 - 나의 유니버스 확인하기 : 
-- 같이 하는 친구 : '${MessageAlarmList[0].nickname}', '${MessageAlarmList[1][0].nickname}', '${MessageAlarmList[1][1].nickname}', '${MessageAlarmList[2].nickname}', '${MessageAlarmList[3][0].nickname}', '${MessageAlarmList[3][1].nickname}'
+- 같이 하는 친구 : 
+'${MessageAlarmList[0].nickname}', 
+'${MessageAlarmList[1][0].nickname}', 
+'${MessageAlarmList[1][1].nickname}', 
+'${MessageAlarmList[2].nickname}', 
+'${MessageAlarmList[3][0].nickname}', 
+'${MessageAlarmList[3][1].nickname}'
 - 최대 인원 : ${postInfo.limit_people}
 - 모임 장소 : ${postInfo.location}
 - 모임 시간 : ${postInfo.meeting_date}
