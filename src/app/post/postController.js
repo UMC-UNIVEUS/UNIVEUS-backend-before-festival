@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList} from "./postProvider";
-import { createPost, createPostImage, editPost, removePost, addScrap, addLike, 
+import { createPost, createPostImage, editPost,editPostImage, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
@@ -127,7 +127,7 @@ export const patchPost =  async(req, res) => {
 
     const {post_id} = req.params;
     const {user_id, category, limit_gender,limit_people, location, meeting_date, openchat, 
-        end_date, title,content} = req.body;
+        end_date, title,images,content} = req.body;
     const notUndefined = [category, limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
@@ -156,6 +156,9 @@ export const patchPost =  async(req, res) => {
             }
             const patchPostResult = await editPost(category, limit_gender,limit_people, location, meeting_date, openchat, 
                 end_date, title,content, post_id);   
+            // if(images != undefined ){
+            //     await editPostImage(images,post_id);
+            // } 이미지 수정은 보류.... 너무 헷갈림
             return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
         } 
         else{ 

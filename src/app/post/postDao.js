@@ -79,6 +79,15 @@ export const updatePost = async(connection, updatePostParams)=>{// 게시글 수
     const updatePostRow = await connection.query(patchPostQuery, updatePostParams);
 };
 
+export const updatePostImage = async(connection, updatePostImageParams)=>{// 게시글 이미지 수정
+    const patchPostImageQuery = `
+        UPDATE post_img 
+        SET image = ?
+        WHERE post_id =?;
+    `;
+    const updatePostRow = await connection.query(patchPostImageQuery, updatePostImageParams);
+};
+
 export const erasePost = async(connection, post_id)=>{// 게시글 삭제
     const deletePostQuery = `
         DELETE 
