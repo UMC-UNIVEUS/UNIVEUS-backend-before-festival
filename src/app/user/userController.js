@@ -235,8 +235,8 @@ export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{
     const content = `[UNIVEUS 게시글 신고] user_id = '${reportedBy}' >> post_id = '${reportedPost}'을 신고했습니다.`;
 
     //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    if (!success) { return false} 
-    else { return true}
+    // if (!success) { return false} 
+    // else { return true}
 };
 
 

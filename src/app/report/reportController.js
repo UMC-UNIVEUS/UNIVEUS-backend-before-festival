@@ -1,6 +1,6 @@
 import { baseResponse, response } from "../../../config/response";
 import { getUserIdByEmail } from "../user/userProvider";
-import { createUserReport, createUserReportReason, createPostReport, createPostReportReason } from "./reportService"
+import { createUserReport, createPostReport, createPostReportReason } from "./reportService"
 import {sendUserReportAlarm, sendPostReportAlarm} from "../user/userController"
 
 
@@ -10,9 +10,8 @@ export const reportUser = async(req, res) => {
     const reportReasonText = req.body.reportReasonText;
     const reportedUser = req.body.reportedUser;
     const reportedBy = await getUserIdByEmail(req.verifiedToken.userEmail);
-
-    const reportUserResult = await createUserReport(reportReasonText, reportedBy, reportedUser);
-    const reportReasonResult = await createUserReportReason(reportUserResult, reportReason);
+    
+    const reportUserResult = await createUserReport(reportReasonText, reportedBy, reportedUser, reportReason);
     await sendUserReportAlarm(reportedBy,reportedUser); // 유저 신고 알림 (to 관리자)
     res.send(response(baseResponse.REPORT_SUCCESS));
 };
