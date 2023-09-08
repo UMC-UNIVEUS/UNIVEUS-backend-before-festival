@@ -2,16 +2,16 @@
 (CRUD에 해당하는 서버 로직 처리) */
 
 import pool from "../../../config/database";
-import { insertPost,updatePost, erasePost, insertScrap, insertLike,
+import { insertPost, insertPostImages, updatePost, updatePostImage, erasePost, insertScrap, insertLike,
      insertParticipant, updateParticipant,deleteParticipant, insertUniveus, 
      addParticipant,blockUniveus, switchPostStatus, eraseParticipant,
      updateStatus } from "./postDao";
 
-export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, // 게시글 생성
-    end_date, title, content) =>{
+export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+    end_date, title, main_img, content) =>{
  
-    const insertPostParams =[userIdFromJWT, category,limit_gender, limit_people, location, meeting_date, openchat, 
-        end_date, title, content]; 
+    const insertPostParams =[userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+    end_date, title, main_img,content]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const createpostResult = await insertPost(connection,insertPostParams);
@@ -19,15 +19,34 @@ export const createPost = async(userIdFromJWT, category, limit_gender, limit_peo
     return createpostResult;
 };
 
+export const createPostImage = async(images, post_id) =>{ //게시글 이미지 저장
+
+    const insertPostImagesParams =[images, post_id]; 
+
+    const connection = await pool.getConnection(async conn => conn);
+    const createpostImagesResult = await insertPostImages(connection,insertPostImagesParams);
+    connection.release();
+    return createpostImagesResult;
+};
+
 export const editPost = async(category, limit_gender,limit_people, location, meeting_date, openchat, // 게시글 수정
     end_date, title,content, post_id)=>{
   
     const updatePostParams =[category, limit_gender,limit_people, location, meeting_date, openchat, 
-        end_date, title,content,post_id]; 
+        end_date, title,content, post_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
-    const editPostResult = await updatePost(connection,updatePostParams); 
+    const updatePostResult = await updatePost(connection,updatePostParams); 
     connection.release();
+};
+
+export const editPostImage = async(images, post_id)=>{
+
+const updatePostImageParams =[images, post_id]; 
+
+const connection = await pool.getConnection(async conn => conn);
+const editPostImageResult = await updatePostImage(connection,updatePostImageParams); 
+connection.release();
 };
 
 export const removePost = async(post_id)=>{// 게시글 삭제

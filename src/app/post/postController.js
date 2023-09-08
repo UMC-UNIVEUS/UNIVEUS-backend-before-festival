@@ -1,13 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
-import { createPost, editPost, removePost, addScrap, addLike, 
+import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList} from "./postProvider";
+import { createPost, createPostImage, editPost,editPostImage, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
 import {getUserIdByEmail, getUserByNickName, getUserById} from "../user/userProvider";
-import {sendMessageAlarm, sendCreatePostMessageAlarm, sendInviteMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
+import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -20,7 +20,8 @@ export const getPost = async(req, res) => {
     
     if(Post){ // Post가 존재한다면
         const Participant = await retrieveParticipant(post_id); 
-        return res.status(200).json(response(baseResponse.SUCCESS, {Post,Participant}));
+        const PostImages = await retrievePostImages(post_id); 
+        return res.status(200).json(response(baseResponse.SUCCESS, {Post,PostImages,Participant}));
     } 
     else{ 
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
@@ -34,9 +35,9 @@ export const getPost = async(req, res) => {
 export const postPost = async(req, res) => {
     
     const {category, limit_gender, limit_people, location, meeting_date, openchat, 
-        end_date, title, content, invited_userNickNames } = req.body; // 축제용 >> limit_gender, invited_userNickNames
+        end_date, title, content, images, invited_userNickNames } = req.body; // 축제용 >> limit_gender, invited_userNickNames
     const notUndefined = [category, limit_gender, limit_people, location, meeting_date, openchat, 
-        end_date, title, content, invited_userNickNames]; // 빠지면 안될 정보들
+        end_date, title, content,invited_userNickNames]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
 
@@ -67,9 +68,12 @@ export const postPost = async(req, res) => {
 
             if(participant){// 초대 받은 유저가 존재할 때
                 const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
-                    end_date, title, content);
-                await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant, 
-                    limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
+                    end_date, title,images[0], content);
+                if(images != undefined ){
+                    await createPostImage(images,postPostResult.insertId); 
+                }
+                //await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant, 
+                //   limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
                 await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
                 return res.status(200).json(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
             }
@@ -90,11 +94,13 @@ export const postPost = async(req, res) => {
 
                 if(participant2){
                     const participants = [participant1, participant2]
-                    console.log(participants);
                     const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
-                        end_date, title, content);
-                    await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants, 
-                        limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
+                        end_date, title,images[0], content);
+                    if(images != undefined ){
+                        await createPostImage(images,postPostResult.insertId);
+                    }
+                   // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants, 
+                    //    limit_people, location, meeting_date, openchat); // 작성 알림 (to 작성자, 초대 받은 사람) 
                     await inviteOneParticipant(postPostResult.insertId, participant1.user_id, userIdFromJWT);
                     await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
                     return res.status(200).json(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
@@ -121,7 +127,7 @@ export const patchPost =  async(req, res) => {
 
     const {post_id} = req.params;
     const {user_id, category, limit_gender,limit_people, location, meeting_date, openchat, 
-        end_date, title,content} = req.body;
+        end_date, title,images,content} = req.body;
     const notUndefined = [category, limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
@@ -150,6 +156,9 @@ export const patchPost =  async(req, res) => {
             }
             const patchPostResult = await editPost(category, limit_gender,limit_people, location, meeting_date, openchat, 
                 end_date, title,content, post_id);   
+            // if(images != undefined ){
+            //     await editPostImage(images,post_id);
+            // } 이미지 수정은 보류.... 너무 헷갈림
             return res.status(200).json(response(baseResponse.SUCCESS, patchPostResult));
         } 
         else{ 

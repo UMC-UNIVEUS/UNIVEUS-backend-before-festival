@@ -48,7 +48,7 @@ export const baseResponse = {
     POST_PARTICIPATE_ONLY_ONE : { "isSuccess": false, "code": 3015, "message": "제한 인원이 4명일 때는 1명만 초대할 수 있습니다." },
     POST_PARTICIPATE_ONLY_TWO : { "isSuccess": false, "code": 3016, "message": "제한 인원이 6명일 때는 2명만 초대할 수 있습니다." },
     POST_PARTICIPATE_ALREADY_CLOSE : { "isSuccess": false, "code": 3017, "message": "이미 모집 마감됐습니다." },
-
+    POST_IMAGE_LIMIT: { "isSuccess": false, "code": 3018, "message": "이미지는 최대 4개까지 업로드할 수 있습니다." },
 
 
 
