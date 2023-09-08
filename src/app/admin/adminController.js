@@ -1,14 +1,11 @@
 import { baseResponse, response, errResponse } from "../../../config/response";
-import { isAdmin, getAllUsersInfo } from "./adminProvider"
+import { isAdmin, getAllUsersInfo, reportsUser } from "./adminProvider"
 import { changeStatusByAdmin, changeHiddenByAdmin, signUpByAdmin } from "./adminService"
 import { retrievePost } from "../post/postProvider";
 import { createPost, editPost, removePost } from "../post/postService";
 
 /** 모든 유저 정보 가져오기 */
 export const getUsersInfo = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
-
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
 
     const getAllUsersInfoResult = await getAllUsersInfo();
 
@@ -17,9 +14,6 @@ export const getUsersInfo = async(req, res) => {
 
 /** 임의 회원가입 */
 export const adminSignUp = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
-
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
 
     const userInfo =  req.body;
 
@@ -28,16 +22,11 @@ export const adminSignUp = async(req, res) => {
     return res.send(response(baseResponse.SUCCESS));
 }
 
-/** userReports 함수 */
+/** 신고 유저 확인 함수 */
 // TODO : DAO, servcie 구현
 export const userReports = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
 
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
-
-    const userInfo =  req.body;
-
-    const getAdminSignUpResult = await signUpByAdmin(userInfo);
+    const userReports = await reportsUser();
 
     return res.send(response(baseResponse.SUCCESS));
 }
@@ -45,9 +34,6 @@ export const userReports = async(req, res) => {
 /** postReports 함수 */
 // TODO : DAO, servcie 구현
 export const postReports = async(req, res) => {
-    const userEmail = req.verifiedToken.userEmail;
-
-    if (!isAdmin(userEmail)) return res.send(errResponse(baseResponse.NOT_ADMIN));
 
     const userInfo =  req.body;
 

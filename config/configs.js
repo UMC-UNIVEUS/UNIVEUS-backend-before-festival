@@ -4,4 +4,3 @@ export const naverCloudSensSecret = {
     secretKey: process.env.NCP_SECRET_KEY,
     accessKey: process.env.NCP_ACCESS_KEY
 };
-

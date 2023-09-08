@@ -16,3 +16,12 @@ export const getAllUsersInfo = async() => {
     connection.release();
     return getUsersInfoResult;
 }
+
+/** 신고 유저 확인 함수 */
+export const reportsUser = async(userEmail) => {
+    const connection = await pool.getConnection(async(conn) => conn);
+    const reportsUserResult = await selectUserReports(connection);
+    connection.release();
+    if(isAdminResult == 1) return true;
+    return false;
+}

@@ -12,7 +12,6 @@ import reportRouter from "../src/app/report/reportRoute";
 import profileRouter from "../src/app/profile/profileRoute";
 import adminRouter from "../src/app/admin/adminRoute";
 
-
 const app = express();  
 
 dotenv.config();

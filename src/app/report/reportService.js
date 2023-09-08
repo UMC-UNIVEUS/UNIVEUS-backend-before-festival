@@ -1,48 +1,28 @@
-import { insertUserReport, insertUserReportReason, insertPostReport, insertPostReportReason } from "./reportDao"
+import { insertUserReport, insertPostReport } from "./reportDao"
 import pool from "../../../config/database"
 
 /** User Report 생성 */
-export const createUserReport = async(reportReasonText, reportedBy, reportedUser) => {
+export const createUserReport = async(reportReasonText, reportedBy, reportedUser, reportReasons) => {
     const connection = await pool.getConnection(async conn => conn);
-    const insertUserReportParams = [reportedBy, reportReasonText, reportedUser];
-    const reportUserResult = await insertUserReport(connection, insertUserReportParams);
-    connection.release();
-    return reportUserResult;
-}
+    const insertUserReportParam = [reportedBy, reportReasonText, reportedUser];
 
-/** User Report Reason 생성 */
-export const createUserReportReason = async (reportUserResult, reportReasons) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const insertReportReasonParams = reportReasons.map(reason => ({
-        reportReason: reason,
-        userReportId: reportUserResult
-    }));
-    for (const params of insertReportReasonParams) {
-        await insertUserReportReason(connection, [params.reportReason, params.userReportId]);
+    for (let i = 0; i < reportReasons.length; i++) {
+        insertUserReportParam.push(reportReasons[i]);
     }
+
+    const reportUserResult = await insertUserReport(connection, insertUserReportParam);
     connection.release();
-    return null;
 };
 
 /** Post Report 생성 */
-export const createPostReport = async(reportReasonText, reportedBy, reportedPost) => {
+export const createPostReport = async(reportReasonText, reportedBy, reportedPost, reportReasons) => {
     const connection = await pool.getConnection(async conn => conn);
-    const insertPostReportParams = [reportReasonText, reportedBy, reportedPost];
-    const reportPostResult = await insertPostReport(connection, insertPostReportParams);
-    connection.release();
-    return reportPostResult;
-}
+    const insertPostReportParam = [reportedBy, reportReasonText, reportedPost];
 
-/** Post Report Reason 생성 */
-export const createPostReportReason = async (reportPostResult, reportReason) => {
-    const connection = await pool.getConnection(async conn => conn);
-    const insertReportReasonParams = reportReason.map(reason => ({
-        reportReason : reason,
-        postReportId: reportPostResult
-    }));
-    for (const params of insertReportReasonParams) {
-        await insertPostReportReason(connection, [params.reportReason, params.postReportId]);
+    for (let i = 0; i < reportReasons.length; i++) {
+        insertPostReportParam.push(reportReasons[i]);
     }
+
+    const reportPostResult = await insertPostReport(connection, insertPostReportParam);
     connection.release();
-    return null;
-}
+};

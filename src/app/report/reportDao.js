@@ -1,10 +1,9 @@
 /** 유저 신고 insert */
 export const insertUserReport = async(connection, insertUserReportParams) => {
-    const insertUserReportQuery =  `INSERT INTO user_reports (reported_by, report_reason_text, 
-        report_user_id, report_status) VALUES (?, ?, ?, 0);`;
+    const insertUserReportQuery =  `INSERT INTO user_reports (reported_by, reason_text, 
+        report_user_id, report_status, reported_at, reason_category1, reason_category2
+        , reason_category3, reason_category4, reason_category5) VALUES (?, ?, ?, 0, now(), ?, ?, ?, ?, ?);`;
     const [insertUserReportRow] = await connection.query(insertUserReportQuery, insertUserReportParams);
-    /** insert후 테이블 id 반환 */
-    return insertUserReportRow.insertId;
 }
 
 /** 유저 신고 사유 insert */
@@ -15,17 +14,9 @@ export const insertUserReportReason = async(connection, insertUserReportReasonPa
 }
 
 /** 게시글 신고 insert */
-export const insertPostReport = async(connection, insertPostReportParams) => {
-    const insertPostReportQuery =  `INSERT INTO post_reports (report_reason_text, reported_by, 
-        post_id, report_status) VALUES (?, ?, ?, 0);`;
-    const [insertPostReportRow] = await connection.query(insertPostReportQuery, insertPostReportParams);
-    /** insert후 테이블 id 반환 */
-    return insertPostReportRow.insertId;
-}
-
-/** 게시글 신고 사유 insert */
-export const insertPostReportReason = async(connection, insertPostReportReasonParams) => {
-    const insertPostReportReasonQuery = `INSERT INTO post_report_reasons (report_reason, post_report_id) VALUES (?, ?)`;
-    const insertPostReportReasonRow = await connection.query(insertPostReportReasonQuery, insertPostReportReasonParams);
-    return insertPostReportReasonRow;
+export const insertPostReport = async(connection, insertPostReportParam) => {
+    const insertPostReportQuery =  `INSERT INTO post_reports (reported_by, reason_text, 
+        post_id, report_status, reported_at, reason_category1, reason_category2
+        , reason_category3, reason_category4, reason_category5) VALUES (?, ?, ?, 0, now(), ?, ?, ?, ?, ?);`;
+    const [insertPostReportRow] = await connection.query(insertPostReportQuery, insertPostReportParam);
 }

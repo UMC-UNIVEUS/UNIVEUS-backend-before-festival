@@ -1,12 +1,12 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
-    createUser, addUserPhoneNumber } from "../user/userService";
+    createUser, addUserPhoneNumber, addAgreementTerms } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
     getUserNickNameById, isAuthNumber, isAuthUser, getUserById } from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
-import { sendSMS } from "../../../config/NaverCloudClient";
+import { sendSMS } from "../../../config/naverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
 import NodeCache from "node-cache";
 
@@ -211,6 +211,7 @@ export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림
     const userNickName = await getUserNickNameById(userIdFromJWT); // user_id로 닉네임 가져오기
     const content = `[UNIVEUS] 유니버스에 참여했던 '${userNickName}'님이/가 참여 취소하였습니다.`;
 
+
     // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
     //if (!success) { return false} 
     //else { return true}
@@ -234,8 +235,8 @@ export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{
     const content = `[UNIVEUS 게시글 신고] user_id = '${reportedBy}' >> post_id = '${reportedPost}'을 신고했습니다.`;
 
     //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    if (!success) { return false} 
-    else { return true}
+    // if (!success) { return false} 
+    // else { return true}
 };
 
 
@@ -318,3 +319,21 @@ export const patchAlarms = async(req, res) => {
         return res.status(400).json(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
     } 
 };
+
+/** 약관 동의 API*/
+// TODO: DAO, SERVICE 구현
+export const agreementTerms = async(req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+    const userId = await getUserIdByEmail(userEmail);
+    const userAgreed = req.body.userAgreement
+
+    if (userAgreed[0] == 0) return res.send(errResponse(baseResponse.FIRST_AGREEMENT_EMPTY));
+
+    if (userAgreed[1] == 0) return res.send(errResponse(baseResponse.SECOND_AGREEMENT_EMPTY));
+
+    if (userAgreed[2] == 0) return res.send(errResponse(baseResponse.THIRD_AGREEMENT_EMPTY));
+
+    await addAgreementTerms(userId, userAgreed);
+
+    return res.send(response(baseResponse.SUCCESS));
+}
