@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrieveParticipantList} from "./postProvider";
+import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList} from "./postProvider";
 import { createPost, createPostImage, editPost, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
@@ -20,7 +20,8 @@ export const getPost = async(req, res) => {
     
     if(Post){ // Post가 존재한다면
         const Participant = await retrieveParticipant(post_id); 
-        return res.status(200).json(response(baseResponse.SUCCESS, {Post,Participant}));
+        const PostImages = await retrievePostImages(post_id); 
+        return res.status(200).json(response(baseResponse.SUCCESS, {Post,PostImages,Participant}));
     } 
     else{ 
         return res.status(404).json(errResponse(baseResponse.POST_POSTID_NOT_EXIST))

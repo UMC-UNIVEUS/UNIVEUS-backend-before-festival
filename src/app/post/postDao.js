@@ -9,13 +9,23 @@ export const selectPost = async(connection, post_id)=>{ // 게시글 조회
     return PostRow;
 };
 
+export const selectPostImages = async(connection, post_id)=>{ // 게시글 이미지 조회
+    const selectPostImagesQuery = `
+        SELECT *
+        FROM post_img
+        WHERE post_id = ?;
+    `;
+    const [PostImagesRow] = await connection.query(selectPostImagesQuery, post_id);
+    return PostImagesRow;
+};
+
 export const selectParticipant = async(connection, post_id)=>{ // 참여자 목록 조회
     const selectParticipantQuery = `
         SELECT participant_users.participant_id, user.user_id, user.gender, user.nickname, user.major, user.class_of, participant_users.status
         FROM participant_users
         INNER JOIN user
         ON participant_users.user_id = user.user_id
-        WHERE post_id = ? AND status = "approval";
+        WHERE post_id = ?;
     `;
     const [ParticipantRow] = await connection.query(selectParticipantQuery, post_id);
     return ParticipantRow;
