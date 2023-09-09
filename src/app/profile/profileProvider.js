@@ -74,7 +74,7 @@ export const showUserMyUnive = async (user_id) => {
              //모임 시간 변경
              if(showUserMyUniveResult[0][i].meeting_date) {
                  const datevalue = dayjs(showUserMyUniveResult[0][i].meeting_date);
-                 showUserMyUniveResult[0][i].meeting_date = datevalue.month() + 1 + "월" + datevalue.date() + "일 " + datevalue.hour() + ":" + datevalue.minute();
+                 showUserMyUniveResult[0][i].meeting_date = datevalue.month() + 1 + "월" + datevalue.date() + " 일 " + datevalue.hour() + ":" + datevalue.minute();
              }
 
             /*
@@ -119,7 +119,7 @@ export const showUserParticipate = async (user_id) => {
             //모임 시간 변경
             if (showUserParticipateResult[0][i].meeting_date) {
                 const datevalue = dayjs(showUserParticipateResult[0][i].meeting_date);
-                showUserParticipateResult[0][i].meeting_date = datevalue.month() + 1 + "월" + datevalue.date() + "일 " + datevalue.hour() + ":" + datevalue.minute();
+                showUserParticipateResult[0][i].meeting_date = datevalue.month() + 1 + "월" + datevalue.date() + " 일 " + datevalue.hour() + ":" + datevalue.minute();
             }
 
 /*
