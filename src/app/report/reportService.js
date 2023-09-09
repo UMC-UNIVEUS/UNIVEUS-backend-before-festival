@@ -28,8 +28,8 @@ export const createPostReport = async(reportReasonText, reportedBy, reportedPost
 };
 
 /** User의 Report Satus 변경 */
-export const changeUserReportStatus = async(reportId) => {
+export const changeUserReportStatus = async(reportId, reportStatus) => {
     const connection = await pool.getConnection(async conn => conn);
-    const changeUserReportResult = await updateUserReportStatus(connection, reportId);
+    const changeUserReportResult = await updateUserReportStatus(connection, reportId, reportStatus);
     connection.release();
 }
