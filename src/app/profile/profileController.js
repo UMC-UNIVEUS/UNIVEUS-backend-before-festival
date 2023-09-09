@@ -6,7 +6,8 @@ import {
     showUserDefaultProfile,
     showUserIntroProfile,
     showUserMyUnive,
-    showUserParticipate
+    showUserParticipate,
+    showUserProfile
 } from './profileProvider';
 import {
     ModifyIntroProfile
@@ -61,7 +62,14 @@ export const getUserMyUnive = async (req, res) => {
     // 빈 아이디 체크
     if (!userEmail) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
     const user_id = await getUserIdByEmail(userEmail);
+    // const user_profile = await showUserProfile(user_id);
+    //const getUserMyUniveResponse = await showUserProfile(user_id);
     const getUserMyUniveResponse = await showUserMyUnive(user_id);
+    //const my_unive = await showUserMyUnive(user_id);
+    /*const getUserMyUniveResponse = {
+        user_profile,
+        my_unive
+    };*/
     return res.status(200).json(response(baseResponse.SUCCESS, getUserMyUniveResponse));
 };
 
@@ -73,4 +81,12 @@ export const getUserParticipate = async (req, res) => {
     const user_id = await getUserIdByEmail(userEmail);
     const getUserParticipateResponse = await showUserParticipate(user_id);
     return res.status(200).json(response(baseResponse.SUCCESS, getUserParticipateResponse));
-}
+};
+export const getUserProfile = async (req, res) => {
+    const userEmail = req.verifiedToken.userEmail;
+    // 빈 아이디 체크
+    if (!userEmail) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    const user_id = await getUserIdByEmail(userEmail);
+    const getUserProfileResponse = await showUserProfile(user_id);
+    return res.status(200).json(response(baseResponse.SUCCESS, getUserProfileResponse));
+};
