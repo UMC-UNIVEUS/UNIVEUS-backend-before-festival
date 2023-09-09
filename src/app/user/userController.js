@@ -172,7 +172,7 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
 
     const Post = await retrievePost(post_id);
     const date = dayjs(Post.meeting_date);
-    Post.meeting_date = date.month() + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
+    Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
 
     if(MessageAlarmList[1].length == 1){ // 제한 인원 == 4
         const content = `
