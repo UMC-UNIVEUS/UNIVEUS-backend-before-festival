@@ -2,7 +2,7 @@ import express from "express";
 import{ getUsersInfo, postPostByAdmin, patchPostByAdmin, 
     deletePostByAdmin, patchStatusByAdmin, patchHiddenByAdmin,
     adminSignUp, userReports, postReports, adminHome, userHome, 
-    adminSignUpPage} from "./adminController";
+    adminSignUpPage,adminUserBlockPage, adminUserBlock} from "./adminController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 import { adminMiddleware } from "../../../config/adminMiddleware";
 
@@ -20,10 +20,13 @@ adminRouter.patch('/post/:post_id/hidden', patchHiddenByAdmin); // 게시글 공
 
 adminRouter.post('/user/signup', adminSignUp);
 adminRouter.get('/user/signup', adminSignUpPage)
+
 adminRouter.get('/user/info', getUsersInfo);
 adminRouter.get('/user/reports', userReports); // 신고 유저 확인
 adminRouter.get('/user', userHome);
 adminRouter.get('/post-reports', postReports);
 
+adminRouter.get('/user/block/:reportId/:userId', adminUserBlockPage);
+adminRouter.put('/user/block/:reportId/:userId', adminUserBlock);
 
 export default adminRouter;

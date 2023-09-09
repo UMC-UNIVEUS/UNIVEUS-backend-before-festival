@@ -20,3 +20,9 @@ export const insertPostReport = async(connection, insertPostReportParam) => {
         , reason_category3, reason_category4, reason_category5) VALUES (?, ?, ?, 0, now(), ?, ?, ?, ?, ?);`;
     const [insertPostReportRow] = await connection.query(insertPostReportQuery, insertPostReportParam);
 }
+
+/** User의 report status 변경 */
+export const updateUserReportStatus = async(connection, reportId) => {
+    const updateUseReportStatusQuery = `UPDATE user_reports SET report_status = 1 WHERE user_report_id = ${reportId};`;
+    const [updateUserReportRow] = await connection.query(updateUseReportStatusQuery);
+};

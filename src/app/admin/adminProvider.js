@@ -39,6 +39,8 @@ export const reportsUser = async() => {
       })
     );
 
+    console.log(reportedUser)
+
     const combinedData = reportsUserResult.map((report, index) => ({
       reportsUserResult: report,
       reporter: reporter[index],
