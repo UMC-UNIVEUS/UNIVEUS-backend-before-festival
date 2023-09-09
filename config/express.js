@@ -22,6 +22,9 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride());
 app.use(cors());
 
+app.set('views', './src/app/views');
+app.set('view engine', 'ejs');
+
 app.use('/user', userRouter);
 app.use('/post',postRouter);
 app.use('/comments',commentRouter);

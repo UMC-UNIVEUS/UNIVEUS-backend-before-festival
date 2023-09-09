@@ -9,7 +9,9 @@ export const getUsersInfo = async(req, res) => {
 
     const getAllUsersInfoResult = await getAllUsersInfo();
 
-    return res.send(response(baseResponse.SUCCESS, getAllUsersInfoResult));
+    return res.render('userInfo.ejs', { user : getAllUsersInfoResult });
+
+    // return res.send(response(baseResponse.SUCCESS, getAllUsersInfoResult));
 }
 
 /** 임의 회원가입 */
@@ -22,13 +24,13 @@ export const adminSignUp = async(req, res) => {
     return res.send(response(baseResponse.SUCCESS));
 }
 
-/** 신고 유저 확인 함수 */
+/** 신고 유저 확인 */
 // TODO : DAO, servcie 구현
 export const userReports = async(req, res) => {
 
-    const userReports = await reportsUser();
+    const userReportsResult = await reportsUser();
 
-    return res.send(response(baseResponse.SUCCESS));
+    return res.render('userReports.ejs', { userReports : userReportsResult });
 }
 
 /** postReports 함수 */
@@ -164,3 +166,15 @@ export const patchHiddenByAdmin = async(req, res) => {
         }
     }
 };
+
+export const adminHome = async(req, res) => {
+    return res.render('index.ejs');
+}
+
+export const userHome = async(req, res) => {
+    return res.render('user.ejs');
+}
+
+export const adminSignUpPage = async(req, res) => {
+    return res.render('signup.ejs');
+}

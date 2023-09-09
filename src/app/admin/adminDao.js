@@ -7,7 +7,7 @@ export const selectIsAdminByUserEmail = async(connection, userEmail) => {
 };
 
 export const selectUserInfoFromUser = async(connection) => {
-    const selectAllFromUserQuery = `SELECT phone, nickname, class_of, major, email_id FROM user;`;
+    const selectAllFromUserQuery = `SELECT user_id, phone, nickname, class_of, major, email_id FROM user;`;
     const [selectAllFromUserRow] = await connection.query(selectAllFromUserQuery);
 
     return selectAllFromUserRow;
@@ -34,8 +34,10 @@ export const updateHiddenByAdmin = async(connection, changeHiddenByAdminParms)=>
 /** report된 유저 확인 */
 
 export const selectUserReports = async(connection) => {
-    const selectUserReportsQuery = `SELECT is_admin FROM user WHERE email_id = '${userEmail}'`;
-    const [selectUserReportsRow] = await connection.query(selectIsAdminByUserEmailQuery, userEmail);
+    const selectUserReportsQuery = `SELECT * FROM user_reports WHERE report_status = 0;`
+    const [selectUserReportsRow] = await connection.query(selectUserReportsQuery);
+
+    console.log(selectUserReportsRow)
 
     return selectUserReportsRow;
 };
