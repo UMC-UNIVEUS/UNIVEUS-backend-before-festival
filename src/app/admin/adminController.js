@@ -3,6 +3,8 @@ import { isAdmin, getAllUsersInfo, reportsUser } from "./adminProvider"
 import { changeStatusByAdmin, changeHiddenByAdmin, signUpByAdmin } from "./adminService"
 import { retrievePost } from "../post/postProvider";
 import { createPost, editPost, removePost } from "../post/postService";
+import { changeUserStatus } from "../user/userService";
+import { changeUserReportStatus } from "../report/reportService";
 
 /** 모든 유저 정보 가져오기 */
 export const getUsersInfo = async(req, res) => {
@@ -169,12 +171,30 @@ export const patchHiddenByAdmin = async(req, res) => {
 
 export const adminHome = async(req, res) => {
     return res.render('index.ejs');
-}
+};
 
 export const userHome = async(req, res) => {
     return res.render('user.ejs');
-}
+};
 
 export const adminSignUpPage = async(req, res) => {
     return res.render('signup.ejs');
-}
+};
+
+/** userBlockPage 랜더링 */
+export const adminUserBlockPage = async(req, res) => {
+    return res.render('userBlock.ejs');
+};
+
+/** userBlock 기능 수행 */
+export const adminUserBlock = async(req, res) => {
+    const blockDuration = parseInt(req.body.blockDuration);
+    const userId = req.params.userId;
+    const reportId = req.params.reportId;
+    
+    //blockDuration : 7(7일) 30(30일) 0(탈퇴) 1(정상)
+    const changeUserStatusResult = await changeUserStatus(userId, blockDuration);
+    const chageUserReportStatusResult = await changeUserReportStatus(reportId);
+
+    return res.send(response(baseResponse.SUCCESS));
+};

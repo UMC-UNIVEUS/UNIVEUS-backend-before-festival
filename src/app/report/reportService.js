@@ -1,4 +1,4 @@
-import { insertUserReport, insertPostReport } from "./reportDao"
+import { insertUserReport, insertPostReport, updateUserReportStatus } from "./reportDao"
 import pool from "../../../config/database"
 
 /** User Report 생성 */
@@ -26,3 +26,10 @@ export const createPostReport = async(reportReasonText, reportedBy, reportedPost
     const reportPostResult = await insertPostReport(connection, insertPostReportParam);
     connection.release();
 };
+
+/** User의 Report Satus 변경 */
+export const changeUserReportStatus = async(reportId) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const changeUserReportResult = await updateUserReportStatus(connection, reportId);
+    connection.release();
+}

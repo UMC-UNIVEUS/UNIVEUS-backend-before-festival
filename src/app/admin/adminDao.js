@@ -34,7 +34,7 @@ export const updateHiddenByAdmin = async(connection, changeHiddenByAdminParms)=>
 /** report된 유저 확인 */
 
 export const selectUserReports = async(connection) => {
-    const selectUserReportsQuery = `SELECT * FROM user_reports WHERE report_status = 0;`
+    const selectUserReportsQuery = `SELECT * FROM user_reports;`
     const [selectUserReportsRow] = await connection.query(selectUserReportsQuery);
 
     console.log(selectUserReportsRow)
