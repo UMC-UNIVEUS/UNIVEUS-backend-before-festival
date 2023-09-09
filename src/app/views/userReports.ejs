@@ -45,13 +45,16 @@
         <p>누적 신고 수 : <%=userReports[i].reportedUser.reported_num%></p>
         
         <% if (userReports[i].reportsUserResult.report_status === 0) { %>
-            <button class="block btn btn-dark" data-user = "<%=userReports[i].reportedUser.user_id%>" 
-                data-report = "<%=userReports[i].reportsUserResult.user_report_id%>"
+            <button class="block btn btn-dark" data-user="<%=userReports[i].reportedUser.user_id%>" 
+                data-report="<%=userReports[i].reportsUserResult.user_report_id%>"
                 type="button">유저 제재</button>
+        <% } else if (userReports[i].reportsUserResult.report_status === 1) { %>
+            <button type="button" data-user="<%=userReports[i].reportedUser.user_id%>" 
+                data-report="<%=userReports[i].reportsUserResult.user_report_id%>"
+                class="free btn btn-info">유저 제재 해제</button>
         <% } else { %>
-          <button type="button" data-id = "<%=userReports[i].reportedUser.user_id%>" class="block btn btn-info">유저 제재 해제</button>
-        <% } %>
-          
+            <p style="color: red;">처리 완료된 신고 - 더 이상 조치가 필요하지 않습니다.</p>
+        <% } %>        
     </li>
         <% }%>
       </ul>
@@ -65,6 +68,32 @@
         let userId = e.target.dataset.user;
         let reportId = e.target.dataset.report;
         window.location.href = `/admin/user/block/${reportId}/${userId}`;
+      });
+
+
+      $('.free').click((e)=> {
+        let userId = e.target.dataset.user;
+        let reportId = e.target.dataset.report;
+
+        fetch(`/admin/user/block/free/${reportId}/${userId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ userId }) // userId를 JSON 형식으로 전송
+        })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('서버 응답이 실패했습니다.');
+          }
+          return response.json();
+        })
+        .then((data) => {
+            window.location.reload();
+        })
+        .catch((error) => {
+          console.error('에러:', error);
+        });
       });
       </script>
 

@@ -22,7 +22,7 @@ export const insertPostReport = async(connection, insertPostReportParam) => {
 }
 
 /** User의 report status 변경 */
-export const updateUserReportStatus = async(connection, reportId) => {
-    const updateUseReportStatusQuery = `UPDATE user_reports SET report_status = 1 WHERE user_report_id = ${reportId};`;
+export const updateUserReportStatus = async(connection, reportId, reportStatus) => {
+    const updateUseReportStatusQuery = `UPDATE user_reports SET report_status = ${reportStatus} WHERE user_report_id = ${reportId};`;
     const [updateUserReportRow] = await connection.query(updateUseReportStatusQuery);
 };

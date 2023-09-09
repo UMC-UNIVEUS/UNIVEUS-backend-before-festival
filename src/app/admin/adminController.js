@@ -169,14 +169,17 @@ export const patchHiddenByAdmin = async(req, res) => {
     }
 };
 
-export const adminHome = async(req, res) => {
+/** 관리자 home 랜더링 */
+export const adminHomePage = async(req, res) => {
     return res.render('index.ejs');
 };
 
-export const userHome = async(req, res) => {
+/** user 관리 home 랜더링 */
+export const userHomePage = async(req, res) => {
     return res.render('user.ejs');
 };
 
+/** user 임의 회원가입 page 랜더링 */
 export const adminSignUpPage = async(req, res) => {
     return res.render('signup.ejs');
 };
@@ -186,15 +189,28 @@ export const adminUserBlockPage = async(req, res) => {
     return res.render('userBlock.ejs');
 };
 
+/** userBlock 해제 */
+export const adminUserBlockFree = async(req, res) => {
+    const userId = req.params.userId; 
+    const reportedId = req.params.reportedId;
+    const userBlockFreeResult = changeUserStatus(userId, 1);
+    const changeUserReportResult = changeUserReportStatus(reportedId, 2);
+
+    return res.send(response(baseResponse.SUCCESS));
+}
+
 /** userBlock 기능 수행 */
 export const adminUserBlock = async(req, res) => {
     const blockDuration = parseInt(req.body.blockDuration);
     const userId = req.params.userId;
     const reportId = req.params.reportId;
-    
+
     //blockDuration : 7(7일) 30(30일) 0(탈퇴) 1(정상)
     const changeUserStatusResult = await changeUserStatus(userId, blockDuration);
-    const chageUserReportStatusResult = await changeUserReportStatus(reportId);
+
+    //reportStatus : 0 확인 전, 1 block 중, 2 신고 처리 완료
+    const chageUserReportStatusResult = await changeUserReportStatus(reportId, 1);
 
     return res.send(response(baseResponse.SUCCESS));
 };
+
