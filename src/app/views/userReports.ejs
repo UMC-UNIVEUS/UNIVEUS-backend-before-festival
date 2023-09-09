@@ -47,9 +47,9 @@
         <% if (userReports[i].reportsUserResult.report_status === 0) { %>
             <button class="block btn btn-dark" data-user = "<%=userReports[i].reportedUser.user_id%>" 
                 data-report = "<%=userReports[i].reportsUserResult.user_report_id%>"
-                type="button">유저 제제</button>
+                type="button">유저 제재</button>
         <% } else { %>
-          <button type="button" data-id = "<%=userReports[i].reportedUser.user_id%>" class="block btn btn-info">유저 제제 해제</button>
+          <button type="button" data-id = "<%=userReports[i].reportedUser.user_id%>" class="block btn btn-info">유저 제재 해제</button>
         <% } %>
           
     </li>
