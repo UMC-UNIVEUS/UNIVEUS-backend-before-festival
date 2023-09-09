@@ -31,5 +31,4 @@ postRouter.delete('/:post_id/participant/cancel', jwtMiddleware, cancelParticipa
 
 
 
-
 export default postRouter;
