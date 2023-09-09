@@ -191,7 +191,10 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
 *매칭 시 유의사항*
 - 유니버스는 우리학교 학우들이 모인 공간입니다. 부적절 한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
 - 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
-- 긴급상황 발생 시 [https://www.instagram.com/unive.us/?igshid=MzMyNGUyNmU2YQ%3D%3D] 로 연락주시면 운영자가 달려가 조치하겠습니다.`; 
+- 긴급상황 발생 시 [https://www.instagram.com/unive.us/?igshid=MzMyNGUyNmU2YQ%3D%3D] 로 연락주시면 운영자가 달려가 조치하겠습니다.
+
+즐거우셨다면 유니버스를 평가해 주세요! 큰 도움이 됩니다!!
+[링크]`; 
         const { success1 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[0].phone, content });
         const { success2 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][0].phone, content });
         const { success3 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[2].phone, content });   
@@ -224,7 +227,10 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
 *매칭 시 유의사항*
 - 유니버스는 우리학교 학우들이 모인 공간입니다. 부적절 한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
 - 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
-- 긴급상황 발생 시 [https://www.instagram.com/unive.us/?igshid=MzMyNGUyNmU2YQ%3D%3D] 로 연락주시면 운영자가 달려가 조치하겠습니다.`; 
+- 긴급상황 발생 시 [https://www.instagram.com/unive.us/?igshid=MzMyNGUyNmU2YQ%3D%3D] 로 연락주시면 운영자가 달려가 조치하겠습니다.
+
+즐거우셨다면 유니버스를 평가해 주세요! 큰 도움이 됩니다!!
+[링크]`; 
         const { success1 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[0].phone, content });
         const { success2 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][0].phone, content });
         const { success3 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][1].phone, content });
