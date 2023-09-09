@@ -100,7 +100,7 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
     const writerPhone = User.phone;
 
     const date = dayjs(Post.meeting_date);
-    Post.meeting_date = date.month() + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
+    Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
     if(Post.limit_people == 4){
 
         const participantPhone = participants.phone
