@@ -157,5 +157,6 @@ export const showUserProfile = async(user_id) => {
 
     const changeClassof = Math.floor(showUserProfileResult[0].class_of / 100000 % 100);
     showUserProfileResult[0].class_of = changeClassof + "학번"
+    connection.release();
     return showUserProfileResult[0];
 };
