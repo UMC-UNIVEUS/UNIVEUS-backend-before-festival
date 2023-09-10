@@ -4,8 +4,8 @@ export const baseResponse = {
     SUCCESS : { "isSuccess": true, "code": 1000, "message":"성공" },
 
     //유저 관련 response msg
-    USER_FIRST_NOT_EXIST : { "isSuccess": false, "code": 2000, "message": "첫 번째 유저가 존재하지 않습니다." },
-    USER_SECOND_NOT_EXIST : { "isSuccess": false, "code": 2001, "message": "두 번째 유저가 존재하지 않습니다." },
+    USER_FIRST_NOT_EXIST : { "isSuccess": false, "code": 2000, "message": "초대한 유저 중 첫 번째 유저가 존재하지 않습니다." },
+    USER_SECOND_NOT_EXIST : { "isSuccess": false, "code": 2001, "message": "초대한 유저 중 두 번째 유저가 존재하지 않습니다." },
     USER_USERID_NOT_EXIST : { "isSuccess": false, "code": 2002, "message": "해당 유저가 존재하지 않습니다." },
     SIGNUP_EMAIL_DUPLICATE : {"isSuccess" : false, "code" : 2003, "message" : "이미 존재하는 이메일입니다."},
     SIGNUP_EMAIL_KYONGGI : {"isSuccess" : false, "code" : 2004, "message" : "경기대학교 이메일만 사용 가능합니다."},
@@ -31,7 +31,6 @@ export const baseResponse = {
     THIRD_AGREEMENT_EMPTY : {"isSuccess" : false, "code" : 2024, "message" : "세 번째 약관에 동의하지 않았습니다." },
 
     
-    
     //게시글 관련
     POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3000, "message": "해당 게시글이 존재하지 않습니다." },
     POST_TITLE_LENGTH : { "isSuccess": false, "code": 3001, "message": "제목은 최대 48자리를 입력해주세요." },
@@ -49,6 +48,8 @@ export const baseResponse = {
     POST_PARTICIPATE_ONLY_TWO : { "isSuccess": false, "code": 3016, "message": "제한 인원이 6명일 때는 2명만 초대할 수 있습니다." },
     POST_PARTICIPATE_ALREADY_CLOSE : { "isSuccess": false, "code": 3017, "message": "이미 모집 마감됐습니다." },
     POST_IMAGE_LIMIT: { "isSuccess": false, "code": 3018, "message": "이미지는 최대 4개까지 업로드할 수 있습니다." },
+    POST_GENDER_LIMIT: { "isSuccess": false, "code": 3019, "message": "성별 제한이 있습니다. 확인해 주세요." },
+    POST_PARTICIPANT_NOT_EXIST: { "isSuccess": false, "code": 3020, "message": "초대할 사람이 존재하지 않습니다." },
 
 
 
