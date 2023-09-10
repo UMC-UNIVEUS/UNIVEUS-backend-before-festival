@@ -209,6 +209,7 @@ export const adminUserBlock = async(req, res) => {
     const changeUserReportedNumResult = await increaseUserReportedNum(userId);
 
     if (await getUserReportedNum(userId) >= 3)  {
+        console.log(await getUserReportedNum(userId))
         await changeUserStatus(userId, 0);
     }
     else {

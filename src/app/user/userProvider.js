@@ -1,6 +1,6 @@
 import { selectUser, selectUserByNickname, selectUserIdByEmail, selectAlarms, 
     selectUserById, selectUserNickNameById, selectPhoneByEmail, selectAuthStatusByEmail, 
-    selectUserByNickName, selectUserReportedNum, selectUserAccountStatus } from "./userDao"
+    selectUserByNickName, selectUserReportedNum } from "./userDao"
 
 import pool from "../../../config/database"
 
@@ -86,12 +86,4 @@ export const getUserReportedNum = async(userId) => {
     const [getUserReportedNumResult] = await selectUserReportedNum(connection, userId);
     connection.release();
     return getUserReportedNumResult[0].reported_num;
-}
-
-/** 유저의 account_status 가져오기 */
-export const getUserAccountStatus = async(userEmail) => {
-    const connection = await pool.getConnection(async (conn) => conn);
-    const [getUserAccountStatusResult] = await selectUserAccountStatus(connection, userEmail);
-    connection.release();
-    return getUserAccountStatusResult[0].account_status;
 }
