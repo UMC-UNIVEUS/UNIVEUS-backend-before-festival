@@ -160,10 +160,3 @@ export const selectUserReportedNum = async(connection, userId) => {
     const selectUserReportedNumRow = await connection.query(selectUserReportedNumQuery);
     return selectUserReportedNumRow;
 }
-
-/** 유저의 account_status 조회 */
-export const selectUserAccountStatus = async(connection, userEmail) => {
-    const selectUserAccountStatusQuery = `SELECT account_status FROM user WHERE email_id = '${userEmail}';`;
-    const selectUserAccountStatusRow = await connection.query(selectUserAccountStatusQuery);
-    return selectUserAccountStatusRow;
-}
