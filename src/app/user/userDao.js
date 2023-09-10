@@ -147,3 +147,16 @@ export const updateAccountStatus = async(connection, userId, userStatus) => {
     const updateAccountStatusQuery = `UPDATE user SET account_status = ${userStatus} WHERE user_id = ${userId};`;
     const updateAccountStatusRow = await connection.query(updateAccountStatusQuery);
 }
+
+/** 유저의 reported_num을 증가 */
+export const updateUserReportedNum = async(connection, userId) => {
+    const updateUserReportedNumQuery = `UPDATE user SET reported_num = reported_num + 1 WHERE user_id = ${userId};`;
+    const updateUserReportedNumRow = await connection.query(updateUserReportedNumQuery);
+}
+
+/** 유저의 reported_num 조회 */
+export const selectUserReportedNum = async(connection, userId) => {
+    const selectUserReportedNumQuery = `SELECT reported_num FROM user WHERE user_id = ${userId};`;
+    const selectUserReportedNumRow = await connection.query(selectUserReportedNumQuery);
+    return selectUserReportedNumRow;
+}
