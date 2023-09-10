@@ -81,7 +81,7 @@ export const selectPostbyId = async (connection, post_id) => {
 
 export const selectUserProfilebyId = async (connection, user_id) => {
     const selectUserProfilebyIdQuery = `
-    SELECT profile_img, nickname, class_of
+    SELECT profile_img, nickname, class_of, gender
     FROM user
     WHERE user_id = ? ;`;
 
