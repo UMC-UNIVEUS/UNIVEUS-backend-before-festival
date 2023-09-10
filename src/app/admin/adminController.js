@@ -3,8 +3,9 @@ import { isAdmin, getAllUsersInfo, reportsUser } from "./adminProvider"
 import { changeStatusByAdmin, changeHiddenByAdmin, signUpByAdmin } from "./adminService"
 import { retrievePost } from "../post/postProvider";
 import { createPost, editPost, removePost } from "../post/postService";
-import { changeUserStatus } from "../user/userService";
+import { changeUserStatus, increaseUserReportedNum } from "../user/userService";
 import { changeUserReportStatus } from "../report/reportService";
+import { getUserReportedNum } from "../user/userProvider";
 
 /** 모든 유저 정보 가져오기 */
 export const getUsersInfo = async(req, res) => {
@@ -12,8 +13,6 @@ export const getUsersInfo = async(req, res) => {
     const getAllUsersInfoResult = await getAllUsersInfo();
 
     return res.render('userInfo.ejs', { user : getAllUsersInfoResult });
-
-    // return res.send(response(baseResponse.SUCCESS, getAllUsersInfoResult));
 }
 
 /** 임의 회원가입 */
@@ -27,7 +26,6 @@ export const adminSignUp = async(req, res) => {
 }
 
 /** 신고 유저 확인 */
-// TODO : DAO, servcie 구현
 export const userReports = async(req, res) => {
 
     const userReportsResult = await reportsUser();
@@ -205,11 +203,19 @@ export const adminUserBlock = async(req, res) => {
     const userId = req.params.userId;
     const reportId = req.params.reportId;
 
-    //blockDuration : 7(7일) 30(30일) 0(탈퇴) 1(정상)
-    const changeUserStatusResult = await changeUserStatus(userId, blockDuration);
-
     //reportStatus : 0 확인 전, 1 block 중, 2 신고 처리 완료
     const chageUserReportStatusResult = await changeUserReportStatus(reportId, 1);
+    
+    const changeUserReportedNumResult = await increaseUserReportedNum(userId);
+
+    if (await getUserReportedNum(userId) >= 3)  {
+        console.log(await getUserReportedNum(userId))
+        await changeUserStatus(userId, 0);
+    }
+    else {
+        // blockDuration : 7(7일) 30(30일) 0(탈퇴) 1(정상)
+        await changeUserStatus(userId, blockDuration);
+    }
 
     return res.send(response(baseResponse.SUCCESS));
 };
