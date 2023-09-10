@@ -1,5 +1,5 @@
 import { updateUserProfileInfo, updateAlarms, insertUserEmailId, 
-    updateUserPhoneNumber, insertAgreementTerms } from "./userDao"
+    updateUserPhoneNumber, insertAgreementTerms, updateAccountStatus } from "./userDao"
 import pool from "../../../config/database"
 
 /** 유저 생성 - 프로필 등록, 번호인증 전 user */
@@ -67,3 +67,11 @@ export const addAgreementTerms = async(userId, agreementParams) => {
     connection.release();
 };
 
+/** user의 계정 상태 변경 */
+export const changeUserStatus = async(userId, userStatus) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const userAccountStatus = userStatus;
+    const changeUserStatusResult = await updateAccountStatus(connection, userId, userAccountStatus);
+   
+    connection.release();
+} 

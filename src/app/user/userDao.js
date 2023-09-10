@@ -133,7 +133,6 @@ export const selectAuthStatusByEmail = async(connection, userEmail) => {
 export const insertUser = async (connection, userInfoParams) => {
     const insertUserQuery = `
         INSERT INTO user(nickname, email_id, gender, major, class_of, auth_status, phone) VALUES (?, ?, ?, ?, ?, 1, ?);`;
-
     const insertUserRow = await connection.query(insertUserQuery, userInfoParams);
 };
 
@@ -141,4 +140,10 @@ export const insertUser = async (connection, userInfoParams) => {
 export const insertAgreementTerms = async(connection, userId, agreementParam) => {
     const insertAgreementTermsQuery = `INSERT INTO term_agreement(user_id, term_agreement_name_id, created_at) VALUES(${userId}, ${agreementParam}, now());`;
     const insertAgreementTermsRow = await connection.query(insertAgreementTermsQuery);
+}
+
+/** 유저의 계정 상태 변경 */
+export const updateAccountStatus = async(connection, userId, userStatus) => {
+    const updateAccountStatusQuery = `UPDATE user SET account_status = ${userStatus} WHERE user_id = ${userId};`;
+    const updateAccountStatusRow = await connection.query(updateAccountStatusQuery);
 }
