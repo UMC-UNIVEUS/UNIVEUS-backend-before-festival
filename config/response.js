@@ -31,7 +31,6 @@ export const baseResponse = {
     THIRD_AGREEMENT_EMPTY : {"isSuccess" : false, "code" : 2024, "message" : "세 번째 약관에 동의하지 않았습니다." },
 
     
-    
     //게시글 관련
     POST_POSTID_NOT_EXIST : { "isSuccess": false, "code": 3000, "message": "해당 게시글이 존재하지 않습니다." },
     POST_TITLE_LENGTH : { "isSuccess": false, "code": 3001, "message": "제목은 최대 48자리를 입력해주세요." },
