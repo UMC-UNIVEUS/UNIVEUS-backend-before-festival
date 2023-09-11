@@ -115,7 +115,7 @@ export const updateUserPhoneNumber = async(connection, userPhoneNumber, userId) 
     return updateUserRow;
 }
 
-/** user의 phone 번호 update */
+/** user의 phone 번호 조회 */
 export const selectPhoneByEmail = async(connection, userEmail) => {
     const selectPhoneByEmailQuery = `SELECT phone FROM user WHERE email_id = '${userEmail}';`;
     const selectPhoneByEmailRow = await connection.query(selectPhoneByEmailQuery);
