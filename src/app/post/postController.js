@@ -8,6 +8,7 @@ import { createPost, createPostImage, editPost,editPostImage, removePost, addScr
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
 import {getUserIdByEmail, getUserByNickName, getUserById} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
+import dayjs from 'dayjs';
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -20,8 +21,30 @@ export const getPost = async(req, res) => {
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
 
     const Post = await retrievePost(post_id); 
-    
+ 
     if(Post){ // Post가 존재한다면
+        const date1 = dayjs(Post.meeting_date);
+        const date2 = dayjs(Post.end_date);
+        const meeting_month = date1.month() + 1 + "월" ;
+        const meeting_date = date1.date() + "일" ;
+        const meeting_time = date1.hour() + ":" + date1.minute();
+        const end_month = date2.month() + 1 + "월";
+        const end_date = date2.date() + "일";
+        const end_time = date2.hour() + ":" + date2.minute();
+        delete Post.meeting_date;
+        delete Post.end_date;
+
+        const datetime = {
+            "meeting_month":meeting_month,
+            "meeting_date":meeting_date,
+            "meeting_time":meeting_time,
+            "end_month":end_month,
+            "end_date":end_date,
+            "end_time":end_time,
+        }
+       
+        Object.assign(Post, datetime);
+        
         const Participants = await retrieveParticipant(post_id); 
         const Participant = [];
         const Writer = Participants[0];
@@ -30,6 +53,15 @@ export const getPost = async(req, res) => {
         }
         const PostImages = await retrievePostImages(post_id); 
         const connectedUser = await getUserById(userIdFromJWT);
+        const isParticipate = Participants.find((item) => item.user_id === userIdFromJWT);
+        console.log(isParticipate);
+        if(isParticipate){
+            Object.assign(connectedUser,{"isParticipate":1});
+        }
+        else{
+            Object.assign(connectedUser,{"isParticipate":0});
+        }
+        
         return res.send(response(baseResponse.SUCCESS, {Post,PostImages,connectedUser,Writer,Participant}));
     } 
     else{ 
