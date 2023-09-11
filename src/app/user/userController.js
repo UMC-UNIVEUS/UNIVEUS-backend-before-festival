@@ -346,10 +346,6 @@ export const startUniveUs = async (req, res) => {
 
         const { success } = await sendSMS(naverCloudSensSecret, { to, content });
 
-        if (!success) {
-            return res.send(errResponse(baseResponse.SEND_AUTH_NUMBER_MSG_FAIL));
-        } 
-
         return res.send(response(baseResponse.SUCCESS));
 };
 
