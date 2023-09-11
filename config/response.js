@@ -49,7 +49,7 @@ export const baseResponse = {
     POST_PARTICIPATE_ALREADY_CLOSE : { "isSuccess": false, "code": 3017, "message": "이미 모집 마감됐습니다." },
     POST_IMAGE_LIMIT: { "isSuccess": false, "code": 3018, "message": "이미지는 최대 4개까지 업로드할 수 있습니다." },
     POST_GENDER_LIMIT: { "isSuccess": false, "code": 3019, "message": "성별 제한이 있습니다. 확인해 주세요." },
-    POST_PARTICIPANT_NOT_EXIST: { "isSuccess": false, "code": 3020, "message": "초대할 사람이 존재하지 않습니다." },
+    POST_PARTICIPANT_NOT_EXIST: { "isSuccess": false, "code": 3020, "message": "초대할 유저가 존재하지 않습니다." },
 
 
 
