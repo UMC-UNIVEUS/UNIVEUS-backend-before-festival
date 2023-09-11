@@ -95,3 +95,11 @@ export const getUserAccountStatus = async(userEmail) => {
     connection.release();
     return getUserAccountStatusResult[0].account_status;
 }
+
+/** 유저의 phoneNumber 가져오기 */
+export const getUserPhoneNumber = async(userEmail) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const [getUserPhoneNumberResult] = await selectPhoneByEmail(connection, userEmail);
+    connection.release();
+    return getUserPhoneNumberResult[0].phone;
+}
