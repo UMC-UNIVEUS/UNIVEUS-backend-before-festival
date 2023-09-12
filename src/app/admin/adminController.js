@@ -5,14 +5,17 @@ import { retrievePost } from "../post/postProvider";
 import { createPost, editPost, removePost } from "../post/postService";
 import { changeUserStatus, increaseUserReportedNum } from "../user/userService";
 import { changeUserReportStatus } from "../report/reportService";
-import { getUserReportedNum } from "../user/userProvider";
+import { getUserReportedNum, isUser } from "../user/userProvider";
+import jwt from "jsonwebtoken";
 
 /** 모든 유저 정보 가져오기 */
 export const getUsersInfo = async(req, res) => {
 
     const getAllUsersInfoResult = await getAllUsersInfo();
 
-    return res.render('userInfo.ejs', { user : getAllUsersInfoResult });
+    return res.send(response(baseResponse.SUCCESS, getAllUsersInfoResult));
+
+    // return res.render('userInfo.ejs', { user : getAllUsersInfoResult });
 }
 
 /** 임의 회원가입 */
@@ -30,7 +33,10 @@ export const userReports = async(req, res) => {
 
     const userReportsResult = await reportsUser();
 
-    return res.render('userReports.ejs', { userReports : userReportsResult });
+    
+    return res.send(response(baseResponse.SUCCESS, userReportsResult));
+
+    // return res.render('userReports.ejs', { userReports : userReportsResult });
 }
 
 /** postReports 함수 */
@@ -219,3 +225,23 @@ export const adminUserBlock = async(req, res) => {
     return res.send(response(baseResponse.SUCCESS));
 };
 
+/** 관리자 로그인 기능 수행*/
+export const adminLogin = async(req, res) => {
+    const userEmail = req.body.id;
+    if(await isUser(userEmail)) {
+        if (await isAdmin(userEmail)) {
+            const accessToken = jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' })    
+
+            if(!accessToken) return res.send(errResponse(baseResponse.VERIFIED_ACCESS_TOKEN_EMPTY));
+            return res.send(response(baseResponse.SUCCESS));
+            // return res.send(response(baseResponse.SUCCESS,{ accessToken }));
+        }
+    }
+    
+    return res.send(errResponse(baseResponse.LOGIN_NOT_USER));
+};
+
+/** 관리자 로그인 페이지 랜더링 */
+export const adminLoginPage = async(req, res) => {
+    res.render('login.ejs');
+};
