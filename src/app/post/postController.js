@@ -48,6 +48,9 @@ export const getPost = async(req, res) => {
         const Participants = await retrieveParticipant(post_id); 
         const Participant = [];
         const Writer = Participants[0];
+        console.log(Writer);
+        const changeClassof = Math.floor(Writer.class_of / 100000 % 100);
+        Writer.class_of = changeClassof + "학번"
         for(let i = 1; i < Participants.length; i++){
             Participant.push(Participants[i]);
         }
