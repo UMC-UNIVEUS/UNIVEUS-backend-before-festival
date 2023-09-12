@@ -54,14 +54,14 @@ export const getPost = async(req, res) => {
         const PostImages = await retrievePostImages(post_id); 
         const connectedUser = await getUserById(userIdFromJWT);
         const isParticipate = Participants.find((item) => item.user_id === userIdFromJWT);
-        console.log(isParticipate);
+
         if(isParticipate){
             Object.assign(connectedUser,{"isParticipate":1});
         }
         else{
             Object.assign(connectedUser,{"isParticipate":0});
         }
-        
+
         return res.send(response(baseResponse.SUCCESS, {Post,PostImages,connectedUser,Writer,Participant}));
     } 
     else{ 
@@ -108,14 +108,19 @@ export const postPost = async(req, res) => {
             const participant = await getUserByNickName(invited_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
 
             if(participant){// 초대 받은 유저가 존재할 때
-                const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
-                    end_date, title,images[0], content);
-                if(images != undefined ){
-                    await createPostImage(images,postPostResult.insertId); 
+                if(userIdFromJWT == participant.user_id){
+                    return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));            
                 }
-                await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
-                await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
-                return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공   
+                else{
+                    const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+                        end_date, title,images[0], content);
+                    if(images != undefined ){
+                        await createPostImage(images,postPostResult.insertId); 
+                    }
+                    await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
+                    await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
+                    return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공   
+                }
             }
             else{
                 return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_EXIST));            
@@ -133,16 +138,25 @@ export const postPost = async(req, res) => {
                 const participant2 = await getUserByNickName(invited_userNickNames[1]); 
 
                 if(participant2){
-                    const participants = [participant1, participant2]
-                    const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
-                        end_date, title,images[0], content);
-                    if(images != undefined ){
-                        await createPostImage(images,postPostResult.insertId);
+                    if(userIdFromJWT == participant1.user_id || userIdFromJWT == participant2.user_id){
+                        return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));            
                     }
-                    await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
-                    await inviteOneParticipant(postPostResult.insertId, participant1.user_id, userIdFromJWT);
-                    await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
-                    return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
+                    else if(participant1.user_id == participant2.user_id){
+                        return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_OVERLAP));
+                    }
+                    else{
+                        const participants = [participant1, participant2]
+                        const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+                            end_date, title,images[0], content);
+                        if(images != undefined ){
+                            await createPostImage(images,postPostResult.insertId);
+                        }
+                        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
+                        await inviteOneParticipant(postPostResult.insertId, participant1.user_id, userIdFromJWT);
+                        await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
+                        return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
+                    }
+                    
                 }
                 else{
                     return res.send(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
@@ -447,30 +461,35 @@ export const participateUniveus = async(req, res) => {
         if(Post.limit_people == 4){
             const guest = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
             if(guest){
-                const isParticipate = (participant_userIDsFromDB.includes(userIdFromJWT) || participant_userIDsFromDB.includes(guest.user_id));
-
-                if(isParticipate){ // 이미 참여한 유저가 있다면
-                    return res.send(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
+                if(Invitee.user_id == guest.user_id){
+                    return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));
                 }
-                else{ // 처음 참여하는 유저라면
-                    if(Post.limit_people <= Post.current_people){ // 모집 마감이라면
-                        return res.send(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
+                else{
+                    const isParticipate = (participant_userIDsFromDB.includes(userIdFromJWT) || participant_userIDsFromDB.includes(guest.user_id));
+
+                    if(isParticipate){ // 이미 참여한 유저가 있다면
+                        return res.send(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
                     }
-                    else{// 정상적인 참여
-                        const genderLimit = (Post.limit_gender == 0 || (Post.limit_gender == Invitee.gender && Post.limit_gender == guest.gender));
-                        if(genderLimit){
-                            const alreadyParticipant = await getUserById(participant_userIDsFromDB[1]); 
-                            await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
-                            await applyUniveus(post_id, guest.user_id); // 초대받은 사람 참여
-                            await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
-                            const MessageAlarmList = [Writer, [alreadyParticipant], Invitee, [guest]];
-                            //await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
-                            return res.send(response(baseResponse.SUCCESS));
+                    else{ // 처음 참여하는 유저라면
+                        if(Post.limit_people <= Post.current_people){ // 모집 마감이라면
+                            return res.send(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
                         }
-                        else{
-                            return res.send(errResponse(baseResponse.POST_GENDER_LIMIT));
-                        }
-                    }  
+                        else{// 정상적인 참여
+                            const genderLimit = (Post.limit_gender == 0 || (Post.limit_gender == Invitee.gender && Post.limit_gender == guest.gender));
+                            if(genderLimit){
+                                const alreadyParticipant = await getUserById(participant_userIDsFromDB[1]); 
+                                await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
+                                await applyUniveus(post_id, guest.user_id); // 초대받은 사람 참여
+                                await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
+                                const MessageAlarmList = [Writer, [alreadyParticipant], Invitee, [guest]];
+                                await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
+                                return res.send(response(baseResponse.SUCCESS));
+                            }
+                            else{
+                                return res.send(errResponse(baseResponse.POST_GENDER_LIMIT));
+                            }
+                        }  
+                    }
                 }
             }
             else{
@@ -479,37 +498,44 @@ export const participateUniveus = async(req, res) => {
         }
         else if(Post.limit_people == 6){
             const guest1 = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
-            
             if(guest1){
                 const guest2 = await getUserByNickName(invited_userNickNamesFromAPI[1]); 
                 
                 if(guest2){
-                    const isParticipate = (participant_userIDsFromDB.includes(userIdFromJWT) || participant_userIDsFromDB.includes(guest1.user_id) || participant_userIDsFromDB.includes(guest2.user_id));
-                    
-                    if(isParticipate){ // 이미 참여한 유저가 있다면
-                        return res.send(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
+                    if(Invitee.user_id == guest1.user_id || Invitee.user_id == guest2.user_id){
+                        return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));
                     }
-                    else{ 
-                        if(Post.limit_people <= Post.current_people){ // 모집 마감이라면
-                            return res.send(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
+                    else if(guest1.user_id == guest2.user_id){
+                        return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_OVERLAP));
+                    }
+                    else{
+                        const isParticipate = (participant_userIDsFromDB.includes(userIdFromJWT) || participant_userIDsFromDB.includes(guest1.user_id) || participant_userIDsFromDB.includes(guest2.user_id));
+                    
+                        if(isParticipate){ // 이미 참여한 유저가 있다면
+                            return res.send(errResponse(baseResponse.POST_PARTICIPATION_OVERLAP));
                         }
-                        else{// 정상적인 참여
-                            const genderLimit = (Post.limit_gender == 0 || (Post.limit_gender == Invitee.gender && Post.limit_gender == guest1.gender && Post.limit_gender == guest2.gender))
-                            if(genderLimit){
-                                const alreadyParticipant1 = await getUserById(participant_userIDsFromDB[1]); 
-                                const alreadyParticipant2 = await getUserById(participant_userIDsFromDB[2]); 
-                                await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
-                                await applyUniveus(post_id, guest1.user_id); // 초대받은 사람 참여
-                                await applyUniveus(post_id, guest2.user_id); // 초대받은 사람 참여
-                                await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
-                                const MessageAlarmList = [Writer, [alreadyParticipant1, alreadyParticipant2], Invitee, [guest1, guest2]];
-                                // await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
-                                return res.send(response(baseResponse.SUCCESS));
+                        else{ 
+                            if(Post.limit_people <= Post.current_people){ // 모집 마감이라면
+                                return res.send(errResponse(baseResponse.POST_PARTICIPATION_CLOSE));
                             }
-                            else{
-                                return res.send(errResponse(baseResponse.POST_GENDER_LIMIT));
-                            }
-                        }  
+                            else{// 정상적인 참여
+                                const genderLimit = (Post.limit_gender == 0 || (Post.limit_gender == Invitee.gender && Post.limit_gender == guest1.gender && Post.limit_gender == guest2.gender))
+                                if(genderLimit){
+                                    const alreadyParticipant1 = await getUserById(participant_userIDsFromDB[1]); 
+                                    const alreadyParticipant2 = await getUserById(participant_userIDsFromDB[2]); 
+                                    await applyUniveus(post_id, userIdFromJWT); // 초대자 참여
+                                    await applyUniveus(post_id, guest1.user_id); // 초대받은 사람 참여
+                                    await applyUniveus(post_id, guest2.user_id); // 초대받은 사람 참여
+                                    await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
+                                    const MessageAlarmList = [Writer, [alreadyParticipant1, alreadyParticipant2], Invitee, [guest1, guest2]];
+                                    await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
+                                    return res.send(response(baseResponse.SUCCESS));
+                                }
+                                else{
+                                    return res.send(errResponse(baseResponse.POST_GENDER_LIMIT));
+                                }
+                            }  
+                        }
                     }
                 }
                 else{

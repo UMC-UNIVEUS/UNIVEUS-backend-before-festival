@@ -50,6 +50,8 @@ export const baseResponse = {
     POST_IMAGE_LIMIT: { "isSuccess": false, "code": 3018, "message": "이미지는 최대 4개까지 업로드할 수 있습니다." },
     POST_GENDER_LIMIT: { "isSuccess": false, "code": 3019, "message": "성별 제한이 있습니다. 확인해 주세요." },
     POST_PARTICIPANT_NOT_EXIST: { "isSuccess": false, "code": 3020, "message": "초대할 유저가 존재하지 않습니다." },
+    POST_PARTICIPANT_INVITEE_OVERLAP: { "isSuccess": false, "code": 3021, "message": "초대자와 초대할 유저가 일치합니다." },
+    POST_PARTICIPANT_NOT_OVERLAP: { "isSuccess": false, "code": 3022, "message": "초대할 유저들이 중복입니다." },
 
 
 
