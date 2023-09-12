@@ -25,12 +25,12 @@ export const getPost = async(req, res) => {
     if(Post){ // Post가 존재한다면
         const date1 = dayjs(Post.meeting_date);
         const date2 = dayjs(Post.end_date);
-        const meeting_month = date1.month() + 1 + "월" ;
-        const meeting_date = date1.date() + "일" ;
-        const meeting_time = date1.hour() + ":" + date1.minute();
-        const end_month = date2.month() + 1 + "월";
-        const end_date = date2.date() + "일";
-        const end_time = date2.hour() + ":" + date2.minute();
+        const meeting_month = date1.month() < 9 ?  "0" + (date1.month() + 1) : ""+(date1.month() + 1);
+        const meeting_date = date1.date() < 10 ?  "0" + date1.date() : ""+date1.date();
+        const meeting_time = (date1.hour() < 10 ?  "0" + date1.hour() : ""+date1.hour()) + ":" + (date1.minute() < 10 ? "0" + date1.minute() : ""+date1.minute());
+        const end_month = date2.month() < 10 ? "0" + (date2.month() + 1)  : ""+(date2.month() + 1);
+        const end_date = date2.date() < 10 ? "0" + date2.date() : ""+date2.date();
+        const end_time = (date2.hour() < 10 ? "0" + date2.hour() : ""+date2.hour()) + ":" + (date2.minute() < 10 ? "0" + date2.minute() : ""+date2.minute());
         delete Post.meeting_date;
         delete Post.end_date;
 
