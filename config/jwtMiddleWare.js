@@ -7,7 +7,8 @@ export const jwtMiddleware = (req, res, next) =>{
     /** 헤더에서 토큰 추출 */
     const token = req.headers['x-access-token']
 
-
+    console.log(req.headers);
+    console.log(req.headers['x-access-token'])
     console.log("토큰 존재 확인 : " + token);
 
     // token does not exist
