@@ -1,14 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList} from "./postProvider";
+import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate} from "./postProvider";
 import { createPost, createPostImage, editPost,editPostImage, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
 import {getUserIdByEmail, getUserByNickName, getUserById} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
-import dayjs from 'dayjs';
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -23,31 +22,9 @@ export const getPost = async(req, res) => {
     const Post = await retrievePost(post_id); 
  
     if(Post){ // Post가 존재한다면
-        const date1 = dayjs(Post.meeting_date);
-        const date2 = dayjs(Post.end_date);
-        const meeting_year = date1.year();
-        const meeting_month = date1.month() < 9 ?  "0" + (date1.month() + 1) : ""+(date1.month() + 1);
-        const meeting_date = date1.date() < 10 ?  "0" + date1.date() : ""+date1.date();
-        const meeting_time = (date1.hour() < 10 ?  "0" + date1.hour() : ""+date1.hour()) + ":" + (date1.minute() < 10 ? "0" + date1.minute() : ""+date1.minute());
-        const end_year = date2.year();
-        const end_month = date2.month() < 10 ? "0" + (date2.month() + 1)  : ""+(date2.month() + 1);
-        const end_date = date2.date() < 10 ? "0" + date2.date() : ""+date2.date();
-        const end_time = (date2.hour() < 10 ? "0" + date2.hour() : ""+date2.hour()) + ":" + (date2.minute() < 10 ? "0" + date2.minute() : ""+date2.minute());
-        delete Post.meeting_date;
-        delete Post.end_date;
 
-        const datetime = {
-            "meeting_year": meeting_year,
-            "meeting_month":meeting_month,
-            "meeting_date":meeting_date,
-            "meeting_time":meeting_time,
-            "end_year":end_year,
-            "end_month":end_month,
-            "end_date":end_date,
-            "end_time":end_time,
-        }
-       
-        Object.assign(Post, datetime);
+        formatingMeetingDate(Post);
+        formatingEndDate(Post);
         
         const Participants = await retrieveParticipant(post_id); 
         const Participant = [];

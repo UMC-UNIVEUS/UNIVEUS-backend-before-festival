@@ -8,7 +8,7 @@ import {
     findTitle$
 } from "./mainDao"
 import pool from "../../../config/database";
-import dayjs from 'dayjs';
+import { formatingMeetingDate } from "../post/postProvider";
 
 /** postListPage 계산 - 업데이트용 */
 // export const getPostList = async (categoryType, sortedType, page, size) => {
@@ -44,8 +44,7 @@ export const getPostPage = async (getPostParams, sortedType) => {
         connection.release();
          for(let i  = 0; i < getPostResult.length; i++) {
             if(getPostResult[i].meeting_date) {
-                const datevalue = dayjs(getPostResult[i].meeting_date);
-                getPostResult[i].meeting_date = datevalue.month() + 1 + "월 " + datevalue.date() + "일 " + datevalue.hour() + ":" + datevalue.minute();
+                formatingMeetingDate(getPostResult[i]);
             }
         }
         return getPostResult;
@@ -55,8 +54,7 @@ export const getPostPage = async (getPostParams, sortedType) => {
         connection.release();
         for(let i  = 0; i < getPostResult.length; i++) {
             if(getPostResult[i].meeting_date) {
-                const datevalue = dayjs(getPostResult[i].meeting_date);
-                getPostResult[i].meeting_date = datevalue.month() + 1 + "월 " + datevalue.date() + "일 " + datevalue.hour() + ":" + datevalue.minute();
+                formatingMeetingDate(getPostResult[i]);
             }
         }
         return getPostResult;
@@ -76,8 +74,7 @@ export const searchPosts = async (keywordParam) => {
     const getSearchPosts = await findTitle$(connection, keywordParam);
     for(let i  = 0; i < getSearchPosts.length; i++) {
         if(getSearchPosts[i].meeting_date) {
-            const datevalue = dayjs(getSearchPosts[i].meeting_date);
-            getSearchPosts[i].meeting_date = datevalue.month() + 1 + "월 " + datevalue.date() + "일 " + datevalue.hour() + ":" + datevalue.minute();
+            formatingMeetingDate(getSearchPosts[i]);
         }
     }
     return getSearchPosts;
