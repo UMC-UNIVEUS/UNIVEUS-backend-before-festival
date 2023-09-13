@@ -307,7 +307,7 @@ export const checkNickNameDuplicate = async (req, res) => {
 /**유니버스 시작하기 API */
 export const startUniveUs = async (req, res) => {
 
-    cosole.log("시작하기 토큰 : " + req.verifiedToken);
+    console.log("시작하기 토큰 : " + req.verifiedToken);
 
         if (typeof req.body.nickname == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
 
@@ -396,7 +396,7 @@ export const patchAlarms = async(req, res) => {
 // TODO: DAO, SERVICE 구현
 export const agreementTerms = async(req, res) => {
 
-    cosole.log("동의하기 토큰 : " + req.verifiedToken);
+    console.log("동의하기 토큰 : " + req.verifiedToken);
 
     const userEmail = req.verifiedToken.userEmail;
     const userId = await getUserIdByEmail(userEmail);
