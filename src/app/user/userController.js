@@ -33,7 +33,7 @@ export const login = async(req, res) => {
         return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
     }
 
-    const accessToken = jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' })    
+    const accessToken = jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '7days', issuer : 'univeus' })    
 
     if(!accessToken) return res.send(errResponse(baseResponse.VERIFIED_ACCESS_TOKEN_EMPTY));
     
@@ -60,6 +60,7 @@ export const login = async(req, res) => {
 /** 인증번호 문자 전송 API */
 export const sendAuthNumber = async(req, res) => {
     const to = req.body.phoneNumber;
+    cache.del(to);
     const sendAuth = createAuthNum();
     const content = `[UNIVEUS] 인증번호는 "${sendAuth}"입니다.`;
     const { success } = await sendSMS(naverCloudSensSecret, { to, content });
@@ -260,9 +261,9 @@ export const sendCancelMessageAlarm = async(user_id,userIdFromJWT) =>{ // 알림
     const content = `[UNIVEUS] 유니버스에 참여했던 '${userNickName}'님이/가 참여 취소하였습니다.`;
 
 
-    // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    //if (!success) { return false} 
-    //else { return true}
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
 };
 
 /** 유저 신고 관련 알림 (to 관리자) */
@@ -271,9 +272,9 @@ export const sendUserReportAlarm = async(reportedBy,reportedUser) =>{
     const to = "01092185178"; // 일단 내번호로....
     const content = `[UNIVEUS 유저 신고] user_id = '${reportedBy}' >> user_id = '${reportedUser}'을 신고했습니다.`;
 
-    //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    //if (!success) { return false} 
-    //else { return true}
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
 };
 
 /** 게시글 신고 관련 알림 (to 관리자) */
@@ -282,9 +283,9 @@ export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{
     const to = "01092185178"; // 일단 내번호로....
     const content = `[UNIVEUS 게시글 신고] user_id = '${reportedBy}' >> post_id = '${reportedPost}'을 신고했습니다.`;
 
-    //const { success } = await sendSMS(naverCloudSensSecret, { to, content });
-    // if (!success) { return false} 
-    // else { return true}
+    const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+    if (!success) { return false} 
+    else { return true}
 };
 
 
@@ -299,9 +300,6 @@ export const checkNickNameDuplicate = async (req, res) => {
         else {
             return res.send(response(baseResponse.SUCCESS));
         }
-    // } catch(err) {
-    //     res.send(errResponse(baseResponse.SERVER_ERROR));
-    // }
 }
 
 /**유니버스 시작하기 API */
