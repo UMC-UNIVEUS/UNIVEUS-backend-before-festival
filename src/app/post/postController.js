@@ -43,15 +43,14 @@ export const getPost = async(req, res) => {
 
         if(isParticipateThisPost){
             Object.assign(connectedUser,{"isParticipateThisPost":1});
+            Object.assign(connectedUser,{"isParticipateOtherPost":0});
+        }
+        else if(isParticipateOtherPost){
+            Object.assign(connectedUser,{"isParticipateOtherPost":1});
+            Object.assign(connectedUser,{"isParticipateThisPost":0});
         }
         else{
             Object.assign(connectedUser,{"isParticipateThisPost":0});
-        }
-
-        if(isParticipateOtherPost){
-            Object.assign(connectedUser,{"isParticipateOtherPost":1});
-        }
-        else{
             Object.assign(connectedUser,{"isParticipateOtherPost":0});
         }
 
