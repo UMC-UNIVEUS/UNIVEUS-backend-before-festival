@@ -61,6 +61,24 @@ export const insertPostImages = async(connection, insertPostImagesParams)=>{// �
     }
 };
 
+export const updatePostImages = async(connection, updatePostImagesParams)=>{// 게시글 이미지 수정
+    const deletePostImageQuery = `
+        DELETE FROM post_img
+        WHERE post_id = ?;
+    `;
+
+    const postPostImagesQuery = `
+    INSERT INTO post_img(img_url, post_id) 
+    VALUES (?,?);
+    `;
+    
+    const deletePostImageRow = await connection.query(deletePostImageQuery, [updatePostImagesParams[1]]);
+
+    for(var i =0; i<updatePostImagesParams[0].length ;i++){
+        const updatePostImagesRow = await connection.query(postPostImagesQuery, [updatePostImagesParams[0][i],updatePostImagesParams[1]]);
+    }
+};
+
 export const updatePost = async(connection, updatePostParams)=>{// 게시글 수정
     const patchPostQuery = `
         UPDATE post 
@@ -72,20 +90,12 @@ export const updatePost = async(connection, updatePostParams)=>{// 게시글 수
         openchat =?, 
         end_date =?, 
         title =?,
+        main_img =?,
         content =?,
         updated_at = now()
         WHERE post_id =?;
     `;
     const updatePostRow = await connection.query(patchPostQuery, updatePostParams);
-};
-
-export const updatePostImage = async(connection, updatePostImageParams)=>{// 게시글 이미지 수정
-    const patchPostImageQuery = `
-        UPDATE post_img 
-        SET image = ?
-        WHERE post_id =?;
-    `;
-    const updatePostRow = await connection.query(patchPostImageQuery, updatePostImageParams);
 };
 
 export const erasePost = async(connection, post_id)=>{// 게시글 삭제

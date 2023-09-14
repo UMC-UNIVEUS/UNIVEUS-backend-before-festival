@@ -78,6 +78,16 @@ export const selectUserById = async(connection,user_id) => {// id로 유저 전�
     return UserByIdRow[0];
 };
 
+export const selectIsParticipateOtherById = async(connection,user_id) => {// id로 다른 게시글에 참여했는지 
+    const selectIsParticipateOtherByIdQuery = `
+        SELECT *
+        FROM participant_users
+        WHERE user_id = ?;
+    `;
+    const [IsParticipateOtherByIdRow] = await connection.query(selectIsParticipateOtherByIdQuery,user_id);
+    return IsParticipateOtherByIdRow[0];
+};
+
 export const selectUserByNickName = async(connection,nickname) => {// 닉네임으로 유저 전체 조회
     const selectUserByNickNameQuery = `
         SELECT *

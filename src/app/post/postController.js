@@ -2,11 +2,11 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate} from "./postProvider";
-import { createPost, createPostImage, editPost,editPostImage, removePost, addScrap, addLike, 
+import { createPost, createPostImage, editPost,patchPostImage, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus } from "./postService";
-import {getUserIdByEmail, getUserByNickName, getUserById} from "../user/userProvider";
+import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 
 /**
@@ -29,21 +29,30 @@ export const getPost = async(req, res) => {
         const Participants = await retrieveParticipant(post_id); 
         const Participant = [];
         const Writer = Participants[0];
-        console.log(Writer);
+
         const changeClassof = Math.floor(Writer.class_of / 100000 % 100);
-        Writer.class_of = changeClassof + "학번"
+        Writer.class_of = changeClassof + "학번";
         for(let i = 1; i < Participants.length; i++){
             Participant.push(Participants[i]);
         }
         const PostImages = await retrievePostImages(post_id); 
         const connectedUser = await getUserById(userIdFromJWT);
-        const isParticipate = Participants.find((item) => item.user_id === userIdFromJWT);
+        const isParticipateThisPost = Participants.find((item) => item.user_id === userIdFromJWT);
+        const isParticipateOtherPost = await getIsParticipateOtherById(userIdFromJWT);
+        console.log(isParticipateOtherPost);
 
-        if(isParticipate){
-            Object.assign(connectedUser,{"isParticipate":1});
+        if(isParticipateThisPost){
+            Object.assign(connectedUser,{"isParticipateThisPost":1});
         }
         else{
-            Object.assign(connectedUser,{"isParticipate":0});
+            Object.assign(connectedUser,{"isParticipateThisPost":0});
+        }
+
+        if(isParticipateOtherPost){
+            Object.assign(connectedUser,{"isParticipateOtherPost":1});
+        }
+        else{
+            Object.assign(connectedUser,{"isParticipateOtherPost":0});
         }
 
         return res.send(response(baseResponse.SUCCESS, {Post,PostImages,connectedUser,Writer,Participant}));
@@ -65,9 +74,11 @@ export const postPost = async(req, res) => {
         end_date, title, content,invited_userNickNames]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
-
-    if(notUndefined.includes(undefined)){// 축제용 조건문 
-        return res.send(errResponse(baseResponse.POST_INFORMATION_EMPTY));
+    
+    for(let i = 0; i < notUndefined.length; i++){
+        if(notUndefined[i] == null){
+            return res.send(errResponse(baseResponse.POST_INFORMATION_EMPTY));
+        } 
     }
     if(category != 4){ // 축제용 조건문
         return res.send(errResponse(baseResponse.POST_CATEGORY_LIMIT));
@@ -84,7 +95,7 @@ export const postPost = async(req, res) => {
     if(content.length > 500){ // 축제용 조건문
         return res.send(errResponse(baseResponse.POST_CONTENT_LENGTH));
     }
-    if( invited_userNickNames.length == 0){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때 >> 이 부분 프론트에서 넘겨주는 방식에 따라 다르게 고쳐야 함
+    if( invited_userNickNames.length == 0){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때
         return res.send(errResponse(baseResponse.POST_INVITE_EMPTY)); 
     }
     if(limit_people == 4){ // 축제용 조건문
@@ -140,7 +151,6 @@ export const postPost = async(req, res) => {
                         await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
                         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
                     }
-                    
                 }
                 else{
                     return res.send(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
@@ -173,8 +183,10 @@ export const patchPost =  async(req, res) => {
     if(user_id == userIdFromJWT){  //접속한 유저가 작성자라면
         const Post = await retrievePost(post_id); 
         if(Post){
-            if(notUndefined.includes(undefined)){// 축제용 조건문 
-                return res.send(errResponse(baseResponse.POST_INFORMATION_EMPTY));
+            for(let i = 0; i < notUndefined.length; i++){
+                if(notUndefined[i] == null){ // 
+                    return res.send(errResponse(baseResponse.POST_INFORMATION_EMPTY));
+                } 
             }
             if(category != 4){ // 축제용 조건문
                 return res.send(errResponse(baseResponse.POST_CATEGORY_LIMIT));
@@ -192,10 +204,11 @@ export const patchPost =  async(req, res) => {
                 return res.send(errResponse(baseResponse.POST_CONTENT_LENGTH));
             }
             const patchPostResult = await editPost(category, limit_gender,limit_people, location, meeting_date, openchat, 
-                end_date, title,content, post_id);   
-            // if(images != undefined ){
-            //     await editPostImage(images,post_id);
-            // } 이미지 수정은 보류.... 너무 헷갈림
+                end_date, title,images[0], content, post_id);   
+  
+            if(images != undefined ){
+                await patchPostImage(images,post_id); 
+            }
             return res.send(response(baseResponse.SUCCESS, patchPostResult));
         } 
         else{ 
