@@ -13,8 +13,7 @@ postRouter.post('/', jwtMiddleware, wrapAsync(postPost)); // 게시글 작성 AP
 postRouter.post('/image/upload',
     jwtMiddleware,
     uploadImage.array('image', 4),
-    wrapAsync(postImage)
-);
+    wrapAsync(postImage));
 postRouter.patch('/:post_id', jwtMiddleware, wrapAsync(patchPost)); // 게시글 수정 API
 postRouter.delete('/:post_id', jwtMiddleware, wrapAsync(deletePost)); // 게시글 삭제 API
 postRouter.patch('/:post_id/scrap', jwtMiddleware, wrapAsync(patchScrap)); // 게시글 스크랩 API
