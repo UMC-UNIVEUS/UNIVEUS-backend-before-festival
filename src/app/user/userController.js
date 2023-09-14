@@ -3,7 +3,8 @@ import axios from "axios";
 import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
     createUser, addUserPhoneNumber, addAgreementTerms } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
-    getUserNickNameById, isAuthNumber, isAuthUser, getUserById, getUserPhoneNumber } from "./userProvider";
+    getUserNickNameById, isAuthNumber, isAuthUser, 
+    getUserById, getUserPhoneNumber, removeEmojis } from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/naverCloudClient";
@@ -60,6 +61,12 @@ export const login = async(req, res) => {
 /** 인증번호 문자 전송 API */
 export const sendAuthNumber = async(req, res) => {
     const to = req.body.phoneNumber;
+    console.log(to);
+    if (typeof to == "undefined") {
+        return res.send(errResponse(baseResponse.VERIFY_PHONE_EMPTY));
+    }
+
+    
     cache.del(to);
     const sendAuth = createAuthNum();
     const content = `[UNIVEUS] 인증번호는 "${sendAuth}"입니다.`;
@@ -77,8 +84,23 @@ export const sendAuthNumber = async(req, res) => {
 
 /** 인증번호 검증 API */
 export const verifyNumber = async(req, res) => {
+    
+    if(await getUserPhoneNumber(req.verifiedToken.userEmail) !== "") {
+        return res.send(errResponse(baseResponse.ALREADY_AUTH_NUMBER))  
+    }   
+
     const userPhone = req.body.phoneNumber;
     const userAuthNumber = req.body.number;
+
+    if (userPhone == "") {
+        return res.send(errResponse(baseResponse.VERIFY_PHONE_EMPTY));
+    }
+
+    if (userAuthNumber == "") {
+        return res.send(errResponse(baseResponse.VERIFY_NUMBER_EMPTY));
+    }
+
+
     const authNumber = cache.get(userPhone);
 
     if (authNumber == userAuthNumber) {
@@ -292,8 +314,8 @@ export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{
 
 /** 닉네임 중복 체크 API */
 export const checkNickNameDuplicate = async (req, res) => {
-    const nickname = req.body.nickname;
-    // try {
+    console.log(req.body.nickname);
+    const nickname = removeEmojis(req.body.nickname);
         if (await isNicknameDuplicate(nickname)){
              return res.send(errResponse(baseResponse.NICK_NAME_DUPLICATE));
         }
@@ -305,8 +327,6 @@ export const checkNickNameDuplicate = async (req, res) => {
 /**유니버스 시작하기 API */
 export const startUniveUs = async (req, res) => {
 
-    console.log("시작하기 토큰 : " + req.verifiedToken);
-
         if (typeof req.body.nickname == "undefined") return res.send(errResponse(baseResponse.SIGNUP_NICKNAME_EMPTY));
 
         if (typeof req.body.gender == "undefined") return res.send(errResponse(baseResponse.SIGNUP_GENDER_EMPTY));
@@ -317,7 +337,14 @@ export const startUniveUs = async (req, res) => {
             
 
         const userEmail = req.verifiedToken.userEmail;
-        const userInfo = { userInfo : req.body, userEmail : userEmail };
+
+        const userInfo = {
+            nickname : removeEmojis(req.body.nickname),
+            gender: req.body.gender,
+            major : req.body.major,
+            studentId : req.body.studentId,
+            userEmail : userEmail
+        };
 
 
         if (isKyonggiEmail(userEmail) == false)  return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
@@ -328,7 +355,7 @@ export const startUniveUs = async (req, res) => {
 
         const content = `
 [UNIVEUS] 
-안녕하세요. ${req.body.nickname} 학우 님! 유니버스에 오신것을 환영합니다 :)
+안녕하세요. ${userInfo.nickname} 학우 님! 유니버스에 오신것을 환영합니다 :)
 
 문의사항 : https://www.instagram.com/unive.us 
 

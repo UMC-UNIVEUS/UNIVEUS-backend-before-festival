@@ -31,6 +31,7 @@ export const baseResponse = {
     THIRD_AGREEMENT_EMPTY : {"isSuccess" : false, "code" : 2024, "message" : "세 번째 약관에 동의하지 않았습니다." },
     USERS_ACCOUNT_WITHDRAW : {"isSuccess" : false, "code" : 2025, "message" : "탈퇴한 회원입니다." },
     USERS_ACCOUNT_BLOCKED : {"isSuccess" : false, "code" : 2026, "message" : "정지된 계정입니다." },
+    ALREADY_AUTH_NUMBER : {"isSuccess" : false, "code" : 2027, "message" : "이미 인증을 완료하였습니다" },
 
     
     //게시글 관련
