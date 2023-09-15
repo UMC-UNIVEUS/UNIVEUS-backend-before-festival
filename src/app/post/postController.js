@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate} from "./postProvider";
+import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate, formatingCreatedAt} from "./postProvider";
 import { createPost, createPostImage, editPost,patchPostImage, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
@@ -25,6 +25,7 @@ export const getPost = async(req, res) => {
 
         formatingMeetingDate(Post);
         formatingEndDate(Post);
+        formatingCreatedAt(Post);
         
         const Participants = await retrieveParticipant(post_id); 
         const Participant = [];
