@@ -336,6 +336,9 @@ export const startUniveUs = async (req, res) => {
 
         if (typeof req.body.studentId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));   
 
+        const userEmail = req.verifiedToken.userEmail;
+
+
         const userInfo = {
             nickname : removeEmojisAndSpace(req.body.nickname),
             gender: req.body.gender,
