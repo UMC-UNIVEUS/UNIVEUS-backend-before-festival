@@ -25,7 +25,7 @@ export const baseResponse = {
     USER_USER_NICKNAME_LENGTH : { "isSuccess": false, "code": 2018, "message": "닉네임 길이 제한을 초과하였습니다." },
     LOGIN_NOT_AUTH_NUMBER : {"isSuccess" : false, "code" : 2019, "message" : "번호인증이 필요합니다. 번호인증 페이지로 리다이렉트 됩니다." },
     LOGIN_NOT_AUTH_COMPLETE_USER : {"isSuccess" : false, "code" : 2020, "message" : "본인인증을 완료한 유저가 아닙니다. 해당 페이지로 리다이렉트 됩니다." },
-    NOT_ADMIN :{"isSuccess" : false, "code" : 2021, "message" : "관리자가 아닙니다." },
+    NOT_ADMIN :{"isSuccess" : false, "code" : 2021, "message" : "축제 때 사용해 보시라우.ᐟ" },
     FIRST_AGREEMENT_EMPTY : {"isSuccess" : false, "code" : 2022, "message" : "첫 번째 약관에 동의하지 않았습니다." },
     SECOND_AGREEMENT_EMPTY : {"isSuccess" : false, "code" : 2023, "message" : "두 번째 약관에 동의하지 않았습니다." },
     THIRD_AGREEMENT_EMPTY : {"isSuccess" : false, "code" : 2024, "message" : "세 번째 약관에 동의하지 않았습니다." },
