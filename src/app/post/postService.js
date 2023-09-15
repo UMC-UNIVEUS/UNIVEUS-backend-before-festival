@@ -5,7 +5,7 @@ import pool from "../../../config/database";
 import { insertPost, insertPostImages, updatePost, updatePostImages, erasePost, insertScrap, insertLike,
      insertParticipant, updateParticipant,deleteParticipant, insertUniveus, 
      addParticipant,blockUniveus, switchPostStatus, eraseParticipant,
-     updateStatus } from "./postDao";
+     updateStatus, updateCurrentPeople } from "./postDao";
 
 export const createPost = async(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
     end_date, title, main_img, content) =>{
@@ -152,3 +152,10 @@ export const removeParticipant = async(post_id, userIdFromJWT, user_id) =>{// ê²
     const eraseParticipantResult = await eraseParticipant(connection,removeParticipantParams);
     connection.release();
 }; 
+
+export const changeCurrentPeople = async(current_people, post_id) => {
+
+    const connection = await pool.getConnection(async conn => conn);
+    const updateCurrentPeopleResult = await updateCurrentPeople(connection, current_people, post_id);
+    connection.release();
+}

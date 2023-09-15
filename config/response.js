@@ -42,7 +42,7 @@ export const baseResponse = {
     POST_CATEGORY_LIMIT : { "isSuccess": false, "code": 3004, "message": "축제 기간에는 '축제' 카테고리만 가능합니다." },
     POST_INFORMATION_EMPTY : { "isSuccess": false, "code": 3005, "message": "미입력된 항목이 있습니다." },
     POST_CONTENT_LENGTH : { "isSuccess": false, "code": 3006, "message": "소개글은 최대 500자리를 입력해주세요." },
-    POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "아무도 초대하지 않았습니다." },
+    POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "친구를 초대하지 않았습니다." },
     POST_PARTICIPATION_CLOSE : { "isSuccess": false, "code": 3008, "message": "모집이 마감되었습니다." },
     POST_PARTICIPATION_OVERLAP : { "isSuccess": false, "code": 3009, "message": "이미 참여한 유저가 존재합니다." },
     POST_PARTICIPATION_NOT_MATCH : { "isSuccess": false, "code": 3011, "message": "참여를 하지 않았으므로 참여 취소를 할 수 없습니다." },
