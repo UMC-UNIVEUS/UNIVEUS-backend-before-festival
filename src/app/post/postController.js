@@ -454,14 +454,15 @@ export const participateUniveus = async(req, res) => {
     const {participant_userIDsFromDB, invited_userNickNamesFromAPI} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID)
-
-    console.log(req.body)
     
     const Post = await retrievePost(post_id); 
     const Writer = await getUserById(writer_id); 
     const Invitee = await getUserById(userIdFromJWT); 
 
     if(Post){ // Post가 존재한다면 
+
+        if (invited_userNickNamesFromAPI.length == 0) return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+
         if(Post.limit_people == 4){
             const guest = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
             if(guest){
