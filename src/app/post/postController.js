@@ -459,6 +459,8 @@ export const participateUniveus = async(req, res) => {
     const Writer = await getUserById(writer_id); 
     const Invitee = await getUserById(userIdFromJWT); 
 
+    console.log(req.vody)
+
 
         if(!Post) return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST)); // post가 존재하지 x
 
