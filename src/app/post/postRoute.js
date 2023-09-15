@@ -5,11 +5,12 @@ import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postPart
     cancelParticipant, postImage} from "./postController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 import {wrapAsync} from "../../../config/errorhandler";
+import {adminMiddleware} from "../../../config/adminMiddleware" 
 
 const postRouter = express.Router();
 
 postRouter.get('/:post_id',jwtMiddleware, wrapAsync(getPost)); // 게시글(+참여자 목록) 조회 API
-postRouter.post('/', jwtMiddleware, wrapAsync(postPost)); // 게시글 작성 API
+postRouter.post('/', jwtMiddleware, adminMiddleware, wrapAsync(postPost)); // 게시글 작성 API
 postRouter.post('/image/upload',
     jwtMiddleware,
     uploadImage.array('image', 4),
