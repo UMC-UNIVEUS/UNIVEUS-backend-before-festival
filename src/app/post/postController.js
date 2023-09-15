@@ -67,6 +67,8 @@ export const getPost = async(req, res) => {
  * POST: /post
  */
 export const postPost = async(req, res) => {
+
+    console.log(req.body);
     
     const {category, limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content, images, invited_userNickNames } = req.body; // 축제용 >> limit_gender, invited_userNickNames
@@ -74,6 +76,8 @@ export const postPost = async(req, res) => {
         end_date, title, content,invited_userNickNames]; // 빠지면 안될 정보들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
+
+    console.log(invited_userNickNames);
     
     for(let i = 0; i < notUndefined.length; i++){
         if(notUndefined[i] == null){
@@ -290,6 +294,7 @@ export const patchLike = async(req, res) => {
  * POST: /post/{post_id}/participant/apply
  */
 export const postParticipant = async(req, res) => {
+
     
     const {post_id} = req.params;
     const {user_id} = req.body;// 작성자 ID
