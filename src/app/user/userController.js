@@ -4,7 +4,7 @@ import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms,
     createUser, addUserPhoneNumber, addAgreementTerms } from "../user/userService";
 import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
     getUserNickNameById, isAuthNumber, isAuthUser, 
-    getUserById, getUserPhoneNumber, removeEmojis } from "./userProvider";
+    getUserById, getUserPhoneNumber, removeEmojisAndSpace } from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/naverCloudClient";
@@ -61,11 +61,10 @@ export const login = async(req, res) => {
 /** 인증번호 문자 전송 API */
 export const sendAuthNumber = async(req, res) => {
     const to = req.body.phoneNumber;
-    console.log(to);
+
     if (typeof to == "undefined") {
         return res.send(errResponse(baseResponse.VERIFY_PHONE_EMPTY));
     }
-
     
     cache.del(to);
     const sendAuth = createAuthNum();
@@ -316,8 +315,8 @@ export const sendPostReportAlarm = async(reportedBy, reportedPost) =>{
 
 /** 닉네임 중복 체크 API */
 export const checkNickNameDuplicate = async (req, res) => {
-    console.log(req.body.nickname);
-    const nickname = removeEmojis(req.body.nickname);
+    const nickname = removeEmojisAndSpace(req.body.nickname);
+    console.log(nickname)
         if (await isNicknameDuplicate(nickname)){
              return res.send(errResponse(baseResponse.NICK_NAME_DUPLICATE));
         }
@@ -336,12 +335,9 @@ export const startUniveUs = async (req, res) => {
         if (typeof req.body.major == "undefined") return res.send(errResponse(baseResponse.SIGNUP_MAJOR_EMPTY));
 
         if (typeof req.body.studentId == "undefined") return res.send(errResponse(baseResponse.SIGNUP_STUDENTID_EMPTY));   
-            
-
-        const userEmail = req.verifiedToken.userEmail;
 
         const userInfo = {
-            nickname : removeEmojis(req.body.nickname),
+            nickname : removeEmojisAndSpace(req.body.nickname),
             gender: req.body.gender,
             major : req.body.major,
             studentId : req.body.studentId,
