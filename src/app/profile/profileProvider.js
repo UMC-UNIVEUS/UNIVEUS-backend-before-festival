@@ -12,6 +12,7 @@ import {
 import {baseResponse, response, errResponse} from "../../../config/response";
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration'
+import { formatingMeetingDate } from '../post/postProvider'
 
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
@@ -73,8 +74,7 @@ export const showUserMyUnive = async (user_id) => {
 
              //모임 시간 변경
              if(showUserMyUniveResult[0][i].meeting_date) {
-                 const datevalue = dayjs(showUserMyUniveResult[0][i].meeting_date);
-                 showUserMyUniveResult[0][i].meeting_date = datevalue.month() + 1 + "월 " + datevalue.date() + "일 " + datevalue.hour() + ":" + datevalue.minute();
+                formatingMeetingDate(showUserMyUniveResult[0][i])
              }
 
             /*
@@ -118,8 +118,7 @@ export const showUserParticipate = async (user_id) => {
 
             //모임 시간 변경
             if (showUserParticipateResult[0][i].meeting_date) {
-                const datevalue = dayjs(showUserParticipateResult[0][i].meeting_date);
-                showUserParticipateResult[0][i].meeting_date = datevalue.month() + 1 + "월 " + datevalue.date() + "일 " + datevalue.hour() + ":" + datevalue.minute();
+                formatingMeetingDate(showUserParticipateResult[0][i]);
             }
 
 /*
