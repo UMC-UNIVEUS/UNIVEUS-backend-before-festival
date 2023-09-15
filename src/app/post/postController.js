@@ -454,6 +454,8 @@ export const participateUniveus = async(req, res) => {
     const {participant_userIDsFromDB, invited_userNickNamesFromAPI} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID)
+
+    console.log(req.body)
     
     const Post = await retrievePost(post_id); 
     const Writer = await getUserById(writer_id); 
