@@ -41,7 +41,7 @@ export const retrieveParticipantList = async(post_id)=>{ //게시글 참여자 �
 
 /** meeting_date 포맷팅 */
 export const formatingMeetingDate = (post) => {
-    console.log(post);
+
     const date = dayjs(post.meeting_date);
     const meeting_year = date.year();
     const meeting_month = date.month() < 9 ?  "0" + (date.month() + 1) : ""+(date.month() + 1);
