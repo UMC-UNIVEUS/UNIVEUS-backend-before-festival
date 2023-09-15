@@ -84,8 +84,10 @@ export const sendAuthNumber = async(req, res) => {
 
 /** 인증번호 검증 API */
 export const verifyNumber = async(req, res) => {
+
+    const phoneNumber = await getUserPhoneNumber(req.verifiedToken.userEmail);
     
-    if(await getUserPhoneNumber(req.verifiedToken.userEmail) !== "") {
+    if(phoneNumber !== "" || phoneNumber !== null ) {
         return res.send(errResponse(baseResponse.ALREADY_AUTH_NUMBER))  
     }   
 
