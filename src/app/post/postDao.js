@@ -305,3 +305,8 @@ export const eraseParticipant = async(connection, removeParticipantParams)=>{ //
     const [deleteCurrentPeopleRow] = await connection.query(deleteCurrentPeopleQuery, removeParticipantParams[0]);
 };
 
+export const updateCurrentPeople = async (connection, current_people, post_id) => {
+    const updateCurrentPeopleQuery = `UPDATE post SET current_people = ${current_people} WHERE post_id = ${post_id};`;
+
+    const [updateCurrentPeopleRow] = await connection.query(updateCurrentPeopleQuery);
+}
