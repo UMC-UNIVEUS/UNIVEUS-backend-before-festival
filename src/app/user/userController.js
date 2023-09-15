@@ -86,10 +86,10 @@ export const sendAuthNumber = async(req, res) => {
 export const verifyNumber = async(req, res) => {
 
     const phoneNumber = await getUserPhoneNumber(req.verifiedToken.userEmail);
-    
-    if(phoneNumber !== "" || phoneNumber !== null ) {
+
+    if(phoneNumber != null) {
         return res.send(errResponse(baseResponse.ALREADY_AUTH_NUMBER))  
-    }   
+    } 
 
     const userPhone = req.body.phoneNumber;
     const userAuthNumber = req.body.number;
