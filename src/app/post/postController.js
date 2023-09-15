@@ -459,7 +459,7 @@ export const participateUniveus = async(req, res) => {
     const Writer = await getUserById(writer_id); 
     const Invitee = await getUserById(userIdFromJWT); 
 
-    console.log(req.vody)
+    console.log(req.body)
 
 
         if(!Post) return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST)); // post가 존재하지 x
@@ -471,7 +471,11 @@ export const participateUniveus = async(req, res) => {
 
             if (invited_userNickNamesFromAPI[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
 
+            console.log("들어옴")
+
             if (typeof guest == "undefined") return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_EXIST));
+
+            console.log("들어옴")
 
             if(Invitee.user_id == guest.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));
                
