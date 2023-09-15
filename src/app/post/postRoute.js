@@ -21,7 +21,7 @@ postRouter.patch('/:post_id/scrap', jwtMiddleware, wrapAsync(patchScrap)); // �
 postRouter.patch('/:post_id/like', jwtMiddleware, wrapAsync(patchLike)); // 게시글 좋아요 API
 postRouter.get('/:post_id/participant', jwtMiddleware, wrapAsync(getParticipant)); // 게시글 참여자 신청 내역 조회 API
 postRouter.post('/:post_id/participant/apply', jwtMiddleware, adminMiddleware, wrapAsync(postParticipant)); // 게시글 참여 신청 API + 참여 신청 알람(to 작성자) API
-postRouter.patch('/:post_id/participant/register', jwtMiddleware, wrapAsync(patchParticipant)); // 게시글 참여 승인 API + 참여 승인 알람(to 참여자) API
+postRouter.patch('/:post_id/participant/register', jwtMiddleware, adminMiddleware, wrapAsync(patchParticipant)); // 게시글 참여 승인 API + 참여 승인 알람(to 참여자) API
 postRouter.delete('/:post_id/participant/refuse', jwtMiddleware, wrapAsync(deleteParticipant)); // 게시글 참여 거절 API + 참여 거절 알람(to 참여자) API
 postRouter.patch('/:post_id/status', jwtMiddleware, wrapAsync(patchStatus)); // 모집 마감으로 상태 변경 API
 postRouter.post('/:post_id/participant/onedayalarm', wrapAsync(postOneDayAlarm)); // 게시글 모임 1일 전 알림 API
