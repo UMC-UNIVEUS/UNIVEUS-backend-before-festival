@@ -467,6 +467,8 @@ export const participateUniveus = async(req, res) => {
         if(Post.limit_people == 4){
             const guest = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
 
+            if (invited_userNickNamesFromAPI[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+
             if (typeof guest == "undefined") return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_EXIST));
 
             if(Invitee.user_id == guest.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));
@@ -495,6 +497,11 @@ export const participateUniveus = async(req, res) => {
         }  
 
         else if(Post.limit_people == 6){
+
+            if (invited_userNickNamesFromAPI[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+            if (invited_userNickNamesFromAPI[1] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+
+
             const guest1 = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
 
             if (typeof guest1 == "undefined") return res.send(errResponse(baseResponse.USER_FIRST_NOT_EXIST));
