@@ -9,7 +9,7 @@ const mainRouter = express.Router();
 mainRouter.use(jwtMiddleware);
 mainRouter.use(accountStatusMiddleware);
 
-mainRouter.get('/', wrapAsync(getPostListPage));
+mainRouter.get('/', getPostListPage);
 mainRouter.get('/search', wrapAsync(searchTitle));
 
 export default mainRouter;
