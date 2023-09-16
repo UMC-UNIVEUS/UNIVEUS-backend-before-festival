@@ -1,5 +1,4 @@
 import moment from "moment-timezone";
-import {getIsParticipateOtherById} from "../user/userProvider"
 
 /** 한국 시간 가져오는 함수 moment-timezone lib 사용 */
 export const getCurrentTime = () => {
@@ -72,18 +71,3 @@ export const addDueDate = (postPage, currentTime) => {
         element['due-date'] = calculateTimeResult.message;
     });
 }
-
-/** 다른 글 참가여부 확인 */
-export const getIsParticipateOtherMain = async (postPage, currentUserId) => {
-    for (const element of postPage) {
-      const isParticipateOtherPost = await getIsParticipateOtherById(currentUserId);
-      
-      if (typeof isParticipateOtherPost === "undefined") {
-        element['isParticipateOtherPost'] = 0;
-      } 
-      
-      else {
-        element['isParticipateOtherPost'] = 1;
-      }
-    }
-  }
