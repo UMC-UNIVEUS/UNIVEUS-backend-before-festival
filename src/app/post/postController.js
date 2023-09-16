@@ -211,12 +211,13 @@ export const patchPost =  async(req, res) => {
 export const deletePost =  async(req, res) => {
 
     const {post_id} = req.params;
-    const {user_id} = req.body; // 작성자의 ID
+    // const {user_id} = req.body; // 작성자의 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
-    const Post = await retrievePost(post_id); 
+    const Post = await retrievePost(post_id);
 
-    if (user_id !== userIdFromJWT) return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH)); //접속한 유저가 작성자가 아니라면
+
+    if (Post.user_id !== userIdFromJWT) return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH)); //접속한 유저가 작성자가 아니라면
     
     if (typeof Post == "undefined")return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST))     
 
