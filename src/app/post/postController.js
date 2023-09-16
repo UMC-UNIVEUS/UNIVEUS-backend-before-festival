@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
-import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate, formatingCreatedAt} from "./postProvider";
+import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate, formatingCreatedAt, isValidOpenChat} from "./postProvider";
 import { createPost, createPostImage, editPost,patchPostImage, removePost, addScrap, addLike, 
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
@@ -583,3 +583,13 @@ export const postImage = async(req, res) => {
     if (!fileResponse) return res.send(errResponse(baseResponse.S3_ERROR));
     return res.send(response(baseResponse.SUCCESS, fileResponse));
 };
+
+/** kakao 오픈채팅링크 유효성 검사 */
+export const validateOpentChatLink =  async(req, res) => {
+    const openChaturi = req.body.openChaturi;
+
+    if (isValidOpenChat(openChaturi)) {
+        return res.send(response(baseResponse.SUCCESS));
+    }
+    return res.send(errResponse(baseResponse.OPEN_CHAT_URI_NOT_VALID));
+}

@@ -94,3 +94,11 @@ export const formatingCreatedAt = (post) => {
    
     Object.assign(post, datetime);
 }
+
+/** kakao 유효성 검사 */
+export const isValidOpenChat = (openChaturi) => {
+    
+    if (openChaturi.startsWith("https://open.kakao.com/")) return true;
+
+    return false;
+}
