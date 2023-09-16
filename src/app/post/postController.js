@@ -442,19 +442,17 @@ export const participateUniveus = async(req, res) => {
 
     if (typeof Post == "undefined")return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));     
 
-    console.log("4명 " + req.body)
-
     if (invited_userNickNamesFromAPI.length == 0) return res.send(errResponse(baseResponse.POST_INVITE_EMPTY)); 
 
     if(Post.limit_people == 4){
+
+        console.log("4명 " + req.body)
             
         if (invited_userNickNamesFromAPI[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
 
         if (invited_userNickNamesFromAPI[0] == " ") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY)); 
 
         const guest = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
-
-        console.log(guest)
 
         if (typeof guest == "undefined") return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_EXIST));
 
