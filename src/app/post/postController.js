@@ -94,73 +94,68 @@ export const postPost = async(req, res) => {
     if(invited_userNickNames.length == 0){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때
         return res.send(errResponse(baseResponse.POST_INVITE_EMPTY)); 
     }
-    if(limit_people == 4){ // 축제용 조건문
-        if(invited_userNickNames.length == 1){ // 초대 가능 인원 수는 1명
-            const participant = await getUserByNickName(invited_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
 
-            if(participant){// 초대 받은 유저가 존재할 때
-                if(userIdFromJWT == participant.user_id){
-                    return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));            
-                }
-                else{
-                    const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+    if(limit_people == 4) { // 축제용 조건문
+
+        if (invited_userNickNames[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+
+        if (invited_userNickNames.length != 1) return res.send(errResponse(baseResponse.POST_PARTICIPATE_ONLY_ONE));    
+         // 초대 가능 인원 수는 1명
+        const participant = await getUserByNickName(invited_userNickNames[0]); // 닉네임으로 유저 전체 정보 얻기
+
+        if (typeof participant == "undefined") return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_EXIST));      
+
+        if (userIdFromJWT == participant.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));            
+
+        const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
                         end_date, title,images[0], content);
-                    if(images != undefined ){
-                        await createPostImage(images,postPostResult.insertId); 
-                    }
-                    // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
-                    await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
-                    return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공   
-                }
-            }
-            else{
-                return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_EXIST));            
-            }
-        }
-        else{
-            return res.send(errResponse(baseResponse.POST_PARTICIPATE_ONLY_ONE));            
+
+        if(typeof images != "undefined") await createPostImage(images,postPostResult.insertId); 
+
+        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
+
+        await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
+
+        return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공   
+    }
+
+    if (limit_people == 6) {   
+
+        if (invited_userNickNames[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+
+        if (invited_userNickNames[1] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+
+        if (invited_userNickNames.length != 2) return res.send(errResponse(baseResponse.POST_PARTICIPATE_ONLY_TWO));    
+
+        const participant1 = await getUserByNickName(invited_userNickNames[0]); 
+
+        if (typeof participant1 == "undefined") return res.send(errResponse(baseResponse.USER_FIRST_NOT_EXIST));      
+
+        const participant2 = await getUserByNickName(invited_userNickNames[1]); 
+
+        if (typeof participant2 == "undefined") return res.send(errResponse(baseResponse.USER_SECOND_NOT_EXIST));        
+
+        if (userIdFromJWT == participant1.user_id || userIdFromJWT == participant2.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));           
+                    
+        if (participant1.user_id == participant2.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_OVERLAP));
+
+        const participants = [participant1, participant2]
+
+        const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
+            end_date, title,images[0], content);
+
+        if (typeof images != "undefined") await createPostImage(images,postPostResult.insertId);
+
+        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
+
+        await inviteOneParticipant(postPostResult.insertId, participant1.user_id, userIdFromJWT);
+
+        await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
+
+        return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
+
         }
     }
-    else if(limit_people == 6){
-        if(invited_userNickNames.length == 2){ // 초대 가능 인원 수는 2명
-            const participant1 = await getUserByNickName(invited_userNickNames[0]); 
-
-            if(participant1){
-                const participant2 = await getUserByNickName(invited_userNickNames[1]); 
-
-                if(participant2){
-                    if(userIdFromJWT == participant1.user_id || userIdFromJWT == participant2.user_id){
-                        return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));            
-                    }
-                    else if(participant1.user_id == participant2.user_id){
-                        return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_OVERLAP));
-                    }
-                    else{
-                        const participants = [participant1, participant2]
-                        const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
-                            end_date, title,images[0], content);
-                        if(images != undefined ){
-                            await createPostImage(images,postPostResult.insertId);
-                        }
-                        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
-                        await inviteOneParticipant(postPostResult.insertId, participant1.user_id, userIdFromJWT);
-                        await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
-                        return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
-                    }
-                }
-                else{
-                    return res.send(errResponse(baseResponse.USER_SECOND_NOT_EXIST));            
-                }
-            }
-            else{
-                return res.send(errResponse(baseResponse.USER_FIRST_NOT_EXIST));            
-            }
-        }
-        else{
-            return res.send(errResponse(baseResponse.POST_PARTICIPATE_ONLY_TWO));            
-        }
-    }
-};
 
 /**
  * API name : 게시글 수정
