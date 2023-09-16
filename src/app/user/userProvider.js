@@ -36,7 +36,7 @@ export const getUserById = async(user_id) => {// id로 유저 전체 조회
     return User;
 };
 
-export const getIsParticipateOtherById = async(user_id) => {// id로 게시글 참여했는지 확인인
+export const getIsParticipateOtherById = async(user_id) => {// id로 게시글 참여했는지 확인
 
     const connection = await pool.getConnection(async (conn) => conn);
     const isParticipateOther = await selectIsParticipateOtherById(connection, user_id);
