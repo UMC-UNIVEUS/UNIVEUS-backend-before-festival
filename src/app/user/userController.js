@@ -20,8 +20,6 @@ export const login = async(req, res) => {
     const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
     const googleAccessToken = req.body.accessToken;
 
-    console.log("googleAccessToken : " + googleAccessToken);
-
     const resUserInfo = await axios.get(GOOGLE_USERINFO_URL, {
       headers: {
           Authorization: `Bearer ${googleAccessToken}`,
@@ -40,21 +38,16 @@ export const login = async(req, res) => {
     
     if (!await isUser(userEmail)) {
         createUser(userEmail);
-        console.log("univeus-access-token : " + accessToken);
         return res.send(response(baseResponse.LOGIN_NOT_USER, { accessToken }));
     }
 
     if (!await isAuthNumber(userEmail)) {
-        console.log("univeus-access-token : " + accessToken);
         return res.send(response(baseResponse.LOGIN_NOT_AUTH_NUMBER, { accessToken }));
     }
 
     if (!await isAuthUser(userEmail)) {
-        console.log("univeus-access-token : " + accessToken);
         return res.send(response(baseResponse.LOGIN_NOT_AUTH_COMPLETE_USER, { accessToken }));
     }
-
-    console.log("univeus-access-token : " + accessToken);
     return res.send(response(baseResponse.SUCCESS,{ accessToken }));
 }
 
@@ -421,8 +414,6 @@ export const patchAlarms = async(req, res) => {
 /** 약관 동의 API*/
 // TODO: DAO, SERVICE 구현
 export const agreementTerms = async(req, res) => {
-
-    console.log("동의하기 토큰 : " + req.verifiedToken);
 
     const userEmail = req.verifiedToken.userEmail;
     const userId = await getUserIdByEmail(userEmail);
