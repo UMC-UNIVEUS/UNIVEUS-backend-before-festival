@@ -445,8 +445,6 @@ export const participateUniveus = async(req, res) => {
     if (invited_userNickNamesFromAPI.length == 0) return res.send(errResponse(baseResponse.POST_INVITE_EMPTY)); 
 
     if(Post.limit_people == 4){
-
-        console.log("4명 " + req.body)
             
         if (invited_userNickNamesFromAPI[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
 
@@ -459,6 +457,9 @@ export const participateUniveus = async(req, res) => {
         if (Invitee.user_id == guest.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));
 
         if(Writer.user_id == guest.user_id) return res.send(errResponse(baseResponse.POST_WRITER_GUEST_DUPLICATE));
+
+        console.log(Writer)
+        console.log(guest)
                
         const isParticipate = (participant_userIDsFromDB.includes(userIdFromJWT) || participant_userIDsFromDB.includes(guest.user_id));
 
@@ -505,11 +506,17 @@ export const participateUniveus = async(req, res) => {
         
         if(Writer.user_id == guest1.user_id) return res.send(errResponse(baseResponse.POST_WRITER_GUEST_DUPLICATE));
 
+        console.log(Writer)
+        console.log(guest1)
+
         const guest2 = await getUserByNickName(invited_userNickNamesFromAPI[1]); 
                 
         if(typeof guest2 == "undefined") return res.send(errResponse(baseResponse.USER_SECOND_NOT_EXIST));
 
         if(Writer.user_id == guest2.user_id) return res.send(errResponse(baseResponse.POST_WRITER_GUEST_DUPLICATE));
+
+        console.log(Writer)
+        console.log(guest2)
 
         if(Invitee.user_id == guest1.user_id || Invitee.user_id == guest2.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));
  
