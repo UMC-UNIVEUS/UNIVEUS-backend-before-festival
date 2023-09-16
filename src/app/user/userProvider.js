@@ -119,3 +119,15 @@ export const removeEmojisAndSpace = (nickname) => {
     return nickname.replace(regex, "");
 }
 
+/** 다른 글 참가여부 확인 */
+export const getIsParticipateOther = async (currentUserId) => {
+    const isParticipateOtherPost = await getIsParticipateOtherById(currentUserId);
+    
+    if (typeof isParticipateOtherPost === "undefined") {
+        return 0;
+    } 
+    
+    else {
+        return 1;
+    }
+}
