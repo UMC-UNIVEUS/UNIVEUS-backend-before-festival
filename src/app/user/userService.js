@@ -27,14 +27,12 @@ export const createAuthNum = () => {
 
 /** 유저생성 - 본인인증 후 유저 생성*/
 export const addUserProfileInfo = async(userInfo) => {
-    try {
+
         const connection = await pool.getConnection(async conn => conn);
         const authUserResult = await updateUserProfileInfo(connection, userInfo);
         connection.release();
         return authUserResult;
-    } catch(err) {
-        console.log(err);
-    }
+
 };
 
 export const checkAlarms = async(alarm_id) =>{// 알림 확인 
