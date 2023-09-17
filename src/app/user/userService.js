@@ -1,6 +1,6 @@
 import { updateUserProfileInfo, updateAlarms, insertUserEmailId, 
     updateUserPhoneNumber, insertAgreementTerms, updateAccountStatus, 
-    updateUserReportedNum, updateParticipateAvailable } from "./userDao"
+    updateUserReportedNum, updateParticipateAvailable, updateParticipateAvailableReturn } from "./userDao"
 import pool from "../../../config/database"
 
 /** 유저 생성 - 프로필 등록, 번호인증 전 user */
@@ -84,5 +84,12 @@ export const increaseUserReportedNum = async(userId) => {
 export const changeParticipateAvailable = async(userId) => {
     const connection = await pool.getConnection(async conn => conn);
     const updateParticipateAvailbleResult = await updateParticipateAvailable(connection, userId);
+    connection.release();
+}
+
+/** 축제용 : 유저의 참여 횟수 다시 되돌려주기 */
+export const returnParticipateAvailable = async(userId) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const updateParticipateAvailbleResult = await updateParticipateAvailableReturn(connection, userId);
     connection.release();
 }
