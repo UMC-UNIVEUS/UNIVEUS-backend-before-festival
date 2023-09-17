@@ -6,8 +6,9 @@ import { createPost, createPostImage, editPost,patchPostImage, removePost, addSc
     applyParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus, changeCurrentPeople } from "./postService";
-import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById} from "../user/userProvider";
+import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById, getParticipateAvailable} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
+import { changeParticipateAvailable } from "../user/userService";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -23,7 +24,9 @@ export const getPost = async(req, res) => {
     if (typeof Post == "undefined") return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST)); // 게시글이 존재하지 않는다면
 
         formatingMeetingDate(Post);
+
         formatingEndDate(Post);
+
         formatingCreatedAt(Post);
         
         const Participants = await retrieveParticipant(post_id); 
@@ -37,23 +40,17 @@ export const getPost = async(req, res) => {
         }
         const PostImages = await retrievePostImages(post_id); 
         const connectedUser = await getUserById(userIdFromJWT);
+
         const isParticipateThisPost = Participants.find((item) => item.user_id === userIdFromJWT);
-        const isParticipateOtherPost = await getIsParticipateOtherById(userIdFromJWT);
 
         if(isParticipateThisPost){
             Object.assign(connectedUser,{"isParticipateThisPost":1});
-            Object.assign(connectedUser,{"isParticipateOtherPost":0});
-        }
-        else if(isParticipateOtherPost){
-            Object.assign(connectedUser,{"isParticipateOtherPost":1});
-            Object.assign(connectedUser,{"isParticipateThisPost":0});
         }
         else{
             Object.assign(connectedUser,{"isParticipateThisPost":0});
-            Object.assign(connectedUser,{"isParticipateOtherPost":0});
         }
 
-        return res.send(response(baseResponse.SUCCESS, {Post,PostImages,connectedUser,Writer,Participant}));
+        return res.send(response(baseResponse.SUCCESS, {Post, PostImages, connectedUser, Writer, Participant}));
 };
 
 /**
@@ -105,16 +102,25 @@ export const postPost = async(req, res) => {
 
         if (typeof participant == "undefined") return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_EXIST));      
 
-        if (userIdFromJWT == participant.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));            
+        if (userIdFromJWT == participant.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_INVITEE_OVERLAP));   
+
+        if (await getParticipateAvailable(userIdFromJWT) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
+        if (await getParticipateAvailable(participant.user_id) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
 
         const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
                         end_date, title,images[0], content);
 
         if(typeof images != "undefined") await createPostImage(images,postPostResult.insertId); 
 
-        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
+
+        // TODO :  user 테이블의 participate-available 0으로 만들어주기
+        await changeParticipateAvailable(participant.user_id);
+        await changeParticipateAvailable(userIdFromJWT);
+
+        // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공   
     }
@@ -139,6 +145,12 @@ export const postPost = async(req, res) => {
                     
         if (participant1.user_id == participant2.user_id) return res.send(errResponse(baseResponse.POST_PARTICIPANT_NOT_OVERLAP));
 
+        if (await getParticipateAvailable(userIdFromJWT) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
+        if (await getParticipateAvailable(participant1.user_id) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
+        if (await getParticipateAvailable(participant2.user_id) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
         const participants = [participant1, participant2]
 
         const postPostResult = await createPost(userIdFromJWT, category, limit_gender, limit_people, location, meeting_date, openchat, 
@@ -146,11 +158,19 @@ export const postPost = async(req, res) => {
 
         if (typeof images != "undefined") await createPostImage(images,postPostResult.insertId);
 
-        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         await inviteOneParticipant(postPostResult.insertId, participant1.user_id, userIdFromJWT);
 
         await inviteOneParticipant(postPostResult.insertId, participant2.user_id, userIdFromJWT);
+
+        // TODO :  user 테이블의 participate-available 0으로 만들어주기
+        await changeParticipateAvailable(participant1.user_id);
+
+        await changeParticipateAvailable(participant2.user_id);
+
+        await changeParticipateAvailable(userIdFromJWT);
+
+        // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
 
@@ -463,6 +483,11 @@ export const participateUniveus = async(req, res) => {
         const genderAllowed = Post.limit_gender == 0 || (Post.limit_gender == Invitee.gender && Post.limit_gender == guest.gender);
 
         if(!genderAllowed) return res.send(errResponse(baseResponse.POST_GENDER_LIMIT));
+
+        if (await getParticipateAvailable(userIdFromJWT) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
+        if (await getParticipateAvailable(guest.user_id) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
                             
             // 정상적인 참여
         const alreadyParticipant = await getUserById(participant_userIDsFromDB[0]); 
@@ -474,6 +499,13 @@ export const participateUniveus = async(req, res) => {
         await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
 
         await changeCurrentPeople(4, post_id);
+
+        // TODO :  user 테이블의 participate-available 0으로 만들어주기
+
+        await changeParticipateAvailable(guest.user_id);
+
+        await changeParticipateAvailable(userIdFromJWT);
+
         // const MessageAlarmList = [Writer, [alreadyParticipant], Invitee, [guest]];
         // await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
         return res.send(response(baseResponse.SUCCESS));          
@@ -517,6 +549,12 @@ export const participateUniveus = async(req, res) => {
         
         if(!genderAllowed) return res.send(errResponse(baseResponse.POST_GENDER_LIMIT));
 
+        if (await getParticipateAvailable(userIdFromJWT) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
+        if (await getParticipateAvailable(guest1.user_id) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
+        if (await getParticipateAvailable(guest2.user_id) == 0) return res.send(errResponse(baseResponse.USER_ALREADY_PARTICIPATE));
+
         // 정상적인 참여
         const alreadyParticipant1 = await getUserById(participant_userIDsFromDB[0]); 
 
@@ -531,6 +569,14 @@ export const participateUniveus = async(req, res) => {
         await changeCurrentPeople(6, post_id);
 
         await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
+
+        // TODO :  user 테이블의 participate-available 0으로 만들어주기
+        
+        await changeParticipateAvailable(guest1.user_id);
+
+        await changeParticipateAvailable(guest2.user_id);
+
+        await changeParticipateAvailable(userIdFromJWT);
 
         // const MessageAlarmList = [Writer, [alreadyParticipant1, alreadyParticipant2], Invitee, [guest1, guest2]];
         // await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)

@@ -180,3 +180,15 @@ export const selectUserAccountStatus = async(connection, userEmail) => {
     const selectUserAccountStatusRow = await connection.query(selectUserAccountStatusQuery);
     return selectUserAccountStatusRow;
 }
+
+export const updateParticipateAvailable = async(connection, userId) => {
+    const updateParticipateAvailableQuery = `UPDATE user SET participate_available = 0 WHERE user_id = ${userId};`;
+    const updateParticipateAvailableRow = await connection.query(updateParticipateAvailableQuery);
+}
+
+/** 참여가능 횟수 조회 */
+export const selectParticipateAvailalble = async(connection, userId) => {
+    const selectParticipateAvailalbleQuery = `SELECT participate_available FROM user WHERE user_id = ${userId};`;
+    const [selectParticipateAvailalbleRow] = await connection.query(selectParticipateAvailalbleQuery);
+    return selectParticipateAvailalbleRow[0].participate_available;
+}

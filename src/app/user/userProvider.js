@@ -1,6 +1,7 @@
 import { selectUser, selectUserByNickname, selectUserIdByEmail, selectAlarms, 
     selectUserById, selectIsParticipateOtherById,selectUserNickNameById, selectPhoneByEmail, 
-    selectAuthStatusByEmail,selectUserByNickName, selectUserReportedNum, selectUserAccountStatus } from "./userDao"
+    selectAuthStatusByEmail,selectUserByNickName, selectUserReportedNum, selectUserAccountStatus,
+    selectParticipateAvailalble } from "./userDao"
 
 import pool from "../../../config/database"
 
@@ -120,14 +121,10 @@ export const removeEmojisAndSpace = (nickname) => {
 }
 
 /** 다른 글 참가여부 확인 */
-export const getIsParticipateOther = async (currentUserId) => {
-    const isParticipateOtherPost = await getIsParticipateOtherById(currentUserId);
-    
-    if (typeof isParticipateOtherPost === "undefined") {
-        return 0;
-    } 
-    
-    else {
-        return 1;
-    }
+export const getParticipateAvailable = async (userId) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    const isParticipateAvailable = await selectParticipateAvailalble(connection, userId);
+    connection.release();
+
+    return isParticipateAvailable;
 }
