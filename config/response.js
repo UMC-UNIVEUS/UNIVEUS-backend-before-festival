@@ -55,7 +55,7 @@ export const baseResponse = {
     POST_PARTICIPANT_NOT_EXIST: { "isSuccess": false, "code": 3020, "message": "초대할 유저가 존재하지 않습니다." },
     POST_PARTICIPANT_INVITEE_OVERLAP: { "isSuccess": false, "code": 3021, "message": "초대자와 초대할 유저가 일치합니다." },
     POST_PARTICIPANT_NOT_OVERLAP: { "isSuccess": false, "code": 3022, "message": "초대할 유저들이 중복입니다." },
-
+    UPLOADED_FILE_SIZE_EXCEED_LIMIT: { "isSuccess": false, "code": 3023, "message": "업로드한 이미지의 용량이 너무 큽니다." },
 
 
     //댓글 관련

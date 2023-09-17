@@ -3,7 +3,8 @@ import multer from 'multer';
 import multerS3 from 'multer-s3';
 import path from 'path';
 import dotenv from 'dotenv';
-
+import uuid4 from 'uuid4';
+import {baseResponse, errResponse} from "./response";
 dotenv.config();
 
 AWS.config.update({
@@ -13,6 +14,7 @@ AWS.config.update({
 });
 
 const s3 = new AWS.S3();
+
 
 const allowedExtensions = ['.png', '.jpg', '.jpeg', '.bmp', '.webp'];
 
@@ -25,8 +27,19 @@ export const uploadImage = multer({
             if (!allowedExtensions.includes(extension)) {
                 return callback(new Error('wrong extension'));
             }
-            callback(null, `${Date.now()}_${file.originalname}`);
+            return callback(null, true);
+            callback(null, `${Date.now()}_${uuid4()}`);
         },
         acl: 'public-read-write',
     }),
+    limits: { fileSize: 10 * 1024 * 1024 },  //10MB로 제한
 });
+
+export const handleMulterErrors = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.send(errResponse(baseResponse.UPLOADED_FILE_SIZE_EXCEED_LIMIT));
+        }
+    }
+    next(err);
+};
