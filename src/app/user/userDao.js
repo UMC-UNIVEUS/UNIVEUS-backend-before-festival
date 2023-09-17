@@ -192,3 +192,8 @@ export const selectParticipateAvailalble = async(connection, userId) => {
     const [selectParticipateAvailalbleRow] = await connection.query(selectParticipateAvailalbleQuery);
     return selectParticipateAvailalbleRow[0].participate_available;
 }
+
+export const updateParticipateAvailableReturn = async(connection, userId) => {
+    const updateParticipateAvailableQuery = `UPDATE user SET participate_available = 1 WHERE user_id = ${userId};`;
+    const updateParticipateAvailableRow = await connection.query(updateParticipateAvailableQuery);
+}

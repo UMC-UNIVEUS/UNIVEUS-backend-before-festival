@@ -8,7 +8,7 @@ import { createPost, createPostImage, editPost,patchPostImage, removePost, addSc
     ,changePostStatus, removeParticipant,changeStatus, changeCurrentPeople } from "./postService";
 import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById, getParticipateAvailable} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
-import { changeParticipateAvailable } from "../user/userService";
+import { changeParticipateAvailable, returnParticipateAvailable } from "../user/userService";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -120,7 +120,7 @@ export const postPost = async(req, res) => {
         await changeParticipateAvailable(participant.user_id);
         await changeParticipateAvailable(userIdFromJWT);
 
-        // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
+        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공   
     }
@@ -170,7 +170,7 @@ export const postPost = async(req, res) => {
 
         await changeParticipateAvailable(userIdFromJWT);
 
-        // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
+        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
 
@@ -240,6 +240,16 @@ export const deletePost =  async(req, res) => {
     if (Post.user_id !== userIdFromJWT) return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH)); //접속한 유저가 작성자가 아니라면
     
     if (typeof Post == "undefined")return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST))     
+
+    const participants = await retrieveParticipant(post_id);
+
+    /** 참여자 참여권 돌려주기*/
+    participants.forEach(async function(participant) {
+        await returnParticipateAvailable(participant.user_id);
+    });
+    
+    if (Post.post_status === "end") return res.send(errResponse(baseResponse.POST_MATCHED_CANT_DELETE));
+    
 
     const deletePostResult = await removePost(post_id);
    
@@ -462,7 +472,9 @@ export const participateUniveus = async(req, res) => {
 
     if(Post.limit_people == 4){
             
-        if (invited_userNickNamesFromAPI[0] == "" || invited_userNickNamesFromAPI[0] == " ") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+        if (invited_userNickNamesFromAPI[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
+
+        if (invited_userNickNamesFromAPI[0] == " ") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY)); 
 
         const guest = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
 
@@ -567,8 +579,6 @@ export const participateUniveus = async(req, res) => {
         await changeCurrentPeople(6, post_id);
 
         await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
-
-        // TODO :  user 테이블의 participate-available 0으로 만들어주기>?
         
         await changeParticipateAvailable(guest1.user_id);
 
