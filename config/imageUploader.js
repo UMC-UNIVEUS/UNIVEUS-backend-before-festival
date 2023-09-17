@@ -27,7 +27,7 @@ export const uploadImage = multer({
             if (!allowedExtensions.includes(extension)) {
                 return callback(new Error('wrong extension'));
             }
-            callback(null, `${Date.now()}_${uuid4()}`);
+            callback(null, `${Date.now()}_${uuid4()}${extension}`);
         },
         acl: 'public-read-write',
     }),
