@@ -462,9 +462,7 @@ export const participateUniveus = async(req, res) => {
 
     if(Post.limit_people == 4){
             
-        if (invited_userNickNamesFromAPI[0] == "") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
-
-        if (invited_userNickNamesFromAPI[0] == " ") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY)); 
+        if (invited_userNickNamesFromAPI[0] == "" || invited_userNickNamesFromAPI[0] == " ") return res.send(errResponse(baseResponse.POST_INVITE_EMPTY));
 
         const guest = await getUserByNickName(invited_userNickNamesFromAPI[0]); 
 
