@@ -220,7 +220,7 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
 - 긴급상황 발생 시 [https://www.instagram.com/unive.us] 로 연락주시면 운영자가 달려가 조치하겠습니다.
 
 즐거우셨다면 유니버스를 평가해 주세요! 큰 도움이 됩니다!!
-[링크]`; 
+[https://walla.my/survey/PfJcrC2SsbMbVz4N4QpJ]`; 
         const { success1 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[0].phone, content });
         const { success2 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][0].phone, content });
         const { success3 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[2].phone, content });   
@@ -257,7 +257,7 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
 - 긴급상황 발생 시 [https://www.instagram.com/unive.us] 로 연락주시면 운영자가 달려가 조치하겠습니다.
 
 즐거우셨다면 유니버스를 평가해 주세요! 큰 도움이 됩니다!!
-[링크]`; 
+[https://walla.my/survey/PfJcrC2SsbMbVz4N4QpJ]`; 
         const { success1 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[0].phone, content });
         const { success2 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][0].phone, content });
         const { success3 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][1].phone, content });
@@ -370,7 +370,7 @@ export const startUniveUs = async (req, res) => {
 3. 모임을 생성/참가한 후 함께하는 친구의 닉네임을 (꼭!) 추가해주세요
 - 유니버스 접속링크 : https://univeus.com`;
 
-        // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+        // const { success } = await sendSMS(naverCloudSensSecret, { to, content }); >>>>>>>>>>>>> 이 부분 일부러 주석 처리 인가염?
 
         return res.send(response(baseResponse.SUCCESS));
 };
