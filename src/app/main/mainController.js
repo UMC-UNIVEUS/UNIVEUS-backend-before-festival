@@ -1,6 +1,6 @@
 import { baseResponse, response, errResponse } from "../../../config/response";
 import { getPostList, countPosts, searchPosts } from "./mainProvider";
-import { getUserIdByEmail, getIsParticipateOther } from "../user/userProvider";
+import { getUserIdByEmail, getParticipateAvailable } from "../user/userProvider";
 import { getCurrentTime, sliceTime, isMyPost, addDueDate } from "./mainService"
 
 
@@ -25,9 +25,9 @@ export const getPostListPage = async (req, res) => {
 
     isMyPost(postPageResult, currentUserId);
     addDueDate(postPageResult,currentTime);
-    const isParticipateOtherPost  = await getIsParticipateOther(currentUserId);
+    const participate_available  = await getParticipateAvailable(currentUserId);
 
-    return res.send(response(baseResponse.SUCCESS, { isParticipateOtherPost, postPageResult },));
+    return res.send(response(baseResponse.SUCCESS, { participate_available, postPageResult },));
 }
 
 /** 메인페이지 게시글 제목 검색 */
