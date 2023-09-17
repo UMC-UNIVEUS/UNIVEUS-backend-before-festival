@@ -568,7 +568,7 @@ export const participateUniveus = async(req, res) => {
 
         await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
 
-        // TODO :  user 테이블의 participate-available 0으로 만들어주기
+        // TODO :  user 테이블의 participate-available 0으로 만들어주기>?
         
         await changeParticipateAvailable(guest1.user_id);
 
