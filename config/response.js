@@ -58,7 +58,7 @@ export const baseResponse = {
     POST_PARTICIPANT_NOT_OVERLAP: { "isSuccess": false, "code": 3022, "message": "초대할 유저들이 중복입니다." },
     POST_WRITER_GUEST_DUPLICATE : { "isSuccess": false, "code": 3023, "message": "작성자와 초대할 유저가 일치합니다." },
     OPEN_CHAT_URI_NOT_VALID : { "isSuccess": false, "code": 3024, "message": "유효하지 않는 오픈채팅방 형식입니다." },
-
+    UPLOADED_FILE_SIZE_EXCEED_LIMIT: { "isSuccess": false, "code": 3025, "message": "업로드한 이미지의 용량이 너무 큽니다." },
 
 
     //댓글 관련
