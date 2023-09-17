@@ -1,5 +1,5 @@
 import express from "express"
-import { uploadImage } from '../../../config/imageUploader';
+import {handleMulterErrors, uploadImage} from '../../../config/imageUploader';
 import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, 
     getParticipant, patchParticipant, deleteParticipant, patchStatus,postOneDayAlarm, participateUniveus,
     cancelParticipant, postImage, validateOpentChatLink} from "./postController";
@@ -14,7 +14,8 @@ postRouter.post('/', jwtMiddleware, adminMiddleware, postPost); // 게시글 작
 postRouter.post('/image/upload',
     jwtMiddleware,
     uploadImage.array('image', 4),
-    wrapAsync(postImage));
+    handleMulterErrors,
+    postImage);
 postRouter.patch('/:post_id', jwtMiddleware, wrapAsync(patchPost)); // 게시글 수정 API
 postRouter.delete('/:post_id', jwtMiddleware, wrapAsync(deletePost)); // 게시글 삭제 API
 postRouter.patch('/:post_id/scrap', jwtMiddleware, wrapAsync(patchScrap)); // 게시글 스크랩 API
