@@ -19,20 +19,23 @@ export const selectUserByNickname = async(connection, nickname) => {
     return selectUserRow[0];
 }
 
-/** 본인인증 후 userInfo insert */
+/** 본인인증 후 userInfo update */
 export const updateUserProfileInfo = async(connection, updateUserParams) => {
-    const userInfo = updateUserParams.userInfo;
-    const userEmail = updateUserParams.userEmail;
+    const userInfo = updateUserParams;
+
+    console.log(updateUserParams)
 
     const updateUserQuery = 
     `
         UPDATE user
         SET 
-        nickname =?,
+        nickname = ?,
         gender = ?,
         major = ?,
         class_of = ?,
-        auth_status = 1
+        auth_status = 1,
+        participate_available = 1
+
         WHERE email_id = ?;
     `;
 
@@ -41,7 +44,7 @@ export const updateUserProfileInfo = async(connection, updateUserParams) => {
       userInfo.gender,      
       userInfo.major,       
       userInfo.studentId,    
-      userEmail
+      userInfo.userEmail
     ];
   
     const updateUserRow = await connection.query(updateUserQuery, values);
@@ -176,4 +179,16 @@ export const selectUserAccountStatus = async(connection, userEmail) => {
     const selectUserAccountStatusQuery = `SELECT account_status FROM user WHERE email_id = '${userEmail}';`;
     const selectUserAccountStatusRow = await connection.query(selectUserAccountStatusQuery);
     return selectUserAccountStatusRow;
+}
+
+export const updateParticipateAvailable = async(connection, userId) => {
+    const updateParticipateAvailableQuery = `UPDATE user SET participate_available = 0 WHERE user_id = ${userId};`;
+    const updateParticipateAvailableRow = await connection.query(updateParticipateAvailableQuery);
+}
+
+/** 참여가능 횟수 조회 */
+export const selectParticipateAvailalble = async(connection, userId) => {
+    const selectParticipateAvailalbleQuery = `SELECT participate_available FROM user WHERE user_id = ${userId};`;
+    const [selectParticipateAvailalbleRow] = await connection.query(selectParticipateAvailalbleQuery);
+    return selectParticipateAvailalbleRow[0].participate_available;
 }

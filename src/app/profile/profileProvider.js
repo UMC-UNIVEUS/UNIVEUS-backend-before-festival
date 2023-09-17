@@ -149,7 +149,6 @@ export const showUserParticipate = async (user_id) => {
 };
 
 
-
 export const showUserProfile = async(user_id) => {
     const connection = await pool.getConnection(async (conn) => conn);
     const showUserProfileResult = await selectUserProfilebyId(connection, user_id);

@@ -1,5 +1,6 @@
 import { updateUserProfileInfo, updateAlarms, insertUserEmailId, 
-    updateUserPhoneNumber, insertAgreementTerms, updateAccountStatus, updateUserReportedNum } from "./userDao"
+    updateUserPhoneNumber, insertAgreementTerms, updateAccountStatus, 
+    updateUserReportedNum, updateParticipateAvailable } from "./userDao"
 import pool from "../../../config/database"
 
 /** 유저 생성 - 프로필 등록, 번호인증 전 user */
@@ -27,14 +28,12 @@ export const createAuthNum = () => {
 
 /** 유저생성 - 본인인증 후 유저 생성*/
 export const addUserProfileInfo = async(userInfo) => {
-    try {
+
         const connection = await pool.getConnection(async conn => conn);
         const authUserResult = await updateUserProfileInfo(connection, userInfo);
         connection.release();
         return authUserResult;
-    } catch(err) {
-        console.log(err);
-    }
+
 };
 
 export const checkAlarms = async(alarm_id) =>{// 알림 확인 
@@ -79,4 +78,11 @@ export const changeUserStatus = async(userId, userStatus) => {
 export const increaseUserReportedNum = async(userId) => {
     const connection = await pool.getConnection(async conn => conn);
     const increaseUserReportedNumResult = await updateUserReportedNum(connection , userId); 
+}
+
+/** 축제용 : 유저의 참여가능 횟수 제한 */
+export const changeParticipateAvailable = async(userId) => {
+    const connection = await pool.getConnection(async conn => conn);
+    const updateParticipateAvailbleResult = await updateParticipateAvailable(connection, userId);
+    connection.release();
 }

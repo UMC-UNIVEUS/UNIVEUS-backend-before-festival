@@ -32,6 +32,7 @@ export const baseResponse = {
     USERS_ACCOUNT_WITHDRAW : {"isSuccess" : false, "code" : 2025, "message" : "탈퇴한 회원입니다." },
     USERS_ACCOUNT_BLOCKED : {"isSuccess" : false, "code" : 2026, "message" : "정지된 계정입니다." },
     ALREADY_AUTH_NUMBER : {"isSuccess" : false, "code" : 2027, "message" : "이미 인증을 완료하였습니다" },
+    USER_ALREADY_PARTICIPATE : {"isSuccess" : false, "code" : 2028, "message" : "오늘 참여 횟수를 모두 소진하였습니다."},
 
     
     //게시글 관련
@@ -42,7 +43,7 @@ export const baseResponse = {
     POST_CATEGORY_LIMIT : { "isSuccess": false, "code": 3004, "message": "축제 기간에는 '축제' 카테고리만 가능합니다." },
     POST_INFORMATION_EMPTY : { "isSuccess": false, "code": 3005, "message": "미입력된 항목이 있습니다." },
     POST_CONTENT_LENGTH : { "isSuccess": false, "code": 3006, "message": "소개글은 최대 500자리를 입력해주세요." },
-    POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "아무도 초대하지 않았습니다." },
+    POST_INVITE_EMPTY : { "isSuccess": false, "code": 3007, "message": "친구를 초대하지 않았습니다." },
     POST_PARTICIPATION_CLOSE : { "isSuccess": false, "code": 3008, "message": "모집이 마감되었습니다." },
     POST_PARTICIPATION_OVERLAP : { "isSuccess": false, "code": 3009, "message": "이미 참여한 유저가 존재합니다." },
     POST_PARTICIPATION_NOT_MATCH : { "isSuccess": false, "code": 3011, "message": "참여를 하지 않았으므로 참여 취소를 할 수 없습니다." },
@@ -55,7 +56,9 @@ export const baseResponse = {
     POST_PARTICIPANT_NOT_EXIST: { "isSuccess": false, "code": 3020, "message": "초대할 유저가 존재하지 않습니다." },
     POST_PARTICIPANT_INVITEE_OVERLAP: { "isSuccess": false, "code": 3021, "message": "초대자와 초대할 유저가 일치합니다." },
     POST_PARTICIPANT_NOT_OVERLAP: { "isSuccess": false, "code": 3022, "message": "초대할 유저들이 중복입니다." },
-    UPLOADED_FILE_SIZE_EXCEED_LIMIT: { "isSuccess": false, "code": 3023, "message": "업로드한 이미지의 용량이 너무 큽니다." },
+    POST_WRITER_GUEST_DUPLICATE : { "isSuccess": false, "code": 3023, "message": "작성자와 초대할 유저가 일치합니다." },
+    OPEN_CHAT_URI_NOT_VALID : { "isSuccess": false, "code": 3024, "message": "유효하지 않는 오픈채팅방 형식입니다." },
+    UPLOADED_FILE_SIZE_EXCEED_LIMIT: { "isSuccess": false, "code": 3025, "message": "업로드한 이미지의 용량이 너무 큽니다." },
 
 
     //댓글 관련
