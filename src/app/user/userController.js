@@ -26,6 +26,8 @@ export const login = async(req, res) => {
       },
     });
 
+    console.log(resUserInfo);
+
     const userEmail = resUserInfo.data.email;  
 
     if (isKyonggiEmail(userEmail) == false) {
