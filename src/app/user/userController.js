@@ -142,8 +142,8 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
 
 *매칭 시 유의사항*
 
-- 유니버스는 우리학교 학우들이 모인 공간입니다. 부적절 한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
-- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
+- 유니버스는 우리 학교 학우들이 모인 공간입니다. 부적절한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
+- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성 있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
 - 긴급상황 발생 시 [https://www.instagram.com/unive.us] 로 연락주시면 운영자가 달려가 조치하겠습니다.`; 
    const { success1 } = await sendSMS(naverCloudSensSecret, { to: writerPhone, content });
    const { success2 } = await sendSMS(naverCloudSensSecret, { to: participantPhone, content });
@@ -175,8 +175,8 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
 
 *매칭 시 유의사항*
 
-- 유니버스는 우리학교 학우들이 모인 공간입니다. 부적절 한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
-- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
+- 유니버스는 우리 학교 학우들이 모인 공간입니다. 부적절한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
+- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성 있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
 - 긴급상황 발생 시 [https://www.instagram.com/unive.us] 로 연락주시면 운영자가 달려가 조치하겠습니다.`;
     const { success1 } = await sendSMS(naverCloudSensSecret, { to: writerPhone, content });
     const { success2 } = await sendSMS(naverCloudSensSecret, { to: participant1Phone, content });
@@ -213,16 +213,16 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
 - 나의 유니버스 오픈채팅방 : ${Post.openchat}
     
 *오픈채팅방에 아직 입장하지 않으셨다면 꼭 입장해서 소통해 주세요 :)
-*모임시간에 늦지 않게 시간과 장소를 잘 확인해 주세요!
+*모임 시간에 늦지 않게 시간과 장소를 잘 확인해 주세요!
 
 *매칭 시 유의사항*
 
-- 유니버스는 우리학교 학우들이 모인 공간입니다. 부적절 한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
-- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
+- 유니버스는 우리 학교 학우들이 모인 공간입니다. 부적절한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
+- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성 있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
 - 긴급상황 발생 시 [https://www.instagram.com/unive.us] 로 연락주시면 운영자가 달려가 조치하겠습니다.
 
 즐거우셨다면 유니버스를 평가해 주세요! 큰 도움이 됩니다!!
-[링크]`; 
+[https://walla.my/survey/PfJcrC2SsbMbVz4N4QpJ]`; 
         const { success1 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[0].phone, content });
         const { success2 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][0].phone, content });
         const { success3 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[2].phone, content });   
@@ -250,16 +250,16 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
 - 나의 유니버스 오픈채팅방 : ${Post.openchat}
     
 *오픈채팅방에 아직 입장하지 않으셨다면 꼭 입장해서 소통해 주세요 :)
-*모임시간에 늦지 않게 시간과 장소를 잘 확인해 주세요!
+*모임 시간에 늦지 않게 시간과 장소를 잘 확인해 주세요!
 
 *매칭 시 유의사항*
 
-- 유니버스는 우리학교 학우들이 모인 공간입니다. 부적절 한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
-- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
+- 유니버스는 우리 학교 학우들이 모인 공간입니다. 부적절한 행위 적발 시 서비스 이용에 제약이 있을 수 있습니다. 학우들과 즐거운 추억을 만들어 보아요 :)
+- 유니버스는 반 익명성을 지향하고 있습니다. 신뢰성 있는 유익한 소셜링을 진행해 주시길 부탁드립니다.
 - 긴급상황 발생 시 [https://www.instagram.com/unive.us] 로 연락주시면 운영자가 달려가 조치하겠습니다.
 
 즐거우셨다면 유니버스를 평가해 주세요! 큰 도움이 됩니다!!
-[링크]`; 
+[https://walla.my/survey/PfJcrC2SsbMbVz4N4QpJ]`; 
         const { success1 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[0].phone, content });
         const { success2 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][0].phone, content });
         const { success3 } = await sendSMS(naverCloudSensSecret, { to: MessageAlarmList[1][1].phone, content });
@@ -372,7 +372,7 @@ export const startUniveUs = async (req, res) => {
 3. 모임을 생성/참가한 후 함께하는 친구의 닉네임을 (꼭!) 추가해주세요
 - 유니버스 접속링크 : https://univeus.com`;
 
-        // const { success } = await sendSMS(naverCloudSensSecret, { to, content });
+        // const { success } = await sendSMS(naverCloudSensSecret, { to, content }); >>>>>>>>>>>>> 이 부분 일부러 주석 처리 인가염?
 
         return res.send(response(baseResponse.SUCCESS));
 };
