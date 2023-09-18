@@ -26,6 +26,8 @@ export const login = async(req, res) => {
       },
     });
 
+    console.log("axios 에러 확인용: " + resUserInfo);
+
     const userEmail = resUserInfo.data.email;  
 
     if (isKyonggiEmail(userEmail) == false) {
