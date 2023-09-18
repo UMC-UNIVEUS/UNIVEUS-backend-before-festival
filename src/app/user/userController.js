@@ -372,7 +372,7 @@ export const startUniveUs = async (req, res) => {
 3. 모임을 생성/참가한 후 함께하는 친구의 닉네임을 (꼭!) 추가해주세요
 - 유니버스 접속링크 : https://univeus.com`;
 
-        // const { success } = await sendSMS(naverCloudSensSecret, { to, content }); >>>>>>>>>>>>> 이 부분 일부러 주석 처리 인가염?
+        const { success } = await sendSMS(naverCloudSensSecret, { to, content }); 
 
         return res.send(response(baseResponse.SUCCESS));
 };
