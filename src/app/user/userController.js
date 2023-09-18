@@ -26,7 +26,7 @@ export const login = async(req, res) => {
       },
     });
 
-    console.log("axios 에러 확인용: " + resUserInfo);
+    console.log(resUserInfo);
 
     const userEmail = resUserInfo.data.email;  
 
