@@ -2,7 +2,7 @@ import express from "express"
 import {handleMulterErrors, uploadImage} from '../../../config/imageUploader';
 import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, 
     getParticipant, patchParticipant, deleteParticipant, patchStatus,postOneDayAlarm, participateUniveus,
-    cancelParticipant, postImage, validateOpentChatLink} from "./postController";
+    cancelParticipant, postImage, validateOpentChatLink, removeEmogiTest} from "./postController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 import {wrapAsync} from "../../../config/errorhandler";
 import {adminMiddleware} from "../../../config/adminMiddleware" 
@@ -29,7 +29,6 @@ postRouter.post('/:post_id/participant/onedayalarm', wrapAsync(postOneDayAlarm))
 postRouter.post('/:post_id/participant', jwtMiddleware, wrapAsync(participateUniveus)); // 유니버스 참여 + 자동 모집 마감 API (축제용)
 postRouter.delete('/:post_id/participant/cancel', jwtMiddleware, wrapAsync(cancelParticipant)); // 유니버스 참여 취소 API
 postRouter.post('/:validate/chat-link', wrapAsync(validateOpentChatLink));
-
 
 
 

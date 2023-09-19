@@ -9,6 +9,7 @@ import { createPost, createPostImage, editPost,patchPostImage, removePost, addSc
 import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById, getParticipateAvailable} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 import { changeParticipateAvailable, returnParticipateAvailable } from "../user/userService";
+import {removeEmogi} from "../post/postProvider"
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
