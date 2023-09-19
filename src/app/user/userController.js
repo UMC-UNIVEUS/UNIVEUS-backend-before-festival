@@ -11,6 +11,7 @@ import { sendSMS } from "../../../config/naverCloudClient";
 import { naverCloudSensSecret } from "../../../config/configs";
 import NodeCache from "node-cache";
 import dayjs from 'dayjs';
+import { removeEmogi } from "../post/postProvider"
 
 const cache = new NodeCache();
 
@@ -117,6 +118,7 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
     const Post = await retrievePost(post_id); 
     const User = await getUserById(user_id); // 작성자 id
     const writerPhone = User.phone;
+    const title = removeEmogi(Post.title);
 
     const date = dayjs(Post.meeting_date);
     Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
@@ -126,7 +128,7 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
         
         const content = `
 [UNIVEUS] 
-'${User.nickname}'님의 [${Post.title}] 유니버스가 생성되었습니다.
+'${User.nickname}'님의 [${title}] 유니버스가 생성되었습니다.
 즐겁고 유익한 행성을 만들어 주세요 :)
 
 - 나의 유니버스 확인하기 : 
@@ -158,7 +160,7 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
 
         const content = `
 [UNIVEUS] 
-'${User.nickname}'님의 [${Post.title}] 유니버스가 생성되었습니다.
+'${User.nickname}'님의 [${title}] 유니버스가 생성되었습니다.
 즐겁고 유익한 행성을 만들어 주세요 :)
 
 - 나의 유니버스 확인하기 : 
@@ -195,10 +197,13 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
     const date = dayjs(Post.meeting_date);
     Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
 
+    
+    const title = removeEmogi(Post.title);
+
     if(MessageAlarmList[1].length == 1){ // 제한 인원 == 4
         const content = `
 [UNIVEUS] 
-'${MessageAlarmList[0].nickname}'님의 [${Post.title}] 유니버스가 매칭 완료되었습니다.
+'${MessageAlarmList[0].nickname}'님의 [${title}] 유니버스가 매칭 완료되었습니다.
 즐겁고 행복한 추억을 만드시기 바랍니다 :)
 
 - 나의 유니버스 확인하기 : 
@@ -233,7 +238,7 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
     else if(MessageAlarmList[1].length == 2){// 제한 인원 == 6
         const content = `
 [UNIVEUS] 
-'${MessageAlarmList[0].nickname}'님의 [${Post.title}] 유니버스가 매칭 완료되었습니다.
+'${MessageAlarmList[0].nickname}'님의 [${title}] 유니버스가 매칭 완료되었습니다.
 즐겁고 행복한 추억을 만드시기 바랍니다 :)
 
 - 나의 유니버스 확인하기 : 
