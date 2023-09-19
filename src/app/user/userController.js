@@ -118,7 +118,7 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
     const Post = await retrievePost(post_id); 
     const User = await getUserById(user_id); // 작성자 id
     const writerPhone = User.phone;
-    const title = removeEmogi(Post.title);
+    const title = await removeEmogi(Post.title);
 
     const date = dayjs(Post.meeting_date);
     Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
@@ -198,7 +198,9 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
     Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
 
     
-    const title = removeEmogi(Post.title);
+    const title = await removeEmogi(Post.title);
+
+    console.log(title);
 
     if(MessageAlarmList[1].length == 1){ // 제한 인원 == 4
         const content = `
