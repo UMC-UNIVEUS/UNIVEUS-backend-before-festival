@@ -132,18 +132,18 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
 };
 
 export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
-    const postParticipantQuery = `
-        INSERT INTO participant_users(post_id, user_id) 
-        VALUES (?,?);
+    const requestParticipantQuery = `
+        INSERT INTO participant_users(post_id, user_id, status) 
+        VALUES (?,?, "waiting");
     `;
 
-    const applyParticipantAlarmQuery = `
+    const requestParticipantAlarmQuery = `
         INSERT INTO alarm(post_id, participant_id, user_id, alarm_type) 
-        VALUES (?,?,?,"application_alarm");
+        VALUES (?,?,?,"request_alarm");
     `;
 
-    const postParticipantRow = await connection.query(postParticipantQuery, insertParticipantParams);
-    const applyParticipantAlarmRow = await connection.query(applyParticipantAlarmQuery, insertParticipantParams);
+    const requestParticipantRow = await connection.query(requestParticipantQuery, insertParticipantParams);
+    const requestParticipantAlarmRow = await connection.query(requestParticipantAlarmQuery, insertParticipantParams);
 };
 
 export const selectParticipantList = async(connection, post_id)=>{ //참여자 신청 내역 조회
