@@ -75,9 +75,9 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
     connection.release();
 };
 
-export const applyParticipant = async(post_id, userIdFromJWT, user_id) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
+export const requestParticipant = async(post_id, userIdFromJWT, writer_id) =>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
 
-    const insertParticipantParams =[post_id, userIdFromJWT, user_id]; 
+    const insertParticipantParams =[post_id, userIdFromJWT, writer_id]; 
 
     const connection = await pool.getConnection(async conn => conn);
     const applyParticipantResult = await insertParticipant(connection,insertParticipantParams);
