@@ -1,7 +1,8 @@
 import { selectUser, selectUserByNickname, selectUserIdByEmail, selectAlarms, 
     selectUserById, selectIsParticipateOtherById,selectUserNickNameById, selectPhoneByEmail, 
     selectAuthStatusByEmail,selectUserByNickName, selectUserReportedNum, selectUserAccountStatus,
-    selectParticipateAvailalble } from "./userDao"
+    selectParticipateAvailalble, selectAnalyticsInfo_1, selectAnalyticsInfo_2,selectAnalyticsInfo_3,
+    selectAnalyticsInfo_4, selectAnalyticsInfo_5, selectAnalyticsInfo_6, selectAnalyticsInfo_7} from "./userDao"
 
 import pool from "../../../config/database"
 
@@ -127,4 +128,46 @@ export const getParticipateAvailable = async (userId) => {
     connection.release();
 
     return isParticipateAvailable;
+}
+
+export const AnalyticsInfo = async () => {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const value1 = await selectAnalyticsInfo_1(connection); // 총 유저 수
+    const value2 = await selectAnalyticsInfo_2(connection); // 모임 글 작성 or 모임 참여 유저 수
+    const value3 = await selectAnalyticsInfo_3(connection); // 오늘 가입한 유저 수
+    const value4 = await selectAnalyticsInfo_4(connection); // 오늘 작성된 모임 글 수
+    const value5 = await selectAnalyticsInfo_5(connection); // 오늘 매칭 완료된(4/4 or 6/6) 모임 글 수
+    const value6 = await selectAnalyticsInfo_6(connection); // 오늘 하루 모임 글 작성 or 모임 참여 유저 수
+    const value7 = await selectAnalyticsInfo_7(connection, 1); // 유저 중 남자 수
+    const value8 = await selectAnalyticsInfo_7(connection, 2); // 유저 중 여자 수
+
+    connection.release();
+
+    /*
+    // 두 수의 최대 공약수를 구하는 함수
+    function gcd(a, b) {
+        while (b !== 0) {
+            const temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    const gcd$ = gcd(value7[0]['Gender'], value8[0]['Gender']);
+
+     */
+
+
+    const AnalyticsInfoResult = {
+        "총 유저 수": value1[0]['Total_user_count'],
+        "유저 성비(남:여)": value7[0]['Gender'] > value8[0]['Gender'] ? ((value7[0]['Gender'] / value8[0]['Gender']).toFixed(3) + ":1") : "1:" +  ((value8[0]['Gender'] / value7[0]['Gender']).toFixed(3)),
+        "한 번 이상 모임 글을 작성하거나 모임에 참가한 유저 수": value2[0]['Number_of_people_has_pariticipate'],
+        "오늘 가입한 유저 수": value3[0]['Number_of_people_register_today'],
+        "오늘 하루 작성된 글 수": value4[0]['Number_of_people_register_today'],
+        "오늘 하루 매칭완료 된 모임 글 수": value5[0]['Number_of_univeus_successful_ended'],
+        "오늘 하루 모임 글을 작성하거나 모임에 참가했던 유저 수": value6[0]['Number_of_people_has_pariticipate_today'],
+    };
+    return AnalyticsInfoResult;
 }

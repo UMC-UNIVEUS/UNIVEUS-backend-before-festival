@@ -2,9 +2,11 @@ import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
     createUser, addUserPhoneNumber, addAgreementTerms } from "../user/userService";
-import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
-    getUserNickNameById, isAuthNumber, isAuthUser, 
-    getUserById, getUserPhoneNumber, removeEmojisAndSpace } from "./userProvider";
+import {
+    isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail,
+    getUserNickNameById, isAuthNumber, isAuthUser,
+    getUserById, getUserPhoneNumber, removeEmojisAndSpace, AnalyticsInfo
+} from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/naverCloudClient";
@@ -12,9 +14,10 @@ import { naverCloudSensSecret } from "../../../config/configs";
 import NodeCache from "node-cache";
 import dayjs from 'dayjs';
 import { removeEmogi } from "../post/postProvider"
+import dotenv from "dotenv";
 
 const cache = new NodeCache();
-
+dotenv.config();
 
 /** 구글 로그인 API */
 export const login = async(req, res) => {
@@ -442,4 +445,14 @@ export const agreementTerms = async(req, res) => {
     await addAgreementTerms(userId, userAgreed);
 
     return res.send(response(baseResponse.SUCCESS));
+}
+
+export const getAnalytics = async(req, res) => {
+    const IsCorrectApproach  = req.query.value;
+    if(IsCorrectApproach == process.env.SECRETPASSWORD) {
+        const getAnalyticsResponse = await AnalyticsInfo();
+        return res.send(response(baseResponse.SUCCESS, getAnalyticsResponse));
+    }
+    else
+        return res.send(errResponse(baseResponse.SERVER_ERROR))
 }

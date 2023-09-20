@@ -1,3 +1,5 @@
+import {connect} from "pm2";
+
 /** user에 Email Id insert */
 export const insertUserEmailId = async(connection, email_id) => {
     const insertUserQuery = `INSERT INTO user (email_id) VALUES ('${email_id}');`;
@@ -197,3 +199,80 @@ export const updateParticipateAvailableReturn = async(connection, userId) => {
     const updateParticipateAvailableQuery = `UPDATE user SET participate_available = 1 WHERE user_id = ${userId};`;
     const updateParticipateAvailableRow = await connection.query(updateParticipateAvailableQuery);
 }
+
+export const selectAnalyticsInfo_1 = async(connection) => {
+    const selectAnalyticsInfoQuery = `
+    SELECT COUNT(auth_status) AS 'Total_user_count' 
+    FROM user
+    ;`;
+
+    const [selectAnalyticsInfoRows] = await connection.query(selectAnalyticsInfoQuery);
+    return selectAnalyticsInfoRows;
+}
+
+
+export const selectAnalyticsInfo_2 = async(connection) => {
+    const selectAnalyticsInfoQuery = `
+        SELECT COUNT(DISTINCT user_id) AS 'Number_of_people_has_pariticipate' 
+        FROM participant_users
+        ;`;
+
+    const [selectAnalyticsInfoRows] = await connection.query(selectAnalyticsInfoQuery);
+    return selectAnalyticsInfoRows;
+}
+
+export const selectAnalyticsInfo_3 = async(connection) => {
+    const selectAnalyticsInfoQuery = `
+        SELECT COUNT(auth_status) AS 'Number_of_people_register_today'
+        FROM user
+        WHERE DATE(created_at) = DATE(CURRENT_TIMESTAMP())
+        ;`;
+
+    const [selectAnalyticsInfoRows] = await connection.query(selectAnalyticsInfoQuery);
+    return selectAnalyticsInfoRows;
+}
+    export const selectAnalyticsInfo_4 = async (connection) => {
+        const selectAnalyticsInfoQuery = `
+            SELECT COUNT(post_id) AS 'Number_of_people_register_today'
+            FROM post
+            WHERE DATE(created_at) = DATE(CURRENT_TIMESTAMP())
+            ;`;
+
+        const [selectAnalyticsInfoRows] = await connection.query(selectAnalyticsInfoQuery);
+        return selectAnalyticsInfoRows;
+    }
+
+    export const selectAnalyticsInfo_5 = async (connection) => {
+        const selectAnalyticsInfoQuery = `
+            SELECT COUNT(post_id) AS 'Number_of_univeus_successful_ended'
+            FROM post
+            WHERE DATE(created_at) = DATE(CURRENT_TIMESTAMP()) AND current_people = limit_people
+            ;`;
+
+        const [selectAnalyticsInfoRows] = await connection.query(selectAnalyticsInfoQuery);
+        return selectAnalyticsInfoRows;
+    }
+
+export const selectAnalyticsInfo_6 = async (connection) => {
+    const selectAnalyticsInfoQuery = `
+            SELECT COUNT(user_id) AS 'Number_of_people_has_pariticipate_today'
+            FROM participant_users
+            WHERE DATE(created_at) = DATE(CURRENT_TIMESTAMP())
+            ;`;
+
+    const [selectAnalyticsInfoRows] = await connection.query(selectAnalyticsInfoQuery);
+    return selectAnalyticsInfoRows;
+}
+
+export const selectAnalyticsInfo_7 = async (connection, value) => {
+    const selectAnalyticsInfoQuery = `
+            SELECT COUNT(user_id) AS 'Gender'
+            FROM user
+            WHERE gender = ?;
+            ;`;
+
+    const [selectAnalyticsInfoRows] = await connection.query(selectAnalyticsInfoQuery, value);
+    return selectAnalyticsInfoRows;
+}
+
+
