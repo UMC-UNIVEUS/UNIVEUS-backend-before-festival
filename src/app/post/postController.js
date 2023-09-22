@@ -9,7 +9,6 @@ import { createPost, createPostImage, editPost,patchPostImage, removePost, addSc
 import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById, getParticipateAvailable} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 import { changeParticipateAvailable, returnParticipateAvailable } from "../user/userService";
-import {removeEmogi} from "../post/postProvider"
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -166,7 +165,7 @@ export const postPost = async(req, res) => {
 
         await changeParticipateAvailable(userIdFromJWT);
 
-        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
+       // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
 
@@ -298,7 +297,7 @@ export const postParticipant = async(req, res) => {
     const Post = await retrievePost(post_id); 
 
     if(Post){ // Post가 존재한다면 
-        if(Post.user_id === userIdFromJWT) {return res.send(errResponse(baseResponse.POST_WRITER_PARTICIPANT_NOT_OVERLAP))}
+        if(Post.user_id === userIdFromJWT) {return res.send(errResponse(baseResponse.POST_WRITER_ACCESSOR_OVERLAP))}
 
         const postParticipantResult = await requestParticipant(post_id, userIdFromJWT, Post.user_id);
         return res.send(response(baseResponse.SUCCESS, postParticipantResult));
@@ -315,24 +314,22 @@ export const postParticipant = async(req, res) => {
 export const getParticipant = async(req, res) => {
 	
     const {post_id} = req.params;
-    const {user_id} = req.body; // 작성자 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
     
-    if(user_id == userIdFromJWT){ //접속한 유저가 작성자라면
-        const Post = await retrievePost(post_id); 
+    const Post = await retrievePost(post_id); 
 
-        if(Post){ 
-            const getParticipantList = await retrieveParticipantList(post_id); 
-            return res.send(response(baseResponse.SUCCESS, getParticipantList));
-        } 
-        else{ 
-            return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
-        }  
-    }
-    else{
-        return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
-    }
+    if(Post){ 
+        if(Post.user_id !== userIdFromJWT) {return res.send(errResponse(baseResponse.POST_WRITER_ACCESSOR_NOT_OVERLAP))}
+        
+        const getParticipantList = await retrieveParticipantList(post_id); 
+        return res.send(response(baseResponse.SUCCESS, getParticipantList));
+    } 
+    else{ 
+        return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
+    }  
+    
+    
 };
 
 /**
@@ -348,11 +345,11 @@ export const patchParticipant = async(req, res) => {
     
     const Post = await retrievePost(post_id); 
     if(Post){
-        if(Post.user_id == userIdFromJWT){
-            if(Post.current_people + 1 === Post.limit_people){await closeUniveus(post_id,Post.user_id);}
-            const patchParticipantResult = await registerParticipant(post_id, participant_id);
-            return res.send(response(baseResponse.SUCCESS, patchParticipantResult));
-        }
+        if(Post.user_id !== userIdFromJWT) {return res.send(errResponse(baseResponse.POST_WRITER_ACCESSOR_NOT_OVERLAP))}
+
+        if(Post.current_people + 1 === Post.limit_people){await closeUniveus(post_id,Post.user_id);}
+        const patchParticipantResult = await registerParticipant(post_id, participant_id);
+        return res.send(response(baseResponse.SUCCESS, patchParticipantResult));
     } 
     else{ 
        return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
@@ -366,24 +363,23 @@ export const patchParticipant = async(req, res) => {
 export const deleteParticipant = async(req, res) => {
     
     const {post_id} = req.params;
-    const {participant_id, user_id} = req.body;
+    const {participant_id} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
     
     const Post = await retrievePost(post_id); 
     
-    if(user_id == userIdFromJWT){
-        if(Post){ 
-            const deleteParticipantResult = await refuseParticipant(post_id, participant_id);
-            return res.send(response(baseResponse.SUCCESS, deleteParticipantResult));
-        } 
-        else{ 
-            return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
-        }
+    if(Post){ 
+        if(Post.user_id !== userIdFromJWT) {return res.send(errResponse(baseResponse.POST_WRITER_ACCESSOR_NOT_OVERLAP))}
+
+        const deleteParticipantResult = await refuseParticipant(post_id, participant_id);
+        return res.send(response(baseResponse.SUCCESS, deleteParticipantResult));
+    } 
+    else{ 
+        return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
     }
-    else{
-        return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
-    }
+    
+   
 };
 
 /**
@@ -393,28 +389,24 @@ export const deleteParticipant = async(req, res) => {
 export const patchStatus = async(req, res) => {
 
     const {post_id} = req.params;
-    const {user_id} = req.body; // 작성자 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
     const Post = await retrievePost(post_id); 
    
-    if(user_id == userIdFromJWT){
-        if(Post){ // Post가 존재한다면
-            if(Post.post_status == 'end'){
-                return res.status(errResponse(baseResponse.POST_PARTICIPATE_ALREADY_CLOSE))
-            }
-            else{
-                const changeStatusResult = await changeStatus(post_id);   
-                return res.send(response(baseResponse.SUCCESS, changeStatusResult));
-            }
-        } 
-        else{ 
-            return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
-        } 
-    }
-    else{
-        return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
-    }
+    if(Post){ // Post가 존재한다면
+        if(Post.user_id !== userIdFromJWT) {return res.send(errResponse(baseResponse.POST_WRITER_ACCESSOR_NOT_OVERLAP))}
+
+        if(Post.post_status === 'end'){
+            return res.status(errResponse(baseResponse.POST_PARTICIPATE_ALREADY_CLOSE))
+        }
+        else{
+            const changeStatusResult = await changeStatus(post_id);   
+            return res.send(response(baseResponse.SUCCESS, changeStatusResult));
+        }
+    } 
+    else{ 
+        return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST))
+    } 
 };
 
 /**
@@ -588,7 +580,7 @@ export const participateUniveus = async(req, res) => {
 export const cancelParticipant = async(req, res) => {
     
     const {post_id} = req.params;
-    const {user_id,participant_userIDsFromDB} = req.body;// 작성자 ID, 참여한 유저 ID들
+    const {participant_userIDsFromDB} = req.body;// 작성자 ID, 참여한 유저 ID들
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
     
@@ -600,7 +592,7 @@ export const cancelParticipant = async(req, res) => {
             if(Post.post_status =="end"){// 모집 마감이라면
                 await changePostStatus(post_id);// 모집 중으로 변경
             }
-            const removeParticipantResult = await removeParticipant(post_id, userIdFromJWT, user_id);// 유니버스 참여 취소 
+            const removeParticipantResult = await removeParticipant(post_id, userIdFromJWT, Post.user_id);// 유니버스 참여 취소 
             await sendCancelMessageAlarm(user_id, userIdFromJWT); // 참여 취소 알림 (to 작성자)
             return res.send(response(baseResponse.SUCCESS, removeParticipantResult));
         }
