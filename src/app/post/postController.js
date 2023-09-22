@@ -67,7 +67,6 @@ export const postPost = async(req, res) => {
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 id) 
 
-    
     for(let i = 0; i < notUndefined.length; i++){
         if(notUndefined[i] == null){
             return res.send(errResponse(baseResponse.POST_INFORMATION_EMPTY));
