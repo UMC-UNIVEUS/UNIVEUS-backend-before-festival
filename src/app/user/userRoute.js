@@ -1,14 +1,15 @@
 import express from "express"
-import {sendAuthNumber, login, 
+import {sendAuthNumber, login,
     verifyNumber,
     checkNickNameDuplicate, startUniveUs,
-    getAlarms, patchAlarms, agreementTerms} from "./userController"
+    getAlarms, patchAlarms, agreementTerms, getAnalytics} from "./userController"
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 import { accountStatusMiddleware } from "../../../config/accountStatusMiddleware";
 import {wrapAsync} from "../../../config/errorhandler";
 
 const userRouter = express.Router();
 
+userRouter.get('/analytics', wrapAsync(getAnalytics));
 userRouter.post('/login', wrapAsync(login));
 userRouter.post('/send/number', wrapAsync(sendAuthNumber));
 userRouter.post('/auth/number', jwtMiddleware, wrapAsync(verifyNumber));

@@ -2,9 +2,11 @@ import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
     createUser, addUserPhoneNumber, addAgreementTerms } from "../user/userService";
-import { isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail, 
-    getUserNickNameById, isAuthNumber, isAuthUser, 
-    getUserById, getUserPhoneNumber, removeEmojisAndSpace } from "./userProvider";
+import {
+    isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail,
+    getUserNickNameById, isAuthNumber, isAuthUser,
+    getUserById, getUserPhoneNumber, removeEmojisAndSpace, AnalyticsInfo
+} from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/naverCloudClient";
@@ -12,9 +14,10 @@ import { naverCloudSensSecret } from "../../../config/configs";
 import NodeCache from "node-cache";
 import dayjs from 'dayjs';
 import { removeEmogi } from "../post/postProvider"
+import dotenv from "dotenv";
 
 const cache = new NodeCache();
-
+dotenv.config();
 
 /** 구글 로그인 API */
 export const login = async(req, res) => {
@@ -118,7 +121,7 @@ export const sendCreatePostMessageAlarm = async(user_id, post_id,participants) =
     const Post = await retrievePost(post_id); 
     const User = await getUserById(user_id); // 작성자 id
     const writerPhone = User.phone;
-    const title = removeEmogi(Post.title);
+    const title = await removeEmogi(Post.title);
 
     const date = dayjs(Post.meeting_date);
     Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
@@ -198,7 +201,9 @@ export const sendParticipantMessageAlarm = async(post_id, MessageAlarmList) =>{ 
     Post.meeting_date = date.month() + 1 + "월 " + date.date() + "일 " + date.hour() + ":" + date.minute();
 
     
-    const title = removeEmogi(Post.title);
+    const title = await removeEmogi(Post.title);
+
+    console.log(title);
 
     if(MessageAlarmList[1].length == 1){ // 제한 인원 == 4
         const content = `
@@ -440,4 +445,14 @@ export const agreementTerms = async(req, res) => {
     await addAgreementTerms(userId, userAgreed);
 
     return res.send(response(baseResponse.SUCCESS));
+}
+
+export const getAnalytics = async(req, res) => {
+    const IsCorrectApproach  = req.query.value;
+    if(IsCorrectApproach == process.env.SECRETPASSWORD) {
+        const getAnalyticsResponse = await AnalyticsInfo();
+        return res.send(response(baseResponse.SUCCESS, getAnalyticsResponse));
+    }
+    else
+        return res.send(errResponse(baseResponse.SERVER_ERROR))
 }

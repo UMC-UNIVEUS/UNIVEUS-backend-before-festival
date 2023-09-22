@@ -3,12 +3,13 @@ dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate, formatingCreatedAt, isValidOpenChat} from "./postProvider";
 import { createPost, createPostImage, editPost,patchPostImage, removePost, addScrap, addLike, 
-    applyParticipant, registerParticipant, refuseParticipant,
+    requestParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus, changeCurrentPeople } from "./postService";
 import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById, getParticipateAvailable} from "../user/userProvider";
 import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 import { changeParticipateAvailable, returnParticipateAvailable } from "../user/userService";
+import {removeEmogi} from "../post/postProvider"
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -54,7 +55,7 @@ export const getPost = async(req, res) => {
 };
 
 /**
- * API name : 게시글 작성 >> 넘어온 데이터 형식에 따라 모임, 마감 시간 저장할 방식 수정해야 함
+ * API name : 게시글 작성 >> 넘어온 데이터 형식에 따라 모임, 마감 시간 저장할 방식 수정해야 함 
  * POST: /post
  */
 export const postPost = async(req, res) => {
@@ -297,20 +298,21 @@ export const patchLike = async(req, res) => {
 
 /**
  * API name : 게시글 참여 신청 + 참여 신청 알람(to 작성자)
- * POST: /post/{post_id}/participant/apply
+ * POST: /post/{post_id}/participate/request
  */
 export const postParticipant = async(req, res) => {
 
     
     const {post_id} = req.params;
-    const {user_id} = req.body;// 작성자 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (신청자 ID 여야 함)
     
     const Post = await retrievePost(post_id); 
-    
+
     if(Post){ // Post가 존재한다면 
-        const postParticipantResult = await applyParticipant(post_id, userIdFromJWT, user_id);
+        if(Post.user_id === userIdFromJWT) {return res.send(errResponse(baseResponse.POST_WRITER_PARTICIPANT_NOT_OVERLAP))}
+
+        const postParticipantResult = await requestParticipant(post_id, userIdFromJWT, Post.user_id);
         return res.send(response(baseResponse.SUCCESS, postParticipantResult));
     } 
     else{ 
@@ -598,7 +600,7 @@ export const participateUniveus = async(req, res) => {
 };
 
 /**
- * API name : 유니버스 참여 취소 (축제 때는 불가능함)
+ * API name : 유니버스 참여 취소 
  * DELETE: /post/{post_id}/participant/cancel
  */
 export const cancelParticipant = async(req, res) => {
