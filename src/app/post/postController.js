@@ -55,7 +55,7 @@ export const getPost = async(req, res) => {
 };
 
 /**
- * API name : 게시글 작성 >> 넘어온 데이터 형식에 따라 모임, 마감 시간 저장할 방식 수정해야 함 
+ * API name : 게시글 작성
  * POST: /post
  */
 export const postPost = async(req, res) => {
@@ -74,19 +74,14 @@ export const postPost = async(req, res) => {
             return res.send(errResponse(baseResponse.POST_INFORMATION_EMPTY));
         } 
     }
-    if(category != 4){ // 축제용 조건문
-        return res.send(errResponse(baseResponse.POST_CATEGORY_LIMIT));
-    }    
-    if(limit_people != 4 && limit_people != 6){ // 축제용 조건문
-        return res.send(errResponse(baseResponse.POST_PEOPLE_LIMIT));
-    }    
+    
     if(location.length > 24){
         return res.send(errResponse(baseResponse.POST_LOCATION_LENGTH));
     }    
     if(title.length > 48){ 
         return res.send(errResponse(baseResponse.POST_TITLE_LENGTH));
     }
-    if(content.length > 500){ // 축제용 조건문
+    if(content.length > 500){ 
         return res.send(errResponse(baseResponse.POST_CONTENT_LENGTH));
     }
     if(invited_userNickNames.length == 0){ // 아무도 초대하지 않았는데 초대하기 눌렀을 때
@@ -201,13 +196,7 @@ export const patchPost =  async(req, res) => {
         if(notUndefined[i] == null){ 
             return res.send(errResponse(baseResponse.POST_INFORMATION_EMPTY));
         } 
-    }
-    if(category != 4){ // 축제용 조건문
-        return res.send(errResponse(baseResponse.POST_CATEGORY_LIMIT));
-    }    
-    if(limit_people != 4 && limit_people != 6){ // 축제용 조건문
-        return res.send(errResponse(baseResponse.POST_PEOPLE_LIMIT));
-    }    
+    }  
     if(location.length > 24){
         return res.send(errResponse(baseResponse.POST_LOCATION_LENGTH));
     }    
@@ -232,7 +221,6 @@ export const patchPost =  async(req, res) => {
 export const deletePost =  async(req, res) => {
 
     const {post_id} = req.params;
-    // const {user_id} = req.body; // 작성자의 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID 
     const Post = await retrievePost(post_id);
@@ -244,7 +232,7 @@ export const deletePost =  async(req, res) => {
 
     const participants = await retrieveParticipant(post_id);
 
-    /** 참여자 참여권 돌려주기*/
+    /** 참여자 참여권 돌려주기 >> 서비스 운영 어떻게 할 지 의논 후 수정*/
     participants.forEach(async function(participant) {
         await returnParticipateAvailable(participant.user_id);
     });
@@ -258,7 +246,7 @@ export const deletePost =  async(req, res) => {
 };
 
 /**
- * API name : 게시글 스크랩 >> 축제 때는 필요 X
+ * API name : 게시글 스크랩 
  * PATCH: /post/{post_id}/scrap
  */
 export const patchScrap = async(req, res) => {
@@ -279,7 +267,7 @@ export const patchScrap = async(req, res) => {
 };
 
 /**
- * API name : 게시글 좋아요 >> 축제 때는 필요 X
+ * API name : 게시글 좋아요 
  * PATCH: /post/{post_id}/like
  */
 export const patchLike = async(req, res) => {
@@ -349,27 +337,25 @@ export const getParticipant = async(req, res) => {
 
 /**
  * API name : 게시글 참여자 승인 + 참여 승인 알람(to 참여자)
- * PATCH: /post/{post_id}/participant/register
+ * PATCH: /post/{post_id}/participate/register
  */
 export const patchParticipant = async(req, res) => {
     
     const {post_id} = req.params;
-    const {participant_id, user_id} = req.body;// 참여 테이블 ID, 작성자의 ID
+    const {participant_id} = req.body;// 참여 테이블 ID
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 토큰을 통해 얻은 유저 ID (작성자 ID 여야 함)
     
-    if(user_id == userIdFromJWT){
-        const Post = await retrievePost(post_id); 
-        if(Post){
+    const Post = await retrievePost(post_id); 
+    if(Post){
+        if(Post.user_id == userIdFromJWT){
+            if(Post.current_people + 1 === Post.limit_people){await closeUniveus(post_id,Post.user_id);}
             const patchParticipantResult = await registerParticipant(post_id, participant_id);
             return res.send(response(baseResponse.SUCCESS, patchParticipantResult));
-        } 
-        else{ 
-            return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
         }
-    }
-    else{
-        return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    } 
+    else{ 
+       return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
     }
 };
 
@@ -508,18 +494,16 @@ export const participateUniveus = async(req, res) => {
 
         await applyUniveus(post_id, guest.user_id); // 초대받은 사람 참여
 
-        await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
-
         await changeCurrentPeople(4, post_id);
 
         // TODO :  user 테이블의 participate-available 0으로 만들어주기
 
-        await changeParticipateAvailable(guest.user_id);
+        //await changeParticipateAvailable(guest.user_id);
 
-        await changeParticipateAvailable(userIdFromJWT);
+        //await changeParticipateAvailable(userIdFromJWT);
 
-        const MessageAlarmList = [Writer, [alreadyParticipant], Invitee, [guest]];
-        await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
+        //const MessageAlarmList = [Writer, [alreadyParticipant], Invitee, [guest]];
+        //await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
         return res.send(response(baseResponse.SUCCESS));          
     }  
 
@@ -579,17 +563,15 @@ export const participateUniveus = async(req, res) => {
         await applyUniveus(post_id, guest2.user_id); // 초대받은 사람 참여
 
         await changeCurrentPeople(6, post_id);
-
-        await closeUniveus(post_id,writer_id); // 게시글의 상태를 모집 마감으로 업데이트
         
-        await changeParticipateAvailable(guest1.user_id);
+        //await changeParticipateAvailable(guest1.user_id);
 
-        await changeParticipateAvailable(guest2.user_id);
+        //await changeParticipateAvailable(guest2.user_id);
 
-        await changeParticipateAvailable(userIdFromJWT);
+        //await changeParticipateAvailable(userIdFromJWT);
 
-        const MessageAlarmList = [Writer, [alreadyParticipant1, alreadyParticipant2], Invitee, [guest1, guest2]];
-        await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
+        //const MessageAlarmList = [Writer, [alreadyParticipant1, alreadyParticipant2], Invitee, [guest1, guest2]];
+        //await sendParticipantMessageAlarm(post_id, MessageAlarmList); //게시글 참여 시 문자 알림 (to old 참여자, new 참여자)
 
         return res.send(response(baseResponse.SUCCESS));
         }  
