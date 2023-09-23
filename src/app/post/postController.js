@@ -7,7 +7,7 @@ import { createPost, createPostImage, editPost,patchPostImage, removePost, addSc
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus, changeCurrentPeople } from "./postService";
 import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById, getParticipateAvailable} from "../user/userProvider";
-import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
+//import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 import { changeParticipateAvailable, returnParticipateAvailable } from "../user/userService";
 
 /**
@@ -106,14 +106,13 @@ export const postPost = async(req, res) => {
 
         if(typeof images != "undefined") await createPostImage(images,postPostResult.insertId); 
 
-
         await inviteOneParticipant(postPostResult.insertId, participant.user_id, userIdFromJWT);
 
         // TODO :  user 테이블의 participate-available 0으로 만들어주기
         await changeParticipateAvailable(participant.user_id);
         await changeParticipateAvailable(userIdFromJWT);
 
-        await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
+        //await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participant); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공   
     }
@@ -166,9 +165,8 @@ export const postPost = async(req, res) => {
        // await sendCreatePostMessageAlarm(userIdFromJWT, postPostResult.insertId, participants); // 작성 알림 (to 작성자, 초대 받은 사람) 
 
         return res.send(response(baseResponse.SUCCESS, `생성된 post_id = ${postPostResult.insertId}`)); // 성공
-
         }
-    }
+}
 
 /**
  * API name : 게시글 수정
@@ -591,7 +589,7 @@ export const cancelParticipant = async(req, res) => {
                 await changePostStatus(post_id);// 모집 중으로 변경
             }
             const removeParticipantResult = await removeParticipant(post_id, userIdFromJWT, Post.user_id);// 유니버스 참여 취소 
-            await sendCancelMessageAlarm(user_id, userIdFromJWT); // 참여 취소 알림 (to 작성자)
+           // await sendCancelMessageAlarm(user_id, userIdFromJWT); // 참여 취소 알림 (to 작성자)
             return res.send(response(baseResponse.SUCCESS, removeParticipantResult));
         }
         else{ // 참여를 하지 않았던 유저라면 
