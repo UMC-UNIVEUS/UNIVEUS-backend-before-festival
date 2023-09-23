@@ -59,7 +59,6 @@ export const getPost = async(req, res) => {
  */
 export const postPost = async(req, res) => {
 
-    
     const {category, limit_gender, limit_people, location, meeting_date, openchat, 
         end_date, title, content, images, invited_userNickNames } = req.body; // 축제용 >> limit_gender, invited_userNickNames
     const notUndefined = [category, limit_gender, limit_people, location, meeting_date, openchat, 
