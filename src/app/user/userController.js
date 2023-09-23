@@ -38,7 +38,7 @@ export const login = async(req, res) => {
         return res.send(errResponse(baseResponse.SIGNUP_EMAIL_KYONGGI));
     }
 
-    const accessToken = jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '7days', issuer : 'univeus' })    
+    const accessToken = jwt.sign({ userEmail : userEmail }, process.env.ACCESS_TOKEN_SECRET, { expiresIn : '100days', issuer : 'univeus' })    
 
     if(!accessToken) return res.send(errResponse(baseResponse.VERIFIED_ACCESS_TOKEN_EMPTY));
     
