@@ -7,7 +7,8 @@ import {
     selectUserMyUnivebyId,
     selectUserParticipatebyId,
     selectPostbyId,
-    selectUserProfilebyId
+    selectUserProfilebyId,
+    selectUserMyScrapbyId
 } from './profileDao';
 import {baseResponse, response, errResponse} from "../../../config/response";
 import dayjs from 'dayjs';
@@ -98,6 +99,33 @@ export const showUserMyUnive = async (user_id) => {
          }
         connection.release();
         return showUserMyUniveResult[0];
+    } else {
+        connection.release();
+        return errResponse(baseResponse.PROFILE_INFO_NOT_EXIST);
+    }
+};
+
+export const showUserMyScrap = async (user_id,sortType) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+
+    const showUserMyScrapParams = [user_id,sortType];
+    const showUserMyScrapResult = await selectUserMyScrapbyId(connection, showUserMyScrapParams);
+
+    if(showUserMyScrapResult[0][0]) {
+        for (let i = 0; i < showUserMyScrapResult[0].length; i++) {
+             //학번 변경
+             if(showUserMyScrapResult[0][i].class_of) {
+                 const changeClassof = Math.floor(showUserMyScrapResult[0][i].class_of / 100000 % 100);
+                 showUserMyScrapResult[0][i].class_of = changeClassof + "학번"
+             }
+
+             //모임 시간 변경
+             if(showUserMyScrapResult[0][i].meeting_date) {
+                formatingMeetingDate(showUserMyScrapResult[0][i])
+             }
+         }
+        connection.release();
+        return showUserMyScrapResult[0];
     } else {
         connection.release();
         return errResponse(baseResponse.PROFILE_INFO_NOT_EXIST);
