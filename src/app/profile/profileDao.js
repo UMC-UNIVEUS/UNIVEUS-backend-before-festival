@@ -53,6 +53,39 @@ export const selectUserMyUnivebyId = async (connection, user_id)=> {
     return selectUserMyUniveRows;
 };
 
+export const selectUserMyScrapbyId = async (connection, showUserMyScrapParams)=> {
+    const sortType = showUserMyScrapParams[1];
+
+    if(sortType === "latest"){
+        const selectUserMyScrapQuery = `
+        SELECT post_id, user.profile_img, user.nickname, user.gender, user.class_of,
+               main_img, title, limit_gender, location,
+               current_people, limit_people, meeting_date
+        FROM post
+        INNER JOIN user
+        ON post.user_id = user.user_id
+        WHERE post_id IN (SELECT post_id FROM post_scrapes WHERE user_id = ?)
+        ORDER BY post.created_at DESC
+        ;`;
+        const selectUserMyScrapRows = await connection.query(selectUserMyScrapQuery, showUserMyScrapParams[0]);
+        return selectUserMyScrapRows;
+    }
+    else if(sortType === "popularity"){
+        const selectUserMyScrapQuery = `
+        SELECT post_id, user.profile_img, user.nickname, user.gender, user.class_of,
+            main_img, title, limit_gender, location,
+            current_people, limit_people, meeting_date
+        FROM post
+        INNER JOIN user
+        ON post.user_id = user.user_id
+        WHERE post_id IN (SELECT post_id FROM post_scrapes WHERE user_id = ?)
+        ORDER BY post.likes DESC
+        ;`;
+        const selectUserMyScrapRows = await connection.query(selectUserMyScrapQuery, showUserMyScrapParams[0]);
+        return selectUserMyScrapRows;
+    }
+};
+
 export const selectUserParticipatebyId = async (connection, user_id) => {
     const selectUserParticipatebyIdQuery = `
     SELECT post_id, user.profile_img, user.nickname, user.gender, user.class_of,

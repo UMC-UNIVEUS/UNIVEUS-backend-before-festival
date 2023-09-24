@@ -7,7 +7,8 @@ import {
     showUserIntroProfile,
     showUserMyUnive,
     showUserParticipate,
-    showUserProfile
+    showUserProfile,
+    showUserMyScrap
 } from './profileProvider';
 import {
     ModifyIntroProfile
@@ -73,6 +74,15 @@ export const getUserMyUnive = async (req, res) => {
     return res.status(200).json(response(baseResponse.SUCCESS, getUserMyUniveResponse));
 };
 
+export const getUserMyScrap = async (req,res) =>{
+    const userEmail = req.verifiedToken.userEmail;
+    const {sortType} = req.body;
+    if (!userEmail) return res.send(errResponse(baseResponse.USER_USERID_EMPTY));
+    const user_id = await getUserIdByEmail(userEmail);
+
+    const getUserMyScrapResponse = await showUserMyScrap(user_id, sortType);
+    return res.send(response(baseResponse.SUCCESS, getUserMyScrapResponse));
+};
 
 export const getUserParticipate = async (req, res) => {
     const userEmail = req.verifiedToken.userEmail;
