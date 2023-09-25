@@ -15,7 +15,7 @@ const profileRouter = express.Router();
 //profileRouter.put('/profile/:user_id', putUserProfile);
 profileRouter.get('/', jwtMiddleware, wrapAsync(getUserProfile));
 profileRouter.get('/myunive', jwtMiddleware, wrapAsync(getUserMyUnive));
-profileRouter.get('/myscrap', jwtMiddleware, wrapAsync(getUserMyScrap));
+profileRouter.get('/myscrap', jwtMiddleware, wrapAsync(getUserMyScrap)); // 찜한 게시글 조회
 profileRouter.get('/participate', jwtMiddleware, wrapAsync(getUserParticipate));
 
 export default profileRouter;

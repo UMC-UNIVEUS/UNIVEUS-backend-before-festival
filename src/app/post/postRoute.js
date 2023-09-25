@@ -9,7 +9,7 @@ import {adminMiddleware} from "../../../config/adminMiddleware"
 
 const postRouter = express.Router();
 
-postRouter.get('/:post_id',jwtMiddleware, wrapAsync(getPost)); // 게시글(+참여자 목록) 조회 API
+postRouter.get('/:post_id',jwtMiddleware, wrapAsync(getPost)); // 게시글(+참여자 목록, 댓글) 조회 API
 postRouter.post('/', jwtMiddleware, wrapAsync(postPost)); // 게시글 작성 API
 postRouter.post('/image/upload',
     jwtMiddleware,

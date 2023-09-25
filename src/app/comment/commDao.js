@@ -5,8 +5,8 @@ export const selectComment = async(connection, post_id) => {
         comments.contents, comments.created_at
         FROM comments
         INNER JOIN user
-        ON comments.user_id = user.user_id
-        WHERE post_id = ?;
+        WHERE post_id = ?
+        ORDER BY comments.created_at DESC;
     `;
    
     const [CommentRow] = await connection.query(selectCommentQuery, post_id);
