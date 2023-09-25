@@ -80,6 +80,8 @@ export const baseResponse = {
     PROFILE_INFO_NOT_EXIST : { "isSuccess": false, "code": 2201, "message": "유저 프로필 정보가 존재하지 않습니다." },
     PROFILE_DEFAULT_INFO_NOT_EXIST : { "isSuccess": false, "code": 2202, "message": "유저 기본 프로필 정보가 존재하지 않습니다." },
     PROFILE_INTRO_INFO_NOT_EXIST : { "isSuccess": false, "code": 2203, "message": "유저 자기소개 프로필 정보가 존재하지 않습니다." },
+    PROFILE_SCRAP_NOT_EXIST : { "isSuccess": false, "code": 2204, "message": "해당 유저는 찜한 게시물이 없습니다." },
+
 
     /** 신고 관련 MSG */
     REPORT_SUCCESS : {"isSuccess" : true, "code" : 6000, "message" : "신고가 접수되었습니다."},

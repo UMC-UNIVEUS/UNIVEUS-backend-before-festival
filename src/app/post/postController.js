@@ -9,6 +9,7 @@ import { createPost, createPostImage, editPost,patchPostImage, removePost, addSc
 import {getUserIdByEmail, getUserByNickName, getUserById, getIsParticipateOtherById, getParticipateAvailable} from "../user/userProvider";
 //import { sendCreatePostMessageAlarm, sendParticipantMessageAlarm, sendCancelMessageAlarm} from "../user/userController"
 import { changeParticipateAvailable, returnParticipateAvailable } from "../user/userService";
+import {retrieveComment} from "../comment/commProvider";
 
 /**
  * API name : 게시글 조회(게시글 + 참여자 목록)
@@ -29,6 +30,7 @@ export const getPost = async(req, res) => {
 
         formatingCreatedAt(Post);
         
+        const Comment = await retrieveComment(post_id); 
         const Participants = await retrieveParticipant(post_id); 
         const Participant = [];
         const Writer = Participants[0];
@@ -50,7 +52,7 @@ export const getPost = async(req, res) => {
             Object.assign(connectedUser,{"isParticipateThisPost":0});
         }
 
-        return res.send(response(baseResponse.SUCCESS, {Post, PostImages, connectedUser, Writer, Participant}));
+        return res.send(response(baseResponse.SUCCESS, {Post, PostImages, connectedUser, Writer, Participant, Comment}));
 };
 
 /**

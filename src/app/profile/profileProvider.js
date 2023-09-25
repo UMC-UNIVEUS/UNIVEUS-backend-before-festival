@@ -110,6 +110,7 @@ export const showUserMyScrap = async (user_id,sortType) => {
 
     const showUserMyScrapParams = [user_id,sortType];
     const showUserMyScrapResult = await selectUserMyScrapbyId(connection, showUserMyScrapParams);
+    console.log(showUserMyScrapResult[0]);
 
     if(showUserMyScrapResult[0][0]) {
         for (let i = 0; i < showUserMyScrapResult[0].length; i++) {
@@ -128,7 +129,7 @@ export const showUserMyScrap = async (user_id,sortType) => {
         return showUserMyScrapResult[0];
     } else {
         connection.release();
-        return errResponse(baseResponse.PROFILE_INFO_NOT_EXIST);
+        return errResponse(baseResponse.PROFILE_SCRAP_NOT_EXIST);
     }
 };
 
