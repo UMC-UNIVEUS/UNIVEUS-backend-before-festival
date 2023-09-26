@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import {baseResponse, response, errResponse} from "../../../config/response";
 import { retrievePost, retrieveParticipant, retrievePostImages, retrieveParticipantList, formatingEndDate, formatingMeetingDate, formatingCreatedAt, isValidOpenChat} from "./postProvider";
-import { createPost, createPostImage, editPost,patchPostImage, removePost, addScrap, addLike, 
+import { createPost, createPostImage, editPost,patchPostImage, removePost, addScrap, addLike,cancelLike, 
     requestParticipant, registerParticipant, refuseParticipant,
     addOneDayAlarm, applyUniveus,closeUniveus, inviteOneParticipant
     ,changePostStatus, removeParticipant,changeStatus, changeCurrentPeople } from "./postService";
@@ -263,6 +263,7 @@ export const patchScrap = async(req, res) => {
     } 
 };
 
+
 /**
  * API name : 게시글 좋아요 
  * PATCH: /post/{post_id}/like
@@ -275,6 +276,24 @@ export const patchLike = async(req, res) => {
     if(Post){ // Post가 존재한다면
         const addLikeResult = await addLike(post_id);   
         return res.send(response(baseResponse.SUCCESS, addLikeResult));
+    } 
+    else{ 
+        return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
+    } 
+};
+
+/**
+ * API name : 게시글 좋아요 취소 
+ * PATCH: /post/{post_id}/like/cancel
+ */
+export const patchLikeCancel = async(req, res) => {
+
+    const {post_id} = req.params;
+    const Post = await retrievePost(post_id); 
+    
+    if(Post){ // Post가 존재한다면
+        const cancelLikeResult = await cancelLike(post_id);   
+        return res.send(response(baseResponse.SUCCESS, cancelLikeResult));
     } 
     else{ 
         return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));

@@ -2,7 +2,7 @@
 (CRUD에 해당하는 서버 로직 처리) */
 
 import pool from "../../../config/database";
-import { insertPost, insertPostImages, updatePost, updatePostImages, erasePost, insertScrap, insertLike,
+import { insertPost, insertPostImages, updatePost, updatePostImages, erasePost, insertScrap, insertLike,updateLike,
      insertParticipant, updateParticipant,deleteParticipant, insertUniveus, 
      addParticipant,blockUniveus, switchPostStatus, eraseParticipant,
      updateStatus, updateCurrentPeople } from "./postDao";
@@ -72,6 +72,13 @@ export const addLike = async(post_id)=>{// 게시글 좋아요
 
     const connection = await pool.getConnection(async conn => conn);
     const insertLikeResult = await insertLike(connection,post_id); 
+    connection.release();
+};
+
+export const cancelLike = async(post_id)=>{// 게시글 좋아요 취소
+
+    const connection = await pool.getConnection(async conn => conn);
+    const updateLikeResult = await updateLike(connection,post_id); 
     connection.release();
 };
 
