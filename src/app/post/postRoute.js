@@ -1,6 +1,6 @@
 import express from "express"
 import {handleMulterErrors, uploadImage} from '../../../config/imageUploader';
-import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, postParticipant, 
+import {getPost, postPost, patchPost, deletePost,patchScrap, patchLike, patchLikeCancel, postParticipant, 
     getParticipant, patchParticipant, deleteParticipant, patchStatus,postOneDayAlarm, participateUniveus,
     cancelParticipant, postImage, validateOpentChatLink, removeEmogiTest} from "./postController";
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
@@ -20,6 +20,7 @@ postRouter.patch('/:post_id', jwtMiddleware, wrapAsync(patchPost)); // 게시글
 postRouter.delete('/:post_id', jwtMiddleware, wrapAsync(deletePost)); // 게시글 삭제 API
 postRouter.patch('/:post_id/scrap', jwtMiddleware, wrapAsync(patchScrap)); // 게시글 스크랩 API
 postRouter.patch('/:post_id/like', jwtMiddleware, wrapAsync(patchLike)); // 게시글 좋아요 API
+postRouter.patch('/:post_id/like/cancel', jwtMiddleware, wrapAsync(patchLikeCancel)); // 게시글 좋아요 취소 API
 postRouter.get('/:post_id/participate', jwtMiddleware, wrapAsync(getParticipant)); // 게시글 참여자 신청 내역 조회 API
 postRouter.post('/:post_id/participate/request', jwtMiddleware, wrapAsync(postParticipant)); // 게시글 참여 신청 API + 참여 신청 알람(to 작성자) API
 postRouter.patch('/:post_id/participate/register', jwtMiddleware, wrapAsync(patchParticipant)); // 게시글 참여 승인 API + 참여 승인 알람(to 참여자) API

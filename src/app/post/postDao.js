@@ -131,6 +131,15 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
     const insertLikeRow = await connection.query(addLikeQuery, post_id);
 };
 
+export const updateLike = async(connection, post_id)=>{// 게시글 좋아요 취소
+    const cancelLikeQuery = `
+        UPDATE post 
+        SET likes = likes - 1
+        WHERE post_id = ?;
+    `;
+    const cancelLikeRow = await connection.query(cancelLikeQuery, post_id);
+};
+
 export const insertParticipant = async(connection, insertParticipantParams)=>{// 게시글 참여 신청 + 참여 신청 알람(to 작성자)
     const requestParticipantQuery = `
         INSERT INTO participant_users(post_id, user_id, status) 
