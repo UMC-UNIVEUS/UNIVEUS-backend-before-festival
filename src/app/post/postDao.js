@@ -122,6 +122,21 @@ export const insertScrap = async(connection, addScarpParams)=>{// 게시글 스�
     const insertScrapTableRow = await connection.query(postScrapTableQuery, addScarpParams); // 여기 (postScrapTableQuery, post_id, user_id)처럼 인수를 3개 넘겨주면 에러남 
 };
 
+export const deleteScrap = async(connection, cancelScrapParams)=>{// 게시글 스크랩 수 감소 + post_scrapes 테이블 삭제
+    const deleteScrapQuery = `
+        UPDATE post 
+        SET scrapes = scrapes - 1
+        WHERE post_id = ?;
+    `;
+
+    const deleteScrapTableQuery = `
+        DELETE FROM post_scrapes 
+        WHERE post_id = ? AND user_id = ?;
+    `;
+    const deleteScrapRow = await connection.query(deleteScrapQuery, cancelScrapParams[0]);
+    const deleteScrapTableRow = await connection.query(deleteScrapTableQuery, cancelScrapParams); 
+};
+
 export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
     const addLikeQuery = `
         UPDATE post 
@@ -131,7 +146,7 @@ export const insertLike = async(connection, post_id)=>{// 게시글 좋아요
     const insertLikeRow = await connection.query(addLikeQuery, post_id);
 };
 
-export const updateLike = async(connection, post_id)=>{// 게시글 좋아요 취소
+export const deleteLike = async(connection, post_id)=>{// 게시글 좋아요 취소
     const cancelLikeQuery = `
         UPDATE post 
         SET likes = likes - 1
