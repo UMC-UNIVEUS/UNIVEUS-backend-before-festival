@@ -2,7 +2,8 @@ import { selectUser, selectUserByNickname, selectUserIdByEmail, selectAlarms,
     selectUserById, selectIsParticipateOtherById,selectUserNickNameById, selectPhoneByEmail, 
     selectAuthStatusByEmail,selectUserByNickName, selectUserReportedNum, selectUserAccountStatus,
     selectParticipateAvailalble, selectAnalyticsInfo_1, selectAnalyticsInfo_2,selectAnalyticsInfo_3,
-    selectAnalyticsInfo_4, selectAnalyticsInfo_5, selectAnalyticsInfo_6, selectAnalyticsInfo_7} from "./userDao"
+    selectAnalyticsInfo_4, selectAnalyticsInfo_5, selectAnalyticsInfo_6, selectAnalyticsInfo_7,
+    selectFriend} from "./userDao"
 
 import pool from "../../../config/database"
 
@@ -171,3 +172,12 @@ export const AnalyticsInfo = async () => {
     };
     return AnalyticsInfoResult;
 }
+
+export const retrieveFriend = async(user_id) =>{
+    const connection = await pool.getConnection(async conn => conn);
+
+    const getFriendResult = await selectFriend(connection,user_id); 
+    connection.release();
+
+    return getFriendResult[0];
+};

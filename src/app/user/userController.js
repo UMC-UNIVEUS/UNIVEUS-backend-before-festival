@@ -5,7 +5,7 @@ import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms,
 import {
     isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail,
     getUserNickNameById, isAuthNumber, isAuthUser,
-    getUserById, getUserPhoneNumber, removeEmojisAndSpace, AnalyticsInfo
+    getUserById, getUserPhoneNumber, removeEmojisAndSpace, AnalyticsInfo, retrieveFriend
 } from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
@@ -456,3 +456,21 @@ export const getAnalytics = async(req, res) => {
     else
         return res.send(errResponse(baseResponse.SERVER_ERROR))
 }
+
+/**
+ * API name : 친구 목록 조회
+ * GET: /uesr/friend
+ */
+export const getFriend  = async(req, res) => {
+	
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); 
+
+    const getFriendList = await retrieveFriend(userIdFromJWT); 
+    if(typeof getFriendList == "undefined"){ // 친구가 없을 때
+        return res.send(errResponse(baseResponse.USER_IS_OUTSIDER))
+    }
+    else{
+        return res.send(response(baseResponse.SUCCESS, getFriendList));
+    }
+};

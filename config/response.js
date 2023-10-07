@@ -33,6 +33,7 @@ export const baseResponse = {
     USERS_ACCOUNT_BLOCKED : {"isSuccess" : false, "code" : 2026, "message" : "정지된 계정입니다." },
     ALREADY_AUTH_NUMBER : {"isSuccess" : false, "code" : 2027, "message" : "이미 인증을 완료하였습니다" },
     USER_ALREADY_PARTICIPATE : {"isSuccess" : false, "code" : 2028, "message" : "오늘 참여 횟수를 모두 소진하였습니다."},
+    USER_IS_OUTSIDER : {"isSuccess" : false, "code" : 2029, "message" : "친구가 없습니다."},
 
     
     //게시글 관련

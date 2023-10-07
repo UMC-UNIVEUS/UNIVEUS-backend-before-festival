@@ -366,8 +366,6 @@ export const getParticipant = async(req, res) => {
     else{ 
         return res.send(errResponse(baseResponse.POST_POSTID_NOT_EXIST));
     }  
-    
-    
 };
 
 /**
