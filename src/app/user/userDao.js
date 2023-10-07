@@ -275,4 +275,12 @@ export const selectAnalyticsInfo_7 = async (connection, value) => {
     return selectAnalyticsInfoRows;
 }
 
-
+export const selectFriend = async(connection,user_id)=>{
+    const selectFriendQuery=`
+        SELECT *
+        FROM user_friend
+        WHERE user_id = ?;
+        `
+    const [selectFriendRows] = await connection.query(selectFriendQuery, user_id);
+    return selectFriendRows;
+}

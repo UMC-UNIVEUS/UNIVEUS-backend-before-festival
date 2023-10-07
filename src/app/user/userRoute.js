@@ -2,7 +2,7 @@ import express from "express"
 import {sendAuthNumber, login,
     verifyNumber,
     checkNickNameDuplicate, startUniveUs,
-    getAlarms, patchAlarms, agreementTerms, getAnalytics} from "./userController"
+    getAlarms, patchAlarms, agreementTerms, getAnalytics,getFriend} from "./userController"
 import { jwtMiddleware } from "../../../config/jwtMiddleWare";
 import { accountStatusMiddleware } from "../../../config/accountStatusMiddleware";
 import {wrapAsync} from "../../../config/errorhandler";
@@ -18,5 +18,7 @@ userRouter.post('/start/univeus', jwtMiddleware, wrapAsync(startUniveUs));
 userRouter.get('/:user_id/alarm', jwtMiddleware, wrapAsync(accountStatusMiddleware), wrapAsync(getAlarms)); // 알림 내역 조회 API
 userRouter.patch('/:user_id/alarm', jwtMiddleware, wrapAsync(accountStatusMiddleware), wrapAsync(patchAlarms)); // 알림 확인 API
 userRouter.post('/agreement', jwtMiddleware, wrapAsync(accountStatusMiddleware), wrapAsync(agreementTerms));
+userRouter.get('/friend', jwtMiddleware, wrapAsync(accountStatusMiddleware), wrapAsync(getFriend)); // 친구 목록 조회
+
 
 export default userRouter;
