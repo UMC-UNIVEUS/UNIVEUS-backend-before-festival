@@ -176,10 +176,7 @@ export const AnalyticsInfo = async () => {
 export const retrieveFriend = async(user_id) =>{
     const connection = await pool.getConnection(async conn => conn);
 
-    const getFriendResult = await selectFriend(connection,user_id);
-    console.log(getFriendResult);
-    console.log(getFriendResult[0]);
-    
+    const getFriendResult = await selectFriend(connection,user_id); 
     connection.release();
 
     return getFriendResult[0];

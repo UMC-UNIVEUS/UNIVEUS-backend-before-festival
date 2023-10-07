@@ -467,5 +467,10 @@ export const getFriend  = async(req, res) => {
     const userIdFromJWT = await getUserIdByEmail(userEmail); 
 
     const getFriendList = await retrieveFriend(userIdFromJWT); 
-    return res.send(response(baseResponse.SUCCESS, getFriendList));
+    if(typeof getFriendList == "undefined"){ // 친구가 없을 때
+        return res.send(errResponse(baseResponse.USER_IS_OUTSIDER))
+    }
+    else{
+        return res.send(response(baseResponse.SUCCESS, getFriendList));
+    }
 };
