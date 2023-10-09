@@ -389,11 +389,11 @@ export const startUniveUs = async (req, res) => {
 
 /**
  * API name : 알림 내역 조회
- * GET: /uesr/{user_id}/alarm
+ * GET: /uesr/alarm
  */
 export const getAlarms = async(req, res) => {
 	
-    const {user_id} = req.params; // 알림 받은 유저의 ID
+    const {user_id} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 접속 중인 유저 ID
 
@@ -410,12 +410,11 @@ export const getAlarms = async(req, res) => {
 
 /**
  * API name : 알림 확인 
- * PATCH: /uesr/{user_id}/alarm
+ * PATCH: /uesr/alarm
  */
 export const patchAlarms = async(req, res) => {
 
-    const {user_id} = req.params; //알림을 확인하려는 유저 ID
-    const {alarm_id} = req.body;
+    const {user_id,alarm_id} = req.body;
     const userEmail = req.verifiedToken.userEmail;
     const userIdFromJWT = await getUserIdByEmail(userEmail); // 접속 중인 유저 ID
     
