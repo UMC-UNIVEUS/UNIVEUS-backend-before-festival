@@ -1,6 +1,7 @@
 import { updateUserProfileInfo, updateAlarms, insertUserEmailId, 
     updateUserPhoneNumber, insertAgreementTerms, updateAccountStatus, 
-    updateUserReportedNum, updateParticipateAvailable, updateParticipateAvailableReturn } from "./userDao"
+    updateUserReportedNum, updateParticipateAvailable, updateParticipateAvailableReturn,
+    insertFriend,updateFriend,removeFriend } from "./userDao"
 import pool from "../../../config/database"
 
 /** 유저 생성 - 프로필 등록, 번호인증 전 user */
@@ -93,3 +94,28 @@ export const returnParticipateAvailable = async(userId) => {
     const updateParticipateAvailbleResult = await updateParticipateAvailableReturn(connection, userId);
     connection.release();
 }
+
+
+export const createFriend = async(user_id,friend_id) =>{
+    const createFriendParams = [user_id,friend_id];
+    const connection = await pool.getConnection(async conn => conn);
+
+    const insertFriendResult = await insertFriend(connection,createFriendParams); 
+    connection.release();
+};
+
+export const manageFriend = async(user_id,friend_id,patchType) =>{
+    const manageFriendParams = [patchType,user_id,friend_id];
+    const connection = await pool.getConnection(async conn => conn);
+
+    const manageFriendResult = await updateFriend(connection,manageFriendParams); 
+    connection.release();
+};
+
+export const eraseFriend = async(user_id,friend_id) =>{
+    const eraseFriendParams = [user_id,friend_id];
+    const connection = await pool.getConnection(async conn => conn);
+
+    const removeFriendResult = await removeFriend(connection,eraseFriendParams); 
+    connection.release();
+};
