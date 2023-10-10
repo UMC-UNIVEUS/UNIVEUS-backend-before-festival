@@ -283,4 +283,32 @@ export const selectFriend = async(connection,user_id)=>{
         `
     const [selectFriendRows] = await connection.query(selectFriendQuery, user_id);
     return selectFriendRows;
-}
+};
+
+export const insertFriend = async(connection,createFriendParams)=>{
+    const insertFriendQuery=`
+        INSERT INTO user_friend(user_id, friend_id, status)
+        VALUES (?,?,0);
+        `
+    const [insertFriendRows] = await connection.query(insertFriendQuery, createFriendParams);
+    return insertFriendRows;
+};
+
+export const updateFriend = async(connection,manageFriendParams)=>{
+    const updateFriendQuery=`
+        UPDATE user_friend
+        SET status = ?
+        WHERE user_id =? AND friend_id =?;
+        `
+    const [updateFriendRows] = await connection.query(updateFriendQuery, manageFriendParams);
+    return updateFriendRows;
+};
+
+export const removeFriend = async(connection,eraseFriendParams)=>{
+    const removeFriendQuery=`
+        DELETE FROM user_friend 
+        WHERE user_id =? AND friend_id =?;
+        `
+    const [removeFriendRows] = await connection.query(removeFriendQuery, eraseFriendParams);
+    return removeFriendRows;
+};

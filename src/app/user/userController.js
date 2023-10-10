@@ -1,12 +1,12 @@
 import { baseResponse, errResponse, response } from "../../../config/response";
 import axios from "axios";
 import { addUserProfileInfo, isKyonggiEmail, createAuthNum, checkAlarms, 
-    createUser, addUserPhoneNumber, addAgreementTerms } from "../user/userService";
+    createUser, addUserPhoneNumber, addAgreementTerms,createFriend,manageFriend,eraseFriend } from "../user/userService";
 import {
     isUser, isNicknameDuplicate, retrieveAlarms, getUserIdByEmail,
     getUserNickNameById, isAuthNumber, isAuthUser,
-    getUserById, getUserPhoneNumber, removeEmojisAndSpace, AnalyticsInfo, retrieveFriend
-} from "./userProvider";
+    getUserById, getUserPhoneNumber, removeEmojisAndSpace, AnalyticsInfo, 
+    retrieveFriend} from "./userProvider";
 import { retrievePost } from "../post/postProvider";
 import jwt from "jsonwebtoken";
 import { sendSMS } from "../../../config/naverCloudClient";
@@ -473,3 +473,56 @@ export const getFriend  = async(req, res) => {
         return res.send(response(baseResponse.SUCCESS, getFriendList));
     }
 };
+
+/**
+ * API name : 친구 신청
+ * POST: /uesr/friend
+ */
+export const requestFriend  = async(req, res) => {
+	
+    const {user_id} = req.body; 
+    const userEmail = req.verifiedToken.userEmail;
+    const friend_id = await getUserIdByEmail(userEmail); // user_id에게 친구 신청을 한 friend_id 
+
+    const createFriendResult = await createFriend(user_id, friend_id); 
+    return res.send(response(baseResponse.SUCCESS, createFriendResult));
+};
+
+/**
+ * API name : 친구 승인 or 거절
+ * PATCH: /uesr/friend
+ */
+export const patchFriend  = async(req, res) => {
+	
+    const {user_id,friend_id, patchType} = req.body; //patchType >> 승인일 때: 1 거절일 때: 2 
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); 
+    
+    if(user_id === userIdFromJWT){
+        const manageFriendResult = await manageFriend(user_id, friend_id,patchType); 
+        return res.send(response(baseResponse.SUCCESS, manageFriendResult));
+    }
+    else{
+        return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }
+};
+
+/**
+ * API name : 친구 삭제
+ * DELETE: /uesr/friend
+ */
+export const deleteFriend  = async(req, res) => {
+	
+    const {user_id,friend_id} = req.body; 
+    const userEmail = req.verifiedToken.userEmail;
+    const userIdFromJWT = await getUserIdByEmail(userEmail); 
+    
+    if(user_id === userIdFromJWT){
+        const eraseFriendResult = await eraseFriend(user_id, friend_id); 
+        return res.send(response(baseResponse.SUCCESS, eraseFriendResult));
+    }
+    else{
+        return res.send(errResponse(baseResponse.USER_USERID_USERIDFROMJWT_NOT_MATCH));
+    }
+};
+
